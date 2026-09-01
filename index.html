@@ -17,6 +17,7 @@
     input, textarea, select { font-size: 14px !important; touch-action: manipulation; }
     .custom-scroll::-webkit-scrollbar { height: 4px; width: 4px; }
     .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    .custom-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     @keyframes slideUpFade { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
     .toast-anim { animation: slideUpFade 0.3s ease forwards; }
     @keyframes pulse-ring {
@@ -27,43 +28,104 @@
     .badge-pulse { animation: pulse-ring 2s infinite; }
 
     :root {
-      --sdo-bg: #f5f7fb; --sdo-surface: #ffffff; --sdo-surface-soft: #f8fafc;
-      --sdo-ink: #0f172a; --sdo-muted: #64748b; --sdo-line: #e2e8f0; --sdo-line-soft: #edf1f6;
-      --sdo-navy: #111827; --sdo-accent: #4f46e5; --sdo-accent-soft: #eef2ff;
-      --sdo-blue: #2563eb; --sdo-green: #059669; --sdo-amber: #d97706; --sdo-rose: #e11d48;
-      --sdo-radius: 16px; --sdo-radius-sm: 11px;
-      --sdo-shadow: 0 1px 2px rgba(15,23,42,.035), 0 8px 24px rgba(15,23,42,.045);
-      --sdo-shadow-hover: 0 2px 4px rgba(15,23,42,.04), 0 14px 34px rgba(15,23,42,.075);
+      --sdo-bg: #f8fafc; --sdo-surface: #ffffff; --sdo-surface-soft: #f1f5f9;
+      --sdo-ink: #0f172a; --sdo-muted: #64748b; --sdo-line: #e2e8f0;
+      --sdo-navy: #0f172a; --sdo-accent: #4f46e5; --sdo-blue: #2563eb;
+      --sdo-green: #059669; --sdo-amber: #d97706; --sdo-rose: #e11d48;
     }
 
-    html { background: var(--sdo-bg); scroll-behavior: smooth; }
     body {
-      background: radial-gradient(circle at 85% -10%, rgba(79,70,229,.055), transparent 28rem), var(--sdo-bg) !important;
+      background: radial-gradient(circle at 85% -10%, rgba(79,70,229,.045), transparent 24rem), var(--sdo-bg) !important;
       color: var(--sdo-ink) !important;
       font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
-      letter-spacing: -0.005em;
-    }
-    body > header {
-      background: rgba(15, 23, 42, .97) !important;
-      border-bottom: 1px solid rgba(255,255,255,.08);
-      box-shadow: 0 4px 18px rgba(15,23,42,.12) !important;
-      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
     }
 
+    /* Mobile-first Header */
+    .app-header {
+      background: rgba(15, 23, 42, 0.98) !important;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    /* Mobile Bottom Navigation Bar */
+    .mobile-bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(15, 23, 42, 0.98);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 35;
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    .mobile-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 12px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #94a3b8;
+      transition: all 0.15s ease;
+    }
+
+    .mobile-nav-item.active {
+      color: #ffffff;
+    }
+
+    .mobile-nav-item.active .nav-icon-wrapper {
+      background: rgba(79, 70, 229, 0.3);
+      color: #818cf8;
+      border: 1px solid rgba(129, 140, 248, 0.4);
+    }
+
+    .nav-icon-wrapper {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 2px;
+      font-size: 14px;
+    }
+
+    /* Kanban Columns */
     .kanban-col-container {
-      min-height: calc(100vh - 280px); background: #f1f5f9; border: 1px solid #e2e8f0;
-      border-radius: 14px; padding: 12px; display: flex; flex-direction: column;
+      min-height: calc(100vh - 300px);
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
     }
     .kanban-cards-wrapper {
-      min-height: 200px; flex: 1; display: flex; flex-direction: column; gap: 10px;
-      padding: 3px; border-radius: 10px; transition: background-color 0.2s ease, border-color 0.2s ease;
+      min-height: 200px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 3px;
+      border-radius: 10px;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
     }
     .kanban-cards-wrapper.drag-over {
-      background-color: rgba(224, 242, 254, 0.85) !important; border: 2px dashed #0284c7 !important;
+      background-color: rgba(224, 242, 254, 0.85) !important;
+      border: 2px dashed #0284c7 !important;
     }
     .project-card {
-      background: #ffffff; border: 1px solid var(--sdo-line); border-radius: 12px;
-      padding: 13px; box-shadow: 0 1px 3px rgba(15,23,42,.04); cursor: grab;
+      background: #ffffff;
+      border: 1px solid var(--sdo-line);
+      border-radius: 12px;
+      padding: 13px;
+      box-shadow: 0 1px 3px rgba(15,23,42,.04);
+      cursor: grab;
       transition: transform 0.16s ease, box-shadow 0.16s ease;
     }
     .project-card:hover { transform: translateY(-2px); border-color: #cbd5e1; box-shadow: 0 8px 20px rgba(15,23,42,.07); }
@@ -74,44 +136,39 @@
     .badge-apoyo { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
 
     #unifiedOperativeView { background: var(--sdo-bg) !important; }
-    .uov-section-card { background: #ffffff; border: 1px solid var(--sdo-line-soft); border-radius: var(--sdo-radius); padding: 1.5rem; box-shadow: var(--sdo-shadow); }
-    .uov-nav-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: var(--sdo-radius-sm); color: var(--sdo-muted); font-weight: 600; transition: background 0.2s, color 0.2s; }
-    .uov-nav-link:hover, .uov-nav-link.active { background: var(--sdo-accent-soft); color: var(--sdo-accent); }
-    .uov-bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-top: 1px solid var(--sdo-line); padding: 1rem; z-index: 45; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); }
-    .uov-action-btn { min-height: 44px; border-radius: var(--sdo-radius-sm); font-weight: 700; padding: 0 1.5rem; transition: transform 0.15s; }
-    .uov-action-btn:active { transform: scale(0.98); }
-    .uov-btn-danger { background: #fff; border: 1px solid #fecdd3; color: var(--sdo-rose); }
-    .uov-btn-danger:hover { background: #fff1f2; }
-    .uov-btn-primary { background: var(--sdo-accent); color: white; border: none; }
-    .uov-btn-primary:hover { background: #4338ca; }
+    .uov-section-card { background: #ffffff; border: 1px solid var(--sdo-line); border-radius: 16px; padding: 1.25rem; box-shadow: 0 1px 3px rgba(15,23,42,.04); }
+    .uov-nav-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: 11px; color: #64748b; font-weight: 600; transition: background 0.2s, color 0.2s; }
+    .uov-nav-link:hover, .uov-nav-link.active { background: #eef2ff; color: #4f46e5; }
+    .uov-bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-top: 1px solid #e2e8f0; padding: 1rem; z-index: 45; }
+    .uov-action-btn { min-height: 42px; border-radius: 11px; font-weight: 700; padding: 0 1.25rem; }
   </style>
 </head>
-<body class="bg-slate-100 text-slate-900 min-h-screen flex flex-col font-sans pb-12">
+<body class="min-h-screen flex flex-col font-sans pb-24 md:pb-12">
+  <div id="toastContainer" class="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-[70] flex flex-col gap-2 pointer-events-none max-w-[90vw]"></div>
 
-  <div id="toastContainer" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-[70] flex flex-col gap-2 pointer-events-none"></div>
-
-  <!-- Header Superior -->
-  <header class="bg-slate-900 text-white sticky top-0 z-30 shadow-md">
-    <div class="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between gap-3">
+  <!-- Header Principal Optimizado para Móvil y Desktop -->
+  <header class="app-header text-white sticky top-0 z-30 shadow-md">
+    <div class="max-w-7xl mx-auto px-3 sm:px-4 py-2 flex items-center justify-between gap-2">
       
-      <div class="flex items-center space-x-3 cursor-pointer" onclick="window.app.renderActiveModule()">
-        <div id="headerLogoContainer" class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center overflow-hidden shrink-0">
-          <span class="text-xl" aria-hidden="true">🏥</span>
+      <!-- Logo + Identidad + Status -->
+      <div class="flex items-center space-x-2.5 cursor-pointer min-w-0" onclick="window.app.renderActiveModule()">
+        <div id="headerLogoContainer" class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center shrink-0">
+          <span class="text-lg sm:text-xl" aria-hidden="true">🏥</span>
         </div>
-        <div>
-          <div class="flex items-center space-x-2">
-            <span class="font-bold text-base tracking-wide text-white">SDO Cloud</span>
-            <span id="roleBadge" class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-indigo-600 text-white">Supervisor</span>
-            <span id="supabaseStatusBadge" class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> <span>Supabase En Línea</span>
+        <div class="min-w-0">
+          <div class="flex items-center space-x-1.5">
+            <span class="font-black text-sm sm:text-base tracking-tight text-white truncate">SDO Cloud</span>
+            <span id="roleBadge" class="text-[9px] sm:text-[10px] uppercase font-black tracking-wider px-1.5 py-0.5 rounded bg-indigo-600 text-white shrink-0">Supervisor</span>
+            <span id="supabaseStatusBadge" onclick="window.app.forceSyncAll()" class="cursor-pointer text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/40 flex items-center gap-1 shrink-0" title="Click para forzar sincronización">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> <span class="hidden sm:inline">Supabase En Línea</span>
             </span>
           </div>
-          <p id="headerHospitalName" class="text-xs text-slate-400 truncate max-w-[160px] sm:max-w-xs">HBQP - Infraestructura & Operaciones</p>
+          <p id="headerHospitalName" class="text-[11px] text-slate-400 truncate max-w-[140px] sm:max-w-xs">HBQP - Infraestructura & Operaciones</p>
         </div>
       </div>
 
-      <!-- Selector de Módulos (Solo Supervisor) -->
-      <nav id="moduleSwitcher" class="flex items-center bg-slate-800/90 p-1 rounded-xl border border-slate-700 text-xs font-bold">
+      <!-- Selector de Módulos (En Desktop se ve aquí, en móvil va en la barra inferior) -->
+      <nav id="moduleSwitcherDesktop" class="hidden md:flex items-center bg-slate-800/90 p-1 rounded-xl border border-slate-700 text-xs font-bold">
         <button id="navBtnProjects" onclick="window.app.switchModule('projects')" class="px-3.5 py-1.5 rounded-lg bg-indigo-600 text-white shadow transition flex items-center gap-1.5">
           <i class="fa-solid fa-diagram-project"></i> <span>Módulo Proyectos</span>
         </button>
@@ -120,103 +177,121 @@
         </button>
       </nav>
 
-      <!-- Botones de Acción y Menú Desplegable -->
-      <div class="flex items-center space-x-2 relative">
-        <button id="btnHeaderAction" onclick="window.app.handleHeaderPrimaryAction()" class="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
-          <span id="btnHeaderActionIcon">➕</span> <span id="btnHeaderActionText">Nuevo Proyecto</span>
+      <!-- Botón de Acción Principal + Menú -->
+      <div class="flex items-center space-x-1.5 sm:space-x-2 relative shrink-0">
+        <button id="btnHeaderAction" onclick="window.app.handleHeaderPrimaryAction()" class="px-2.5 sm:px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white text-xs font-bold transition flex items-center gap-1 shadow-sm">
+          <span id="btnHeaderActionIcon">➕</span> <span id="btnHeaderActionText" class="hidden xs:inline sm:inline">Nuevo Proyecto</span>
         </button>
 
-        <button onclick="window.app.toggleMenu()" aria-label="Abrir Menú" class="p-2 rounded-lg bg-slate-800 text-slate-200 hover:bg-slate-700 active:scale-95 border border-slate-700 flex items-center space-x-1">
-          <span class="text-base" aria-hidden="true">☰</span>
-          <span class="text-xs font-semibold hidden sm:inline">Menú</span>
+        <button onclick="window.app.toggleMenu()" aria-label="Abrir Menú" class="p-1.5 sm:p-2 rounded-lg bg-slate-800 text-slate-200 hover:bg-slate-700 active:scale-95 border border-slate-700 flex items-center space-x-1">
+          <span class="text-base leading-none" aria-hidden="true">☰</span>
         </button>
 
         <!-- Dropdown Menú -->
-        <div id="appMenuDropdown" class="hidden absolute right-0 top-12 w-64 bg-white rounded-xl shadow-2xl border border-slate-200 text-slate-800 z-50 overflow-hidden py-1 text-sm">
+        <div id="appMenuDropdown" class="hidden absolute right-0 top-11 w-64 bg-white rounded-xl shadow-2xl border border-slate-200 text-slate-800 z-50 overflow-hidden py-1 text-xs sm:text-sm">
           <div id="mobileModuleOptions" class="md:hidden px-3 py-2 border-b bg-slate-50 space-y-1">
-            <span class="text-[10px] font-bold text-slate-400 uppercase block">Cambiar Módulo</span>
-            <button onclick="window.app.switchModule('projects'); window.app.toggleMenu();" class="w-full text-left px-2 py-1.5 rounded text-xs font-bold text-indigo-700 hover:bg-indigo-50">
-              <i class="fa-solid fa-diagram-project mr-1"></i> Módulo Proyectos
+            <span class="text-[10px] font-bold text-slate-400 uppercase block">Módulos</span>
+            <button onclick="window.app.switchModule('projects'); window.app.toggleMenu();" class="w-full text-left px-2 py-1.5 rounded text-xs font-bold text-indigo-700 hover:bg-indigo-50 flex items-center gap-2">
+              <i class="fa-solid fa-diagram-project"></i> Módulo Proyectos
             </button>
-            <button onclick="window.app.switchModule('orders'); window.app.toggleMenu();" class="w-full text-left px-2 py-1.5 rounded text-xs font-bold text-slate-700 hover:bg-slate-100">
-              <i class="fa-solid fa-wrench mr-1"></i> Módulo OTs
+            <button onclick="window.app.switchModule('orders'); window.app.toggleMenu();" class="w-full text-left px-2 py-1.5 rounded text-xs font-bold text-slate-700 hover:bg-slate-100 flex items-center gap-2">
+              <i class="fa-solid fa-wrench"></i> Módulo OTs
             </button>
           </div>
 
           <div id="supervisorMenuOptions">
-            <button onclick="window.app.openCreateProjectModal(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left text-sm font-medium hover:bg-slate-50 flex items-center space-x-2 text-indigo-600">
+            <button onclick="window.app.openCreateProjectModal(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left font-medium hover:bg-slate-50 flex items-center space-x-2 text-indigo-600">
               <i class="fa-solid fa-plus text-indigo-500"></i> <span>Nuevo Proyecto</span>
             </button>
-            <button onclick="window.app.openCreateOtModal(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left text-sm font-medium hover:bg-slate-50 flex items-center space-x-2 text-blue-600">
+            <button onclick="window.app.openCreateOtModal(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left font-medium hover:bg-slate-50 flex items-center space-x-2 text-blue-600">
               <i class="fa-solid fa-wrench text-blue-500"></i> <span>Nueva Orden de Trabajo (OT)</span>
             </button>
-            <button onclick="window.app.openAdvanceReportModal(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left text-sm font-medium hover:bg-slate-50 flex items-center space-x-2">
+            <button onclick="window.app.openAdvanceReportModal(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left font-medium hover:bg-slate-50 flex items-center space-x-2">
               <span aria-hidden="true">📈</span> <span>Reporte de Avance OTs (PDF)</span>
             </button>
-            <button onclick="window.app.exportToExcel(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left text-sm font-medium hover:bg-slate-50 flex items-center space-x-2 text-emerald-700">
+            <button onclick="window.app.exportToExcel(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left font-medium hover:bg-slate-50 flex items-center space-x-2 text-emerald-700">
               <span aria-hidden="true">📊</span> <span>Descargar BD OTs (Excel)</span>
             </button>
-            <button onclick="window.app.exportProjectsCSV(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left text-sm font-medium hover:bg-slate-50 flex items-center space-x-2 text-emerald-700">
+            <button onclick="window.app.exportProjectsCSV(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left font-medium hover:bg-slate-50 flex items-center space-x-2 text-emerald-700">
               <i class="fa-solid fa-file-csv text-emerald-600"></i> <span>Exportar Proyectos (CSV)</span>
             </button>
-            <button onclick="window.app.openSettingsModal(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left text-sm font-medium hover:bg-slate-50 flex items-center space-x-2">
+            <button onclick="window.app.forceSyncAll(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left font-medium hover:bg-slate-50 flex items-center space-x-2 text-cyan-700">
+              <i class="fa-solid fa-rotate text-cyan-600"></i> <span>Forzar Sincronización Nube</span>
+            </button>
+            <button onclick="window.app.openSettingsModal(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left font-medium hover:bg-slate-50 flex items-center space-x-2">
               <span aria-hidden="true">⚙️</span> <span>Configuración & PINs</span>
             </button>
           </div>
 
           <hr class="my-1 border-slate-100">
-          <button onclick="window.app.openAuthModal(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left text-sm font-medium hover:bg-slate-50 flex items-center space-x-2 text-amber-700">
+          <button onclick="window.app.openAuthModal(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left font-medium hover:bg-slate-50 flex items-center space-x-2 text-amber-700">
             <span aria-hidden="true">🔄</span> <span>Cambiar Rol / PIN</span>
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Barra de Contexto y KPIs -->
-    <div class="bg-slate-950/80 border-t border-slate-800 px-4 py-2 text-xs text-slate-300">
-      <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
-        <div id="moduleStatsSummary" class="flex items-center gap-4 flex-wrap font-medium"></div>
-        <div class="text-[11px] text-slate-400 hidden sm:block">
-          <i class="fa-solid fa-shield-halved text-indigo-400 mr-1"></i> <span>Base de Datos Conectada a Supabase</span>
+    <!-- Barra de Contexto Contextual y KPIs (Scrollable en móvil) -->
+    <div class="bg-slate-950/90 border-t border-slate-800 px-3 sm:px-4 py-1.5 text-xs text-slate-300">
+      <div class="max-w-7xl mx-auto flex items-center justify-between gap-2 overflow-x-auto custom-scroll whitespace-nowrap">
+        <div id="moduleStatsSummary" class="flex items-center gap-3 font-medium text-[11px] sm:text-xs"></div>
+        <div class="text-[10px] text-slate-400 hidden lg:block shrink-0">
+          <i class="fa-solid fa-shield-halved text-indigo-400 mr-1"></i> <span id="moduleAccessLabel">Sincronización Supabase Activa</span>
         </div>
       </div>
     </div>
   </header>
 
+  <!-- Barra de Navegación Inferior Móvil (Bottom Tab Bar) -->
+  <nav id="mobileBottomBar" class="mobile-bottom-nav md:hidden grid grid-cols-2 shadow-2xl">
+    <button id="mobileTabProjects" onclick="window.app.switchModule('projects')" class="mobile-nav-item active">
+      <div class="nav-icon-wrapper">
+        <i class="fa-solid fa-diagram-project"></i>
+      </div>
+      <span>Proyectos</span>
+    </button>
+    <button id="mobileTabOrders" onclick="window.app.switchModule('orders')" class="mobile-nav-item">
+      <div class="nav-icon-wrapper">
+        <i class="fa-solid fa-wrench"></i>
+      </div>
+      <span>Órdenes (OTs)</span>
+    </button>
+  </nav>
+
   <!-- ==========================================================
        VISTA 1: MÓDULO DE PROYECTOS (SUPERVISOR)
        ========================================================== -->
-  <section id="moduleProjectsView" class="max-w-7xl w-full mx-auto px-3 sm:px-4 py-4 flex-1">
+  <section id="moduleProjectsView" class="max-w-7xl w-full mx-auto px-3 sm:px-4 py-3 sm:py-4 flex-1">
     <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm mb-4 space-y-2.5">
       <div class="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center justify-between">
         <div class="relative flex-1">
           <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
           <input type="text" id="searchProjectsInput" oninput="window.app.renderProjects()" placeholder="Buscar proyectos por requerimiento, unidad, recinto, PMA..." 
-                 class="w-full pl-8 pr-3 py-2 bg-slate-50 border rounded-lg text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                 class="w-full pl-8 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
         </div>
 
-        <div class="flex items-center space-x-1 bg-slate-100 p-1 rounded-lg border text-xs font-bold">
-          <button id="btnProjViewKanban" onclick="window.app.setProjectsViewMode('kanban')" class="px-3 py-1.5 rounded-md bg-white text-indigo-600 shadow-sm">
+        <div class="flex items-center space-x-1 bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs font-bold self-end sm:self-auto">
+          <button id="btnProjViewKanban" onclick="window.app.setProjectsViewMode('kanban')" class="px-2.5 sm:px-3 py-1.5 rounded-md bg-white text-indigo-600 shadow-sm">
             <i class="fa-solid fa-table-columns mr-1"></i> Kanban
           </button>
-          <button id="btnProjViewCards" onclick="window.app.setProjectsViewMode('cards')" class="px-3 py-1.5 rounded-md text-slate-600">
+          <button id="btnProjViewCards" onclick="window.app.setProjectsViewMode('cards')" class="px-2.5 sm:px-3 py-1.5 rounded-md text-slate-600">
             <i class="fa-solid fa-grip mr-1"></i> Cuadrícula
           </button>
-          <button id="btnProjViewTable" onclick="window.app.setProjectsViewMode('table')" class="px-3 py-1.5 rounded-md text-slate-600">
+          <button id="btnProjViewTable" onclick="window.app.setProjectsViewMode('table')" class="px-2.5 sm:px-3 py-1.5 rounded-md text-slate-600">
             <i class="fa-solid fa-table-list mr-1"></i> Matriz
           </button>
         </div>
       </div>
 
-      <div class="flex items-center justify-between flex-wrap gap-2 pt-1 border-t text-xs">
-        <div class="flex items-center flex-wrap gap-2">
-          <select id="filterProjTipologia" onchange="window.app.renderProjects()" class="bg-slate-50 border rounded-lg px-2.5 py-1">
+      <div class="flex items-center justify-between flex-wrap gap-2 pt-1 border-t border-slate-100 text-xs">
+        <div class="flex items-center flex-wrap gap-1.5 sm:gap-2">
+          <select id="filterProjTipologia" onchange="window.app.renderProjects()" class="bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-[11px] sm:text-xs">
             <option value="">Todas las Tipologías</option>
             <option value="PROYECTO">Proyecto</option>
             <option value="REPARACION">Reparación</option>
             <option value="APOYO TECNICO">Apoyo Técnico</option>
           </select>
-          <select id="filterProjPiso" onchange="window.app.renderProjects()" class="bg-slate-50 border rounded-lg px-2.5 py-1">
+          <select id="filterProjPiso" onchange="window.app.renderProjects()" class="bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-[11px] sm:text-xs">
             <option value="">Todos los Pisos</option>
             <option value="-1">Piso -1 (Subsuelo)</option>
             <option value="1">Piso 1</option>
@@ -227,15 +302,15 @@
             <option value="6">Piso 6</option>
             <option value="7">Piso 7</option>
           </select>
-          <button onclick="window.app.clearProjectFilters()" class="text-slate-400 hover:text-slate-700 px-2 py-1 bg-slate-100 rounded font-semibold">✕ Limpiar</button>
+          <button onclick="window.app.clearProjectFilters()" class="text-slate-400 hover:text-slate-700 px-2 py-1 bg-slate-100 rounded text-[11px] font-semibold">✕</button>
         </div>
 
-        <div class="flex items-center space-x-1.5 overflow-x-auto custom-scroll">
-          <button onclick="window.app.setProjectStatusFilter('ALL')" class="proj-status-btn px-3 py-1 font-bold rounded-full bg-slate-800 text-white" data-status="ALL">Todos</button>
-          <button onclick="window.app.setProjectStatusFilter('PENDIENTE')" class="proj-status-btn px-3 py-1 font-bold rounded-full bg-slate-100 text-slate-600" data-status="PENDIENTE">En Evaluación</button>
-          <button onclick="window.app.setProjectStatusFilter('Propuesta enviada')" class="proj-status-btn px-3 py-1 font-bold rounded-full bg-slate-100 text-slate-600" data-status="Propuesta enviada">Propuestas</button>
-          <button onclick="window.app.setProjectStatusFilter('EN PROCESO')" class="proj-status-btn px-3 py-1 font-bold rounded-full bg-slate-100 text-slate-600" data-status="EN PROCESO">En Obras</button>
-          <button onclick="window.app.setProjectStatusFilter('TERMINADO')" class="proj-status-btn px-3 py-1 font-bold rounded-full bg-slate-100 text-slate-600" data-status="TERMINADO">Concluidos</button>
+        <div class="flex items-center space-x-1.5 overflow-x-auto custom-scroll pb-1">
+          <button onclick="window.app.setProjectStatusFilter('ALL')" class="proj-status-btn px-2.5 sm:px-3 py-1 text-[11px] font-bold rounded-full bg-slate-800 text-white whitespace-nowrap" data-status="ALL">Todos</button>
+          <button onclick="window.app.setProjectStatusFilter('PENDIENTE')" class="proj-status-btn px-2.5 sm:px-3 py-1 text-[11px] font-bold rounded-full bg-slate-100 text-slate-600 whitespace-nowrap" data-status="PENDIENTE">En Evaluación</button>
+          <button onclick="window.app.setProjectStatusFilter('Propuesta enviada')" class="proj-status-btn px-2.5 sm:px-3 py-1 text-[11px] font-bold rounded-full bg-slate-100 text-slate-600 whitespace-nowrap" data-status="Propuesta enviada">Propuestas</button>
+          <button onclick="window.app.setProjectStatusFilter('EN PROCESO')" class="proj-status-btn px-2.5 sm:px-3 py-1 text-[11px] font-bold rounded-full bg-slate-100 text-slate-600 whitespace-nowrap" data-status="EN PROCESO">En Obras</button>
+          <button onclick="window.app.setProjectStatusFilter('TERMINADO')" class="proj-status-btn px-2.5 sm:px-3 py-1 text-[11px] font-bold rounded-full bg-slate-100 text-slate-600 whitespace-nowrap" data-status="TERMINADO">Concluidos</button>
         </div>
       </div>
     </div>
@@ -246,35 +321,35 @@
   <!-- ==========================================================
        VISTA 2: MÓDULO DE ÓRDENES DE TRABAJO (OTs)
        ========================================================== -->
-  <section id="moduleOrdersView" class="hidden max-w-7xl w-full mx-auto px-3 sm:px-4 py-4 flex-1">
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-4">
+  <section id="moduleOrdersView" class="hidden max-w-7xl w-full mx-auto px-3 sm:px-4 py-3 sm:py-4 flex-1">
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5 mb-3 sm:mb-4">
       <div onclick="window.app.setFilterStatus('Pendiente')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer active:scale-95 transition">
         <div class="flex items-center justify-between">
-          <span class="text-xs font-semibold text-slate-500 uppercase">En Curso</span>
+          <span class="text-[10px] sm:text-xs font-semibold text-slate-500 uppercase">En Curso</span>
           <span class="text-xs" aria-hidden="true">⏳</span>
         </div>
-        <p id="kpiPendientes" class="text-2xl font-black text-amber-600 mt-1">0</p>
+        <p id="kpiPendientes" class="text-xl sm:text-2xl font-black text-amber-600 mt-1">0</p>
       </div>
       <div onclick="window.app.setFilterStatus('En Ejecución')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer active:scale-95 transition">
         <div class="flex items-center justify-between">
-          <span class="text-xs font-semibold text-slate-500 uppercase">En Ejecución</span>
+          <span class="text-[10px] sm:text-xs font-semibold text-slate-500 uppercase">En Ejecución</span>
           <span class="text-xs" aria-hidden="true">🔧</span>
         </div>
-        <p id="kpiEjecucion" class="text-2xl font-black text-blue-600 mt-1">0</p>
+        <p id="kpiEjecucion" class="text-xl sm:text-2xl font-black text-blue-600 mt-1">0</p>
       </div>
       <div onclick="window.app.setFilterStatus('Solicitud Cierre')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer active:scale-95 transition">
         <div class="flex items-center justify-between">
-          <span class="text-xs font-semibold text-slate-500 uppercase">Solic. Cierre</span>
+          <span class="text-[10px] sm:text-xs font-semibold text-slate-500 uppercase">Solic. Cierre</span>
           <span class="text-xs" aria-hidden="true">⚡</span>
         </div>
-        <p id="kpiSolicitudCierre" class="text-2xl font-black text-indigo-600 mt-1">0</p>
+        <p id="kpiSolicitudCierre" class="text-xl sm:text-2xl font-black text-indigo-600 mt-1">0</p>
       </div>
       <div onclick="window.app.setFilterStatus('Terminada')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer active:scale-95 transition">
         <div class="flex items-center justify-between">
-          <span class="text-xs font-semibold text-slate-500 uppercase">Terminadas</span>
+          <span class="text-[10px] sm:text-xs font-semibold text-slate-500 uppercase">Terminadas</span>
           <span class="text-xs" aria-hidden="true">✅</span>
         </div>
-        <p id="kpiTerminadas" class="text-2xl font-black text-emerald-600 mt-1">0</p>
+        <p id="kpiTerminadas" class="text-xl sm:text-2xl font-black text-emerald-600 mt-1">0</p>
       </div>
     </div>
 
@@ -283,21 +358,21 @@
         <div class="relative flex-1">
           <label for="searchInput" class="sr-only">Buscar</label>
           <input type="text" id="searchInput" oninput="window.app.renderOrdersList()" placeholder="Buscar folio, recinto, solicitante, PMA..." 
-                 class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white">
-          <span class="absolute left-3 top-2.5 text-slate-400 text-sm" aria-hidden="true">🔍</span>
+                 class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white">
+          <span class="absolute left-3 top-2.5 text-slate-400 text-xs sm:text-sm" aria-hidden="true">🔍</span>
         </div>
         <div class="flex items-center space-x-1 self-end sm:self-auto bg-slate-100 p-1 rounded-lg border border-slate-200">
-          <button id="viewCardsBtn" onclick="window.app.setViewMode('cards')" class="px-3 py-1.5 text-xs font-bold rounded-md bg-white text-slate-800 shadow-sm transition" aria-label="Vista de tarjetas">⊞ Tarjetas</button>
-          <button id="viewTableBtn" onclick="window.app.setViewMode('table')" class="px-3 py-1.5 text-xs font-bold rounded-md text-slate-600 hover:text-slate-900 transition" aria-label="Vista de tabla">☰ Filas / Tabla</button>
+          <button id="viewCardsBtn" onclick="window.app.setViewMode('cards')" class="px-3 py-1.5 text-xs font-bold rounded-md bg-white text-slate-800 shadow-sm transition">⊞ Tarjetas</button>
+          <button id="viewTableBtn" onclick="window.app.setViewMode('table')" class="px-3 py-1.5 text-xs font-bold rounded-md text-slate-600 hover:text-slate-900 transition">☰ Filas</button>
         </div>
       </div>
 
       <div class="flex items-center space-x-1.5 overflow-x-auto custom-scroll pb-1">
-        <button onclick="window.app.setFilterStatus('TODOS')" class="status-filter-btn px-3 py-1 text-xs font-bold rounded-full bg-slate-800 text-white whitespace-nowrap" data-status="TODOS">Todos</button>
-        <button onclick="window.app.setFilterStatus('Pendiente')" class="status-filter-btn px-3 py-1 text-xs font-bold rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap" data-status="Pendiente">Pendientes</button>
-        <button onclick="window.app.setFilterStatus('En Ejecución')" class="status-filter-btn px-3 py-1 text-xs font-bold rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap" data-status="En Ejecución">En Ejecución</button>
-        <button onclick="window.app.setFilterStatus('Solicitud Cierre')" class="status-filter-btn px-3 py-1 text-xs font-bold rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap" data-status="Solicitud Cierre">Solicitud Cierre</button>
-        <button onclick="window.app.setFilterStatus('Terminada')" class="status-filter-btn px-3 py-1 text-xs font-bold rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap" data-status="Terminada">Terminadas</button>
+        <button onclick="window.app.setFilterStatus('TODOS')" class="status-filter-btn px-2.5 sm:px-3 py-1 text-[11px] font-bold rounded-full bg-slate-800 text-white whitespace-nowrap" data-status="TODOS">Todos</button>
+        <button onclick="window.app.setFilterStatus('Pendiente')" class="status-filter-btn px-2.5 sm:px-3 py-1 text-[11px] font-bold rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap" data-status="Pendiente">Pendientes</button>
+        <button onclick="window.app.setFilterStatus('En Ejecución')" class="status-filter-btn px-2.5 sm:px-3 py-1 text-[11px] font-bold rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap" data-status="En Ejecución">En Ejecución</button>
+        <button onclick="window.app.setFilterStatus('Solicitud Cierre')" class="status-filter-btn px-2.5 sm:px-3 py-1 text-[11px] font-bold rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap" data-status="Solicitud Cierre">Solicitud Cierre</button>
+        <button onclick="window.app.setFilterStatus('Terminada')" class="status-filter-btn px-2.5 sm:px-3 py-1 text-[11px] font-bold rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap" data-status="Terminada">Terminadas</button>
       </div>
     </div>
 
@@ -909,7 +984,7 @@
     </div>
   </div>
 
-  <!-- SDO Cloud Master Unified Logic -->
+  <!-- SDO Cloud Master Engine Script -->
   <script>
     const SGM_CONFIG = {
       supabaseUrl: "https://izyxyycwhszkmosyszzx.supabase.co",
@@ -1034,10 +1109,8 @@
         const cachedRole = sessionStorage.getItem('sdo_active_role');
         if (cachedRole) {
           this.currentRole = cachedRole;
-          this.applyRoleRestrictions();
-        } else {
-          this.applyRoleRestrictions();
         }
+        this.applyRoleRestrictions();
       }
 
       initScrollSpy() {
@@ -1063,17 +1136,22 @@
           if (window.supabase && SGM_CONFIG.supabaseUrl.startsWith("https://")) {
             this.supabase = window.supabase.createClient(SGM_CONFIG.supabaseUrl, SGM_CONFIG.supabaseAnonKey);
             this.subscribeRealtime();
+            this.fetchConfigFromSupabase();
+            this.fetchOrdersFromSupabase();
+            this.fetchProjectsFromSupabase();
           }
-        } catch (e) { console.warn("Supabase local mode"); }
+        } catch (e) { console.warn("Supabase local mode:", e); }
       }
 
       subscribeRealtime() {
         if (!this.supabase) return;
-        this.supabase.channel('unified_realtime')
+        
+        this.supabase.channel('sdo_unified_realtime')
           .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, (payload) => {
-            if (payload.eventType === 'DELETE') {
+            console.log("Realtime evento en orders:", payload.eventType);
+            if (payload.eventType === 'DELETE' && payload.old) {
               this.orders = this.orders.filter(o => o.id !== payload.old.id);
-            } else {
+            } else if (payload.new && payload.new.data) {
               const idx = this.orders.findIndex(o => o.id === payload.new.id);
               if (idx !== -1) {
                 this.orders[idx] = payload.new.data;
@@ -1081,7 +1159,7 @@
                 this.orders.unshift(payload.new.data);
               }
             }
-            localStorage.setItem('sdo_orders_cache_v5', JSON.stringify(this.orders));
+            localStorage.setItem('sdo_orders_cache_v6', JSON.stringify(this.orders));
             this.updateKpis();
             this.renderOrdersList();
 
@@ -1090,8 +1168,20 @@
               this.renderOperativeHistory(this.activeOperativeOt);
             }
           })
-          .on('postgres_changes', { event: '*', schema: 'public', table: 'projects_hbqp' }, () => {
-            this.fetchProjectsFromSupabase();
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'projects_hbqp' }, (payload) => {
+            console.log("Realtime evento en projects_hbqp:", payload.eventType);
+            if (payload.eventType === 'DELETE' && payload.old) {
+              this.projects = this.projects.filter(p => String(p.id) !== String(payload.old.id));
+            } else if (payload.new && payload.new.data) {
+              const idx = this.projects.findIndex(p => String(p.id) === String(payload.new.id));
+              if (idx !== -1) {
+                this.projects[idx] = payload.new.data;
+              } else {
+                this.projects.unshift(payload.new.data);
+              }
+            }
+            localStorage.setItem('hbqp_projects_store_v6', JSON.stringify(this.projects));
+            this.renderProjects();
           })
           .on('postgres_changes', { event: '*', schema: 'public', table: 'system_settings' }, () => {
             this.fetchConfigFromSupabase();
@@ -1102,14 +1192,24 @@
       async fetchOrdersFromSupabase() {
         if (!this.supabase) return;
         try {
-          const { data, error } = await this.supabase.from('orders').select('*');
+          const { data, error } = await this.supabase.from('orders').select('*').order('created_at', { ascending: false });
           if (!error && data) {
-            this.orders = data.map(row => row.data);
-            this.updateKpis();
-            this.renderOrdersList();
-            localStorage.setItem('sdo_orders_cache_v5', JSON.stringify(this.orders));
+            if (data.length > 0) {
+              this.orders = data.map(row => row.data);
+              localStorage.setItem('sdo_orders_cache_v6', JSON.stringify(this.orders));
+              this.updateKpis();
+              this.renderOrdersList();
+            } else if (this.orders.length > 0) {
+              for (const o of this.orders) {
+                await this.supabase.from('orders').upsert({
+                  id: String(o.id),
+                  data: o,
+                  created_at: o.fechaCreacion || new Date().toISOString()
+                });
+              }
+            }
           }
-        } catch (e) {}
+        } catch (e) { console.warn("Error fetching orders:", e); }
       }
 
       async fetchProjectsFromSupabase() {
@@ -1119,19 +1219,20 @@
           if (!error && data) {
             if (data.length > 0) {
               this.projects = data.map(row => row.data);
-              localStorage.setItem('hbqp_projects_store_v5', JSON.stringify(this.projects));
+              localStorage.setItem('hbqp_projects_store_v6', JSON.stringify(this.projects));
               this.renderProjects();
             } else if (this.projects.length > 0) {
               for (const p of this.projects) {
                 await this.supabase.from('projects_hbqp').upsert({
                   id: String(p.id),
                   codigo: p.codigo,
-                  data: p
+                  data: p,
+                  updated_at: new Date().toISOString()
                 });
               }
             }
           }
-        } catch (e) {}
+        } catch (e) { console.warn("Error fetching projects:", e); }
       }
 
       async fetchConfigFromSupabase() {
@@ -1149,13 +1250,41 @@
               this.hashes.tecnico = cfg.hashes.tecnico || this.hashes.tecnico;
             }
             this.updateUIWithConfig();
-            localStorage.setItem('sdo_settings_cache_v5', JSON.stringify(cfg));
+            localStorage.setItem('sdo_settings_cache_v6', JSON.stringify(cfg));
           }
         } catch (e) {}
       }
 
+      async forceSyncAll() {
+        this.showToast('Sincronizando con Supabase...', '🔄');
+        if (this.supabase) {
+          try {
+            for (const o of this.orders) {
+              await this.supabase.from('orders').upsert({
+                id: String(o.id),
+                data: o,
+                created_at: o.fechaCreacion || new Date().toISOString()
+              });
+            }
+            for (const p of this.projects) {
+              await this.supabase.from('projects_hbqp').upsert({
+                id: String(p.id),
+                codigo: p.codigo,
+                data: p,
+                updated_at: new Date().toISOString()
+              });
+            }
+            await this.fetchOrdersFromSupabase();
+            await this.fetchProjectsFromSupabase();
+            this.showToast('Nube y dispositivos sincronizados', '✅');
+          } catch(e) {
+            this.showToast('Error de conexión con Supabase', '⚠️');
+          }
+        }
+      }
+
       loadInitialStores() {
-        const storedCfg = localStorage.getItem('sdo_settings_cache_v5');
+        const storedCfg = localStorage.getItem('sdo_settings_cache_v6');
         if (storedCfg) {
           try {
             const cfg = JSON.parse(storedCfg);
@@ -1171,7 +1300,7 @@
         }
         this.updateUIWithConfig();
 
-        const storedProjects = localStorage.getItem('hbqp_projects_store_v5');
+        const storedProjects = localStorage.getItem('hbqp_projects_store_v6');
         if (storedProjects) {
           try {
             const parsed = JSON.parse(storedProjects);
@@ -1179,20 +1308,14 @@
           } catch (e) { this.projects = INITIAL_PROJECTS; }
         } else {
           this.projects = JSON.parse(JSON.stringify(INITIAL_PROJECTS));
-          localStorage.setItem('hbqp_projects_store_v5', JSON.stringify(this.projects));
+          localStorage.setItem('hbqp_projects_store_v6', JSON.stringify(this.projects));
         }
 
-        const storedOrders = localStorage.getItem('sdo_orders_cache_v5');
+        const storedOrders = localStorage.getItem('sdo_orders_cache_v6');
         if (storedOrders) {
           try { this.orders = JSON.parse(storedOrders); } catch (e) { this.orders = []; }
         } else {
           this.orders = [];
-        }
-
-        if (this.supabase) {
-          this.fetchConfigFromSupabase();
-          this.fetchOrdersFromSupabase();
-          this.fetchProjectsFromSupabase();
         }
 
         this.updateKpis();
@@ -1210,7 +1333,7 @@
           const el = document.getElementById(id);
           if (el) {
             if (this.customLogo) { el.innerHTML = '<img src="' + escapeHtml(this.customLogo) + '" class="w-full h-full object-contain">'; } 
-            else { el.innerHTML = '<span class="text-xl" aria-hidden="true">🏥</span>'; }
+            else { el.innerHTML = '<span class="text-lg sm:text-xl" aria-hidden="true">🏥</span>'; }
           }
         });
         this.populateTechDropdowns();
@@ -1237,19 +1360,31 @@
       }
 
       async syncOrderToCloud(order) {
-        localStorage.setItem('sdo_orders_cache_v5', JSON.stringify(this.orders));
+        localStorage.setItem('sdo_orders_cache_v6', JSON.stringify(this.orders));
         if (this.supabase) {
           this.syncing = true;
           try {
-            const { error } = await this.supabase.from('orders').upsert({ id: order.id, data: order, created_at: order.fechaCreacion });
+            const payload = {
+              id: String(order.id),
+              data: order,
+              created_at: order.fechaCreacion || new Date().toISOString()
+            };
+            const { error } = await this.supabase.from('orders').upsert(payload);
             if (error) throw error;
-            this.showToast('Sincronizado con Supabase');
-          } catch (e) { this.showToast('Guardado local (Sin conexión)', '⚠️'); } finally { this.syncing = false; }
-        } else { this.showToast('Guardado localmente'); }
+            this.showToast('OT sincronizada con Supabase', '☁️');
+          } catch (e) {
+            console.error("Error sincronizando orden con Supabase:", e);
+            this.showToast('Guardado local (Sin conexión)', '⚠️');
+          } finally {
+            this.syncing = false;
+          }
+        } else {
+          this.showToast('Guardado localmente');
+        }
       }
 
       async syncProject(p) {
-        localStorage.setItem('hbqp_projects_store_v5', JSON.stringify(this.projects));
+        localStorage.setItem('hbqp_projects_store_v6', JSON.stringify(this.projects));
         if (this.supabase) {
           try {
             await this.supabase.from('projects_hbqp').upsert({
@@ -1258,13 +1393,15 @@
               data: p,
               updated_at: new Date().toISOString()
             });
-          } catch(e) {}
+          } catch(e) {
+            console.error("Error sincronizando proyecto:", e);
+          }
         }
       }
 
       async syncConfigToCloud() {
         const cfg = { hospitalName: this.hospitalName, folioPrefix: this.folioPrefix, customLogo: this.customLogo, technicians: this.technicians, hashes: this.hashes };
-        localStorage.setItem('sdo_settings_cache_v5', JSON.stringify(cfg));
+        localStorage.setItem('sdo_settings_cache_v6', JSON.stringify(cfg));
         if (this.supabase) {
           try {
             await this.supabase.from('system_settings').upsert({ id: 'global_config', config_data: cfg });
@@ -1277,7 +1414,7 @@
         const container = document.getElementById('toastContainer');
         if (!container) return;
         const t = document.createElement('div');
-        t.className = 'bg-slate-900 text-white px-4 py-2 rounded-lg shadow-xl text-xs font-bold flex items-center gap-2 toast-anim border border-slate-700';
+        t.className = 'bg-slate-900 text-white px-4 py-2 rounded-xl shadow-2xl text-xs font-bold flex items-center gap-2 toast-anim border border-slate-700 pointer-events-auto';
         t.innerHTML = '<span>' + icon + '</span> <span>' + escapeHtml(message) + '</span>';
         container.appendChild(t);
         setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 3000);
@@ -1339,25 +1476,28 @@
       applyRoleRestrictions() {
         if (!this.currentRole) return;
         const badge = document.getElementById('roleBadge');
-        const switcher = document.getElementById('moduleSwitcher');
+        const switcherDesk = document.getElementById('moduleSwitcherDesktop');
+        const bottomNav = document.getElementById('mobileBottomBar');
         const mob = document.getElementById('mobileModuleOptions');
         const sup = document.getElementById('supervisorMenuOptions');
 
         if (this.currentRole === 'supervisor') {
           if (badge) {
             badge.textContent = 'SUPERVISOR';
-            badge.className = 'text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-indigo-600 text-white';
+            badge.className = 'text-[9px] sm:text-[10px] uppercase font-black tracking-wider px-1.5 py-0.5 rounded bg-indigo-600 text-white shrink-0';
           }
-          switcher?.classList.remove('hidden');
+          switcherDesk?.classList.remove('hidden');
+          bottomNav?.classList.remove('hidden');
           mob?.classList.remove('hidden');
           sup?.classList.remove('hidden');
           this.switchModule('projects');
         } else {
           if (badge) {
             badge.textContent = 'TÉCNICO';
-            badge.className = 'text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-amber-600 text-white';
+            badge.className = 'text-[9px] sm:text-[10px] uppercase font-black tracking-wider px-1.5 py-0.5 rounded bg-amber-600 text-white shrink-0';
           }
-          switcher?.classList.add('hidden');
+          switcherDesk?.classList.add('hidden');
+          bottomNav?.classList.add('hidden');
           mob?.classList.add('hidden');
           sup?.classList.add('hidden');
           this.switchModule('orders');
@@ -1367,8 +1507,15 @@
       switchModule(m) {
         if (m === 'projects' && this.currentRole !== 'supervisor') return;
         this.activeModule = m;
+        
+        // Desktop Tabs
         const navP = document.getElementById('navBtnProjects');
         const navO = document.getElementById('navBtnOrders');
+        
+        // Mobile Tabs
+        const mobP = document.getElementById('mobileTabProjects');
+        const mobO = document.getElementById('mobileTabOrders');
+
         const viewP = document.getElementById('moduleProjectsView');
         const viewO = document.getElementById('moduleOrdersView');
         const btnText = document.getElementById('btnHeaderActionText');
@@ -1376,6 +1523,9 @@
         if (m === 'projects') {
           if (navP) navP.className = "px-3.5 py-1.5 rounded-lg bg-indigo-600 text-white shadow transition flex items-center gap-1.5";
           if (navO) navO.className = "px-3.5 py-1.5 rounded-lg text-slate-300 hover:text-white transition flex items-center gap-1.5";
+          if (mobP) mobP.className = "mobile-nav-item active";
+          if (mobO) mobO.className = "mobile-nav-item";
+          
           viewP?.classList.remove('hidden');
           viewO?.classList.add('hidden');
           if (btnText) btnText.textContent = "Nuevo Proyecto";
@@ -1383,6 +1533,9 @@
         } else {
           if (navO) navO.className = "px-3.5 py-1.5 rounded-lg bg-blue-600 text-white shadow transition flex items-center gap-1.5";
           if (navP) navP.className = "px-3.5 py-1.5 rounded-lg text-slate-300 hover:text-white transition flex items-center gap-1.5";
+          if (mobO) mobO.className = "mobile-nav-item active";
+          if (mobP) mobP.className = "mobile-nav-item";
+          
           viewO?.classList.remove('hidden');
           viewP?.classList.add('hidden');
           if (btnText) btnText.textContent = "Nueva OT";
@@ -1425,11 +1578,11 @@
 
         if (sum && this.activeModule === 'projects') {
           sum.innerHTML = `
-            <span>Total Proyectos: <strong class="text-white font-bold">${this.projects.length}</strong></span>
+            <span>Total: <strong class="text-white font-bold">${this.projects.length}</strong></span>
             <span class="text-slate-600">|</span>
-            <span class="cursor-pointer" onclick="window.app.setProjectStatusFilter('PENDIENTE')"><span class="w-2 h-2 rounded-full bg-amber-400 inline-block mr-1"></span>Pendientes: <strong class="text-amber-300 font-bold">${pCount}</strong></span>
-            <span class="cursor-pointer" onclick="window.app.setProjectStatusFilter('Propuesta enviada')"><span class="w-2 h-2 rounded-full bg-blue-400 inline-block mr-1"></span>Propuestas: <strong class="text-blue-300 font-bold">${propCount}</strong></span>
-            <span class="cursor-pointer" onclick="window.app.setProjectStatusFilter('EN PROCESO')"><span class="w-2 h-2 rounded-full bg-indigo-400 inline-block mr-1"></span>En Obras: <strong class="text-indigo-300 font-bold">${procCount}</strong></span>
+            <span class="cursor-pointer" onclick="window.app.setProjectStatusFilter('PENDIENTE')"><span class="w-2 h-2 rounded-full bg-amber-400 inline-block mr-1"></span>Pend: <strong class="text-amber-300 font-bold">${pCount}</strong></span>
+            <span class="cursor-pointer" onclick="window.app.setProjectStatusFilter('Propuesta enviada')"><span class="w-2 h-2 rounded-full bg-blue-400 inline-block mr-1"></span>Prop: <strong class="text-blue-300 font-bold">${propCount}</strong></span>
+            <span class="cursor-pointer" onclick="window.app.setProjectStatusFilter('EN PROCESO')"><span class="w-2 h-2 rounded-full bg-indigo-400 inline-block mr-1"></span>Obras: <strong class="text-indigo-300 font-bold">${procCount}</strong></span>
             <span class="cursor-pointer" onclick="window.app.setProjectStatusFilter('TERMINADO')"><span class="w-2 h-2 rounded-full bg-emerald-400 inline-block mr-1"></span>Concluidos: <strong class="text-emerald-300 font-bold">${doneCount}</strong></span>
           `;
         }
@@ -1451,7 +1604,7 @@
             { key: 'TERMINADO', title: 'Concluidos / Entregados', color: 'bg-emerald-500', badge: 'bg-emerald-100 text-emerald-900' }
           ];
 
-          c.innerHTML = '<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 items-start">' + cols.map(col => `
+          c.innerHTML = '<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 items-start">' + cols.map(col => `
             <div class="kanban-col-container shadow-sm">
               <div class="flex justify-between items-center pb-2 mb-2.5 border-b border-slate-300">
                 <span class="font-bold text-xs flex items-center gap-1.5 uppercase text-slate-800"><span class="w-2.5 h-2.5 rounded-full ${col.color}"></span> ${col.title}</span>
@@ -1471,7 +1624,7 @@
                       ${p.pma ? `<span class="bg-cyan-50 text-cyan-800 px-1.5 py-0.5 rounded border border-cyan-200 font-bold">PMA: ${escapeHtml(p.pma)}</span>` : ''}
                     </div>
                     ${p.pendiente ? `<div class="p-1.5 bg-amber-50 rounded text-amber-900 text-[10px] font-bold mb-2">⚠️ ${escapeHtml(p.pendiente)}</div>` : ''}
-                    <div class="pt-2 border-t flex items-center justify-between text-[10px] text-slate-400">
+                    <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400">
                       <span>${p.fecha_ingreso || ''}</span>
                       <span class="text-indigo-600 font-bold opacity-0 group-hover:opacity-100 transition">Ver Ficha →</span>
                     </div>
@@ -1481,8 +1634,8 @@
             </div>
           `).join('') + '</div>';
         } else if (this.projectsViewMode === 'cards') {
-          c.innerHTML = '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">' + filtered.map(p => `
-            <div class="bg-white p-4 rounded-xl border shadow-sm cursor-pointer hover:border-slate-300 transition" onclick="window.app.openEditProjectModal(${p.id})">
+          c.innerHTML = '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">' + filtered.map(p => `
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-slate-300 transition" onclick="window.app.openEditProjectModal(${p.id})">
               <div class="flex justify-between items-center mb-1">
                 <span class="font-bold text-xs text-indigo-700">${escapeHtml(p.codigo || 'PROY-' + p.id)}</span>
                 <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100">${p.estado}</span>
@@ -1494,9 +1647,9 @@
           `).join('') + '</div>';
         } else {
           c.innerHTML = `
-            <div class="bg-white rounded-xl border overflow-hidden shadow-sm">
+            <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
               <table class="w-full text-left text-xs">
-                <thead class="bg-slate-50 text-slate-700 font-bold border-b">
+                <thead class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
                   <tr><th class="p-3">Código</th><th class="p-3">Tipología</th><th class="p-3">Requerimiento</th><th class="p-3">Unidad</th><th class="p-3">Piso / Recinto</th><th class="p-3">PMA</th><th class="p-3">Hito Pendiente</th><th class="p-3">Fase</th></tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
@@ -1524,17 +1677,17 @@
         const btnK = document.getElementById('btnProjViewKanban');
         const btnC = document.getElementById('btnProjViewCards');
         const btnT = document.getElementById('btnProjViewTable');
-        [btnK, btnC, btnT].forEach(b => { if (b) b.className = "px-3 py-1.5 rounded-md text-slate-600"; });
-        if (m === 'kanban' && btnK) btnK.className = "px-3 py-1.5 rounded-md bg-white text-indigo-600 shadow-sm";
-        if (m === 'cards' && btnC) btnC.className = "px-3 py-1.5 rounded-md bg-white text-indigo-600 shadow-sm";
-        if (m === 'table' && btnT) btnT.className = "px-3 py-1.5 rounded-md bg-white text-indigo-600 shadow-sm";
+        [btnK, btnC, btnT].forEach(b => { if (b) b.className = "px-2.5 sm:px-3 py-1.5 rounded-md text-slate-600"; });
+        if (m === 'kanban' && btnK) btnK.className = "px-2.5 sm:px-3 py-1.5 rounded-md bg-white text-indigo-600 shadow-sm";
+        if (m === 'cards' && btnC) btnC.className = "px-2.5 sm:px-3 py-1.5 rounded-md bg-white text-indigo-600 shadow-sm";
+        if (m === 'table' && btnT) btnT.className = "px-2.5 sm:px-3 py-1.5 rounded-md bg-white text-indigo-600 shadow-sm";
         this.renderProjects();
       }
 
       setProjectStatusFilter(s) {
         this.projectStatusFilter = s;
         document.querySelectorAll('.proj-status-btn').forEach(b => {
-          b.className = b.dataset.status === s ? "proj-status-btn px-3 py-1 font-bold rounded-full bg-slate-800 text-white" : "proj-status-btn px-3 py-1 font-bold rounded-full bg-slate-100 text-slate-600";
+          b.className = b.dataset.status === s ? "proj-status-btn px-2.5 sm:px-3 py-1 text-[11px] font-bold rounded-full bg-slate-800 text-white whitespace-nowrap" : "proj-status-btn px-2.5 sm:px-3 py-1 text-[11px] font-bold rounded-full bg-slate-100 text-slate-600 whitespace-nowrap";
         });
         this.renderProjects();
       }
@@ -1689,7 +1842,7 @@
           if (this.supabase) {
             try { await this.supabase.from('projects_hbqp').delete().eq('id', String(id)); } catch(e) {}
           }
-          localStorage.setItem('hbqp_projects_store_v5', JSON.stringify(this.projects));
+          localStorage.setItem('hbqp_projects_store_v6', JSON.stringify(this.projects));
           this.closeProjectModal();
           this.renderProjects();
           this.showToast('Proyecto eliminado');
@@ -1746,7 +1899,7 @@
       }
 
       // ==========================================================
-      // GESTIÓN DE ÓRDENES DE TRABAJO (OTs) - 100% SDO CLOUD ORIGINAL
+      // GESTIÓN DE ÓRDENES DE TRABAJO (OTs)
       // ==========================================================
       setViewMode(mode) {
         this.viewMode = mode;
@@ -1765,7 +1918,7 @@
       setFilterStatus(status) {
         this.filterStatus = status;
         document.querySelectorAll('.status-filter-btn').forEach(btn => {
-          btn.className = btn.dataset.status === status ? "status-filter-btn px-3 py-1 text-xs font-bold rounded-full bg-slate-800 text-white whitespace-nowrap" : "status-filter-btn px-3 py-1 text-xs font-bold rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap";
+          btn.className = btn.dataset.status === status ? "status-filter-btn px-2.5 sm:px-3 py-1 text-[11px] font-bold rounded-full bg-slate-800 text-white whitespace-nowrap" : "status-filter-btn px-2.5 sm:px-3 py-1 text-[11px] font-bold rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap";
         });
         this.renderOrdersList();
       }
@@ -1840,14 +1993,14 @@
         });
 
         if (filtered.length === 0) {
-          container.innerHTML = '<div class="bg-white p-8 rounded-2xl border text-center text-slate-400"><span class="text-3xl mb-2 block" aria-hidden="true">📋</span><p class="text-sm font-semibold">No se encontraron órdenes de trabajo</p></div>';
+          container.innerHTML = '<div class="bg-white p-8 rounded-2xl border border-slate-200 text-center text-slate-400"><span class="text-3xl mb-2 block" aria-hidden="true">📋</span><p class="text-sm font-semibold">No se encontraron órdenes de trabajo</p></div>';
           return;
         }
 
         if (this.viewMode === 'cards') {
           container.innerHTML = '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">' + filtered.map(o => this.renderOrderCard(o)).join('') + '</div>';
         } else {
-          container.innerHTML = '<div class="bg-white rounded-xl border overflow-hidden"><div class="overflow-x-auto custom-scroll"><table class="w-full text-left text-xs"><thead class="bg-slate-50 text-slate-700 font-bold border-b"><tr><th class="p-3">Folio</th><th class="p-3">Recinto / PMA</th><th class="p-3">Prioridad / Descripción</th><th class="p-3">Estado</th><th class="p-3">Tiempo Corrido</th><th class="p-3 text-right">Acciones</th></tr></thead><tbody class="divide-y divide-slate-100">' + filtered.map(o => this.renderOrderRow(o)).join('') + '</tbody></table></div></div>';
+          container.innerHTML = '<div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm"><div class="overflow-x-auto custom-scroll"><table class="w-full text-left text-xs"><thead class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200"><tr><th class="p-3">Folio</th><th class="p-3">Recinto / PMA</th><th class="p-3">Prioridad / Descripción</th><th class="p-3">Estado</th><th class="p-3">Tiempo Corrido</th><th class="p-3 text-right">Acciones</th></tr></thead><tbody class="divide-y divide-slate-100">' + filtered.map(o => this.renderOrderRow(o)).join('') + '</tbody></table></div></div>';
         }
       }
 
@@ -1859,7 +2012,7 @@
         const emojis = { Urgente: '🚨', Alta: '🟠', Media: '🟡', Baja: '🟢' };
         
         return `
-          <div class="bg-white p-4 rounded-xl border shadow-sm flex flex-col justify-between space-y-3 cursor-pointer hover:border-slate-300 transition" onclick="window.app.openOperativeView('${o.id}')">
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between space-y-3 cursor-pointer hover:border-slate-300 transition" onclick="window.app.openOperativeView('${o.id}')">
             <div>
               <div class="flex justify-between items-center mb-1">
                 <span class="font-black text-xs flex items-center">${escapeHtml(o.folio)} ${unreadBadge}</span>
@@ -1868,11 +2021,11 @@
               <h4 class="font-bold text-sm truncate">${escapeHtml(o.recinto)}</h4>
               <p class="text-[11px] text-slate-500 font-medium truncate mb-1">PMA: ${escapeHtml(o.ticket)} • Prioridad: ${emojis[o.prioridad]||''} ${escapeHtml(o.prioridad)}</p>
               <p class="text-[11px] text-slate-600 leading-tight line-clamp-2">${escapeHtml(o.descripcion)}</p>
-              <div class="mt-2 bg-slate-50 p-2 rounded-lg border">
+              <div class="mt-2 bg-slate-50 p-2 rounded-lg border border-slate-100">
                 <div class="flex justify-between text-[11px] font-semibold"><span>Tiempo transcurrido:</span><span class="${timeInfo.textClass}">${timeInfo.elapsedString}</span></div>
               </div>
             </div>
-            <div class="pt-2 border-t flex items-center justify-between gap-1.5">
+            <div class="pt-2 border-t border-slate-100 flex items-center justify-between gap-1.5">
               <button class="flex-1 py-2 bg-slate-800 text-white text-xs font-bold rounded-lg pointer-events-none">${btnText}</button>
               <button type="button" onclick="event.stopPropagation(); window.app.shareWhatsApp('${o.id}')" class="pointer-events-auto cursor-pointer px-3 py-2 bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-lg transition-transform active:scale-95 shadow-sm" title="Compartir por WhatsApp">
                  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
@@ -2278,7 +2431,7 @@
               const { error } = await this.supabase.from('orders').delete().eq('id', id);
               if (error) throw error;
               this.orders = this.orders.filter(o => o.id !== id);
-              localStorage.setItem('sdo_orders_cache_v5', JSON.stringify(this.orders));
+              localStorage.setItem('sdo_orders_cache_v6', JSON.stringify(this.orders));
               this.closeOperativeView();
               this.updateKpis();
               this.renderOrdersList();
@@ -2288,7 +2441,7 @@
             }
           } else {
             this.orders = this.orders.filter(o => o.id !== id);
-            localStorage.setItem('sdo_orders_cache_v5', JSON.stringify(this.orders));
+            localStorage.setItem('sdo_orders_cache_v6', JSON.stringify(this.orders));
             this.closeOperativeView();
             this.updateKpis();
             this.renderOrdersList();
@@ -2379,7 +2532,7 @@
               const { error } = await this.supabase.from('orders').delete().neq('id', '0');
               if (error) throw error;
               this.orders = [];
-              localStorage.removeItem('sdo_orders_cache_v5');
+              localStorage.removeItem('sdo_orders_cache_v6');
               this.showToast('Base de datos reiniciada');
               this.closeSettingsModal();
               this.updateKpis();
