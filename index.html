@@ -15,58 +15,55 @@
     * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
     html, body { touch-action: manipulation; -webkit-text-size-adjust: 100%; }
     input, textarea, select { font-size: 14px !important; touch-action: manipulation; }
-    .custom-scroll::-webkit-scrollbar { height: 5px; width: 5px; }
+    .custom-scroll::-webkit-scrollbar { height: 4px; width: 4px; }
     .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-    .custom-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     @keyframes slideUpFade { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
     .toast-anim { animation: slideUpFade 0.3s ease forwards; }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(225, 29, 72, 0); }
+      100% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(225, 29, 72, 0); }
+    }
+    .badge-pulse { animation: pulse-ring 2s infinite; }
 
     :root {
-      --sdo-bg: #f8fafc; --sdo-surface: #ffffff; --sdo-ink: #0f172a; --sdo-muted: #64748b;
-      --sdo-line: #e2e8f0; --sdo-navy: #111827; --sdo-accent: #4f46e5; --sdo-blue: #2563eb;
-      --sdo-green: #059669; --sdo-amber: #d97706; --sdo-rose: #e11d48;
+      --sdo-bg: #f5f7fb; --sdo-surface: #ffffff; --sdo-surface-soft: #f8fafc;
+      --sdo-ink: #0f172a; --sdo-muted: #64748b; --sdo-line: #e2e8f0; --sdo-line-soft: #edf1f6;
+      --sdo-navy: #111827; --sdo-accent: #4f46e5; --sdo-accent-soft: #eef2ff;
+      --sdo-blue: #2563eb; --sdo-green: #059669; --sdo-amber: #d97706; --sdo-rose: #e11d48;
+      --sdo-radius: 16px; --sdo-radius-sm: 11px;
+      --sdo-shadow: 0 1px 2px rgba(15,23,42,.035), 0 8px 24px rgba(15,23,42,.045);
+      --sdo-shadow-hover: 0 2px 4px rgba(15,23,42,.04), 0 14px 34px rgba(15,23,42,.075);
     }
 
+    html { background: var(--sdo-bg); scroll-behavior: smooth; }
     body {
       background: radial-gradient(circle at 85% -10%, rgba(79,70,229,.055), transparent 28rem), var(--sdo-bg) !important;
       color: var(--sdo-ink) !important;
       font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+      letter-spacing: -0.005em;
     }
     body > header {
       background: rgba(15, 23, 42, .97) !important;
       border-bottom: 1px solid rgba(255,255,255,.08);
-      backdrop-filter: blur(18px);
+      box-shadow: 0 4px 18px rgba(15,23,42,.12) !important;
+      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
     }
+
     .kanban-col-container {
-      min-height: calc(100vh - 280px);
-      background: #f1f5f9;
-      border: 1px solid #e2e8f0;
-      border-radius: 14px;
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
+      min-height: calc(100vh - 280px); background: #f1f5f9; border: 1px solid #e2e8f0;
+      border-radius: 14px; padding: 12px; display: flex; flex-direction: column;
     }
     .kanban-cards-wrapper {
-      min-height: 200px;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      padding: 3px;
-      border-radius: 10px;
-      transition: background-color 0.2s ease, border-color 0.2s ease;
+      min-height: 200px; flex: 1; display: flex; flex-direction: column; gap: 10px;
+      padding: 3px; border-radius: 10px; transition: background-color 0.2s ease, border-color 0.2s ease;
     }
     .kanban-cards-wrapper.drag-over {
-      background-color: rgba(224, 242, 254, 0.85) !important;
-      border: 2px dashed #0284c7 !important;
+      background-color: rgba(224, 242, 254, 0.85) !important; border: 2px dashed #0284c7 !important;
     }
     .project-card {
-      background: #ffffff;
-      border: 1px solid var(--sdo-line);
-      border-radius: 12px;
-      padding: 13px;
-      box-shadow: 0 1px 3px rgba(15,23,42,.04);
-      cursor: grab;
+      background: #ffffff; border: 1px solid var(--sdo-line); border-radius: 12px;
+      padding: 13px; box-shadow: 0 1px 3px rgba(15,23,42,.04); cursor: grab;
       transition: transform 0.16s ease, box-shadow 0.16s ease;
     }
     .project-card:hover { transform: translateY(-2px); border-color: #cbd5e1; box-shadow: 0 8px 20px rgba(15,23,42,.07); }
@@ -75,9 +72,21 @@
     .badge-proyecto { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
     .badge-reparacion { background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
     .badge-apoyo { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+
+    #unifiedOperativeView { background: var(--sdo-bg) !important; }
+    .uov-section-card { background: #ffffff; border: 1px solid var(--sdo-line-soft); border-radius: var(--sdo-radius); padding: 1.5rem; box-shadow: var(--sdo-shadow); }
+    .uov-nav-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: var(--sdo-radius-sm); color: var(--sdo-muted); font-weight: 600; transition: background 0.2s, color 0.2s; }
+    .uov-nav-link:hover, .uov-nav-link.active { background: var(--sdo-accent-soft); color: var(--sdo-accent); }
+    .uov-bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-top: 1px solid var(--sdo-line); padding: 1rem; z-index: 45; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); }
+    .uov-action-btn { min-height: 44px; border-radius: var(--sdo-radius-sm); font-weight: 700; padding: 0 1.5rem; transition: transform 0.15s; }
+    .uov-action-btn:active { transform: scale(0.98); }
+    .uov-btn-danger { background: #fff; border: 1px solid #fecdd3; color: var(--sdo-rose); }
+    .uov-btn-danger:hover { background: #fff1f2; }
+    .uov-btn-primary { background: var(--sdo-accent); color: white; border: none; }
+    .uov-btn-primary:hover { background: #4338ca; }
   </style>
 </head>
-<body class="min-h-screen flex flex-col font-sans pb-12">
+<body class="bg-slate-100 text-slate-900 min-h-screen flex flex-col font-sans pb-12">
 
   <div id="toastContainer" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-[70] flex flex-col gap-2 pointer-events-none"></div>
 
@@ -86,22 +95,22 @@
     <div class="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between gap-3">
       
       <div class="flex items-center space-x-3 cursor-pointer" onclick="window.app.renderActiveModule()">
-        <div id="headerLogoContainer" class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center shrink-0">
-          <span class="text-xl">🏥</span>
+        <div id="headerLogoContainer" class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center overflow-hidden shrink-0">
+          <span class="text-xl" aria-hidden="true">🏥</span>
         </div>
         <div>
           <div class="flex items-center space-x-2">
             <span class="font-bold text-base tracking-wide text-white">SDO Cloud</span>
-            <span id="roleBadge" class="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-indigo-600 text-white">Supervisor</span>
+            <span id="roleBadge" class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-indigo-600 text-white">Supervisor</span>
             <span id="supabaseStatusBadge" class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> <span>Supabase En Línea</span>
             </span>
           </div>
-          <p id="headerHospitalName" class="text-xs text-slate-400">HBQP - Infraestructura & Operaciones</p>
+          <p id="headerHospitalName" class="text-xs text-slate-400 truncate max-w-[160px] sm:max-w-xs">HBQP - Infraestructura & Operaciones</p>
         </div>
       </div>
 
-      <!-- Selector de Módulo -->
+      <!-- Selector de Módulos (Solo Supervisor) -->
       <nav id="moduleSwitcher" class="flex items-center bg-slate-800/90 p-1 rounded-xl border border-slate-700 text-xs font-bold">
         <button id="navBtnProjects" onclick="window.app.switchModule('projects')" class="px-3.5 py-1.5 rounded-lg bg-indigo-600 text-white shadow transition flex items-center gap-1.5">
           <i class="fa-solid fa-diagram-project"></i> <span>Módulo Proyectos</span>
@@ -111,19 +120,19 @@
         </button>
       </nav>
 
-      <!-- Botones de Acción y Menú -->
+      <!-- Botones de Acción y Menú Desplegable -->
       <div class="flex items-center space-x-2 relative">
         <button id="btnHeaderAction" onclick="window.app.handleHeaderPrimaryAction()" class="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
           <span id="btnHeaderActionIcon">➕</span> <span id="btnHeaderActionText">Nuevo Proyecto</span>
         </button>
 
-        <button onclick="window.app.toggleMenu()" aria-label="Abrir Menú" class="p-2 rounded-lg bg-slate-800 text-slate-200 border border-slate-700 flex items-center space-x-1">
-          <span class="text-base">☰</span>
+        <button onclick="window.app.toggleMenu()" aria-label="Abrir Menú" class="p-2 rounded-lg bg-slate-800 text-slate-200 hover:bg-slate-700 active:scale-95 border border-slate-700 flex items-center space-x-1">
+          <span class="text-base" aria-hidden="true">☰</span>
           <span class="text-xs font-semibold hidden sm:inline">Menú</span>
         </button>
 
         <!-- Dropdown Menú -->
-        <div id="appMenuDropdown" class="hidden absolute right-0 top-12 w-64 bg-white rounded-xl shadow-2xl border text-slate-800 z-50 py-1 text-sm">
+        <div id="appMenuDropdown" class="hidden absolute right-0 top-12 w-64 bg-white rounded-xl shadow-2xl border border-slate-200 text-slate-800 z-50 overflow-hidden py-1 text-sm">
           <div id="mobileModuleOptions" class="md:hidden px-3 py-2 border-b bg-slate-50 space-y-1">
             <span class="text-[10px] font-bold text-slate-400 uppercase block">Cambiar Módulo</span>
             <button onclick="window.app.switchModule('projects'); window.app.toggleMenu();" class="w-full text-left px-2 py-1.5 rounded text-xs font-bold text-indigo-700 hover:bg-indigo-50">
@@ -135,23 +144,29 @@
           </div>
 
           <div id="supervisorMenuOptions">
-            <button onclick="window.app.openCreateProjectModal(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left hover:bg-slate-50 flex items-center gap-2 font-medium text-indigo-600">
+            <button onclick="window.app.openCreateProjectModal(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left text-sm font-medium hover:bg-slate-50 flex items-center space-x-2 text-indigo-600">
               <i class="fa-solid fa-plus text-indigo-500"></i> <span>Nuevo Proyecto</span>
             </button>
-            <button onclick="window.app.openCreateOtModal(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left hover:bg-slate-50 flex items-center gap-2 font-medium text-blue-600">
+            <button onclick="window.app.openCreateOtModal(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left text-sm font-medium hover:bg-slate-50 flex items-center space-x-2 text-blue-600">
               <i class="fa-solid fa-wrench text-blue-500"></i> <span>Nueva Orden de Trabajo (OT)</span>
             </button>
-            <button onclick="window.app.exportActiveDataCSV(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left hover:bg-slate-50 flex items-center gap-2 font-medium">
-              <i class="fa-solid fa-file-csv text-emerald-600"></i> <span>Exportar Planilla CSV</span>
+            <button onclick="window.app.openAdvanceReportModal(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left text-sm font-medium hover:bg-slate-50 flex items-center space-x-2">
+              <span aria-hidden="true">📈</span> <span>Reporte de Avance OTs (PDF)</span>
             </button>
-            <button onclick="window.app.openSettingsModal(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left hover:bg-slate-50 flex items-center gap-2 font-medium">
-              <i class="fa-solid fa-gear text-slate-500"></i> <span>Configuración & PINs</span>
+            <button onclick="window.app.exportToExcel(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left text-sm font-medium hover:bg-slate-50 flex items-center space-x-2 text-emerald-700">
+              <span aria-hidden="true">📊</span> <span>Descargar BD OTs (Excel)</span>
+            </button>
+            <button onclick="window.app.exportProjectsCSV(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left text-sm font-medium hover:bg-slate-50 flex items-center space-x-2 text-emerald-700">
+              <i class="fa-solid fa-file-csv text-emerald-600"></i> <span>Exportar Proyectos (CSV)</span>
+            </button>
+            <button onclick="window.app.openSettingsModal(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left text-sm font-medium hover:bg-slate-50 flex items-center space-x-2">
+              <span aria-hidden="true">⚙️</span> <span>Configuración & PINs</span>
             </button>
           </div>
 
           <hr class="my-1 border-slate-100">
-          <button onclick="window.app.openAuthModal(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left hover:bg-slate-50 flex items-center gap-2 font-medium text-amber-700">
-            <i class="fa-solid fa-arrows-rotate text-amber-600"></i> <span>Cambiar Rol / PIN</span>
+          <button onclick="window.app.openAuthModal(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left text-sm font-medium hover:bg-slate-50 flex items-center space-x-2 text-amber-700">
+            <span aria-hidden="true">🔄</span> <span>Cambiar Rol / PIN</span>
           </button>
         </div>
       </div>
@@ -162,13 +177,15 @@
       <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
         <div id="moduleStatsSummary" class="flex items-center gap-4 flex-wrap font-medium"></div>
         <div class="text-[11px] text-slate-400 hidden sm:block">
-          <i class="fa-solid fa-shield-halved text-indigo-400 mr-1"></i> <span>Módulo de Proyectos (Sincronizado con Supabase)</span>
+          <i class="fa-solid fa-shield-halved text-indigo-400 mr-1"></i> <span>Base de Datos Conectada a Supabase</span>
         </div>
       </div>
     </div>
   </header>
 
-  <!-- VISTA 1: MÓDULO DE PROYECTOS (SUPERVISOR) -->
+  <!-- ==========================================================
+       VISTA 1: MÓDULO DE PROYECTOS (SUPERVISOR)
+       ========================================================== -->
   <section id="moduleProjectsView" class="max-w-7xl w-full mx-auto px-3 sm:px-4 py-4 flex-1">
     <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm mb-4 space-y-2.5">
       <div class="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center justify-between">
@@ -226,42 +243,78 @@
     <div id="projectsContainer"></div>
   </section>
 
-  <!-- VISTA 2: MÓDULO DE ÓRDENES DE TRABAJO (OTs) -->
+  <!-- ==========================================================
+       VISTA 2: MÓDULO DE ÓRDENES DE TRABAJO (OTs)
+       ========================================================== -->
   <section id="moduleOrdersView" class="hidden max-w-7xl w-full mx-auto px-3 sm:px-4 py-4 flex-1">
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-4">
-      <div onclick="window.app.setOtFilterStatus('Pendiente')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer">
-        <span class="text-xs font-semibold text-slate-500 uppercase">En Curso</span>
-        <p id="kpiOtPendientes" class="text-2xl font-black text-amber-600 mt-1">0</p>
+      <div onclick="window.app.setFilterStatus('Pendiente')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer active:scale-95 transition">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-semibold text-slate-500 uppercase">En Curso</span>
+          <span class="text-xs" aria-hidden="true">⏳</span>
+        </div>
+        <p id="kpiPendientes" class="text-2xl font-black text-amber-600 mt-1">0</p>
       </div>
-      <div onclick="window.app.setOtFilterStatus('En Ejecución')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer">
-        <span class="text-xs font-semibold text-slate-500 uppercase">En Ejecución</span>
-        <p id="kpiOtEjecucion" class="text-2xl font-black text-blue-600 mt-1">0</p>
+      <div onclick="window.app.setFilterStatus('En Ejecución')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer active:scale-95 transition">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-semibold text-slate-500 uppercase">En Ejecución</span>
+          <span class="text-xs" aria-hidden="true">🔧</span>
+        </div>
+        <p id="kpiEjecucion" class="text-2xl font-black text-blue-600 mt-1">0</p>
       </div>
-      <div onclick="window.app.setOtFilterStatus('Solicitud Cierre')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer">
-        <span class="text-xs font-semibold text-slate-500 uppercase">Solic. Cierre</span>
-        <p id="kpiOtSolicitudCierre" class="text-2xl font-black text-indigo-600 mt-1">0</p>
+      <div onclick="window.app.setFilterStatus('Solicitud Cierre')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer active:scale-95 transition">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-semibold text-slate-500 uppercase">Solic. Cierre</span>
+          <span class="text-xs" aria-hidden="true">⚡</span>
+        </div>
+        <p id="kpiSolicitudCierre" class="text-2xl font-black text-indigo-600 mt-1">0</p>
       </div>
-      <div onclick="window.app.setOtFilterStatus('Terminada')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer">
-        <span class="text-xs font-semibold text-slate-500 uppercase">Terminadas</span>
-        <p id="kpiOtTerminadas" class="text-2xl font-black text-emerald-600 mt-1">0</p>
+      <div onclick="window.app.setFilterStatus('Terminada')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer active:scale-95 transition">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-semibold text-slate-500 uppercase">Terminadas</span>
+          <span class="text-xs" aria-hidden="true">✅</span>
+        </div>
+        <p id="kpiTerminadas" class="text-2xl font-black text-emerald-600 mt-1">0</p>
       </div>
     </div>
 
-    <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm mb-4">
-      <input type="text" id="searchOtInput" oninput="window.app.renderOrders()" placeholder="Buscar folio OT, recinto, PMA..." 
-             class="w-full pl-4 pr-3 py-2 bg-slate-50 border rounded-lg text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
+    <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm mb-4 space-y-2.5">
+      <div class="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center justify-between">
+        <div class="relative flex-1">
+          <label for="searchInput" class="sr-only">Buscar</label>
+          <input type="text" id="searchInput" oninput="window.app.renderOrdersList()" placeholder="Buscar folio, recinto, solicitante, PMA..." 
+                 class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white">
+          <span class="absolute left-3 top-2.5 text-slate-400 text-sm" aria-hidden="true">🔍</span>
+        </div>
+        <div class="flex items-center space-x-1 self-end sm:self-auto bg-slate-100 p-1 rounded-lg border border-slate-200">
+          <button id="viewCardsBtn" onclick="window.app.setViewMode('cards')" class="px-3 py-1.5 text-xs font-bold rounded-md bg-white text-slate-800 shadow-sm transition" aria-label="Vista de tarjetas">⊞ Tarjetas</button>
+          <button id="viewTableBtn" onclick="window.app.setViewMode('table')" class="px-3 py-1.5 text-xs font-bold rounded-md text-slate-600 hover:text-slate-900 transition" aria-label="Vista de tabla">☰ Filas / Tabla</button>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-1.5 overflow-x-auto custom-scroll pb-1">
+        <button onclick="window.app.setFilterStatus('TODOS')" class="status-filter-btn px-3 py-1 text-xs font-bold rounded-full bg-slate-800 text-white whitespace-nowrap" data-status="TODOS">Todos</button>
+        <button onclick="window.app.setFilterStatus('Pendiente')" class="status-filter-btn px-3 py-1 text-xs font-bold rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap" data-status="Pendiente">Pendientes</button>
+        <button onclick="window.app.setFilterStatus('En Ejecución')" class="status-filter-btn px-3 py-1 text-xs font-bold rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap" data-status="En Ejecución">En Ejecución</button>
+        <button onclick="window.app.setFilterStatus('Solicitud Cierre')" class="status-filter-btn px-3 py-1 text-xs font-bold rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap" data-status="Solicitud Cierre">Solicitud Cierre</button>
+        <button onclick="window.app.setFilterStatus('Terminada')" class="status-filter-btn px-3 py-1 text-xs font-bold rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap" data-status="Terminada">Terminadas</button>
+      </div>
     </div>
 
     <div id="ordersContainer"></div>
   </section>
 
+  <!-- ==========================================================
+       MODALES
+       ========================================================== -->
+
   <!-- Modal Auth (PIN Pad) -->
   <div id="authModal" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white w-full max-w-xs rounded-2xl p-5 shadow-2xl border text-center relative">
-      <button onclick="window.app.closeAuthModal()" class="absolute top-3 right-3 text-slate-400 hover:text-slate-600">✕</button>
-      <div class="w-12 h-12 mx-auto rounded-xl bg-slate-100 flex items-center justify-center mb-2 overflow-hidden border"><span class="text-2xl">🏥</span></div>
+    <div class="bg-white w-full max-w-xs rounded-2xl p-5 shadow-2xl border border-slate-200 text-center relative">
+      <button onclick="window.app.closeAuthModal()" class="absolute top-3 right-3 text-slate-400 hover:text-slate-700" aria-label="Cerrar">✕</button>
+      <div id="authLogoContainer" class="w-12 h-12 mx-auto rounded-xl bg-slate-100 flex items-center justify-center mb-2 overflow-hidden border border-slate-200"><span class="text-2xl" aria-hidden="true">🏥</span></div>
       <h3 class="font-black text-lg text-slate-900">Acceso SDO Cloud</h3>
-      <p class="text-xs text-slate-500 mb-4">Seleccione su rol e ingrese PIN</p>
+      <p class="text-xs text-slate-500 mb-4">Seleccione su rol e ingrese su PIN</p>
       <div class="grid grid-cols-2 gap-2 mb-4">
         <button id="roleBtnSupervisor" onclick="window.app.selectAuthRole('supervisor')" class="py-2 text-xs font-bold rounded-lg border-2 border-indigo-600 bg-indigo-50 text-indigo-700">Supervisor</button>
         <button id="roleBtnTecnico" onclick="window.app.selectAuthRole('tecnico')" class="py-2 text-xs font-bold rounded-lg border-2 border-slate-200 bg-white text-slate-600">Técnico</button>
@@ -273,18 +326,18 @@
         <div id="pinDot3" class="w-3.5 h-3.5 rounded-full border-2 border-slate-300 bg-white"></div>
       </div>
       <div class="grid grid-cols-3 gap-2 max-w-[220px] mx-auto mb-3">
-        <button onclick="window.app.typePin(1)" class="h-12 text-xl font-bold bg-slate-50 rounded-xl border hover:bg-slate-100">1</button>
-        <button onclick="window.app.typePin(2)" class="h-12 text-xl font-bold bg-slate-50 rounded-xl border hover:bg-slate-100">2</button>
-        <button onclick="window.app.typePin(3)" class="h-12 text-xl font-bold bg-slate-50 rounded-xl border hover:bg-slate-100">3</button>
-        <button onclick="window.app.typePin(4)" class="h-12 text-xl font-bold bg-slate-50 rounded-xl border hover:bg-slate-100">4</button>
-        <button onclick="window.app.typePin(5)" class="h-12 text-xl font-bold bg-slate-50 rounded-xl border hover:bg-slate-100">5</button>
-        <button onclick="window.app.typePin(6)" class="h-12 text-xl font-bold bg-slate-50 rounded-xl border hover:bg-slate-100">6</button>
-        <button onclick="window.app.typePin(7)" class="h-12 text-xl font-bold bg-slate-50 rounded-xl border hover:bg-slate-100">7</button>
-        <button onclick="window.app.typePin(8)" class="h-12 text-xl font-bold bg-slate-50 rounded-xl border hover:bg-slate-100">8</button>
-        <button onclick="window.app.typePin(9)" class="h-12 text-xl font-bold bg-slate-50 rounded-xl border hover:bg-slate-100">9</button>
-        <button onclick="window.app.clearPin()" class="h-12 text-xs font-bold bg-slate-100 rounded-xl hover:bg-slate-200">Borrar</button>
-        <button onclick="window.app.typePin(0)" class="h-12 text-xl font-bold bg-slate-50 rounded-xl border hover:bg-slate-100">0</button>
-        <button onclick="window.app.deletePin()" class="h-12 text-base font-bold bg-slate-100 rounded-xl hover:bg-slate-200">⌫</button>
+        <button onclick="window.app.typePin(1)" class="h-12 text-xl font-bold bg-slate-50 hover:bg-slate-100 active:bg-slate-200 rounded-xl border border-slate-200 text-slate-800">1</button>
+        <button onclick="window.app.typePin(2)" class="h-12 text-xl font-bold bg-slate-50 hover:bg-slate-100 active:bg-slate-200 rounded-xl border border-slate-200 text-slate-800">2</button>
+        <button onclick="window.app.typePin(3)" class="h-12 text-xl font-bold bg-slate-50 hover:bg-slate-100 active:bg-slate-200 rounded-xl border border-slate-200 text-slate-800">3</button>
+        <button onclick="window.app.typePin(4)" class="h-12 text-xl font-bold bg-slate-50 hover:bg-slate-100 active:bg-slate-200 rounded-xl border border-slate-200 text-slate-800">4</button>
+        <button onclick="window.app.typePin(5)" class="h-12 text-xl font-bold bg-slate-50 hover:bg-slate-100 active:bg-slate-200 rounded-xl border border-slate-200 text-slate-800">5</button>
+        <button onclick="window.app.typePin(6)" class="h-12 text-xl font-bold bg-slate-50 hover:bg-slate-100 active:bg-slate-200 rounded-xl border border-slate-200 text-slate-800">6</button>
+        <button onclick="window.app.typePin(7)" class="h-12 text-xl font-bold bg-slate-50 hover:bg-slate-100 active:bg-slate-200 rounded-xl border border-slate-200 text-slate-800">7</button>
+        <button onclick="window.app.typePin(8)" class="h-12 text-xl font-bold bg-slate-50 hover:bg-slate-100 active:bg-slate-200 rounded-xl border border-slate-200 text-slate-800">8</button>
+        <button onclick="window.app.typePin(9)" class="h-12 text-xl font-bold bg-slate-50 hover:bg-slate-100 active:bg-slate-200 rounded-xl border border-slate-200 text-slate-800">9</button>
+        <button onclick="window.app.clearPin()" class="h-12 text-xs font-bold bg-slate-100 hover:bg-slate-200 active:bg-slate-300 rounded-xl text-slate-600">Borrar</button>
+        <button onclick="window.app.typePin(0)" class="h-12 text-xl font-bold bg-slate-50 hover:bg-slate-100 active:bg-slate-200 rounded-xl border border-slate-200 text-slate-800">0</button>
+        <button onclick="window.app.deletePin()" class="h-12 text-base font-bold bg-slate-100 hover:bg-slate-200 active:bg-slate-300 rounded-xl text-slate-600">⌫</button>
       </div>
       <div id="authErrorMsg" class="hidden text-xs text-rose-600 font-bold mt-2">PIN Incorrecto</div>
     </div>
@@ -292,7 +345,7 @@
 
   <!-- Modal Ficha de Proyecto / Nuevo Proyecto -->
   <div id="projectModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-    <div class="bg-white rounded-2xl max-w-3xl w-full shadow-2xl overflow-hidden border my-6 max-h-[92vh] flex flex-col">
+    <div class="bg-white rounded-2xl max-w-3xl w-full shadow-2xl overflow-hidden border border-slate-200 my-6 max-h-[92vh] flex flex-col">
       <div class="bg-slate-900 text-white px-6 py-4 flex items-center justify-between">
         <div>
           <h3 id="modalProjectTitle" class="font-bold text-base">Ficha de Proyecto</h3>
@@ -302,25 +355,25 @@
           <button type="button" id="btnConvertToOt" onclick="window.app.convertCurrentProjectToOT()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-lg transition shadow-sm flex items-center gap-1.5">
             <i class="fa-solid fa-bolt"></i> <span>Derivar a OT</span>
           </button>
-          <button onclick="window.app.closeProjectModal()" class="text-slate-400 hover:text-white text-lg p-1">✕</button>
+          <button onclick="window.app.closeProjectModal()" class="text-slate-400 hover:text-white text-lg p-1" aria-label="Cerrar">✕</button>
         </div>
       </div>
 
       <form id="projectForm" onsubmit="window.app.saveProject(event)" class="p-6 space-y-4 text-xs overflow-y-auto custom-scroll flex-1">
         <input type="hidden" id="formProjectId">
 
-        <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 bg-slate-50 p-3 rounded-xl border">
+        <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 bg-slate-50 p-3 rounded-xl border border-slate-200">
           <div>
             <label class="block font-bold text-slate-700 mb-1">Código Proyecto *</label>
-            <input type="text" id="formProjCodigo" required class="w-full border rounded-lg p-2 font-bold text-indigo-700">
+            <input type="text" id="formProjCodigo" required class="w-full border border-slate-200 rounded-lg p-2 font-bold text-indigo-700">
           </div>
           <div>
             <label class="block font-bold text-slate-700 mb-1">Ticket / OC</label>
-            <input type="text" id="formProjTicket" class="w-full border rounded-lg p-2" placeholder="Ej. #66458">
+            <input type="text" id="formProjTicket" class="w-full border border-slate-200 rounded-lg p-2" placeholder="Ej. #66458">
           </div>
           <div>
             <label class="block font-bold text-slate-700 mb-1">Tipología *</label>
-            <select id="formProjTipologia" required class="w-full border rounded-lg p-2 font-semibold">
+            <select id="formProjTipologia" required class="w-full border border-slate-200 rounded-lg p-2 font-semibold">
               <option value="PROYECTO">PROYECTO</option>
               <option value="REPARACION">REPARACIÓN</option>
               <option value="APOYO TECNICO">APOYO TÉCNICO</option>
@@ -328,7 +381,7 @@
           </div>
           <div>
             <label class="block font-bold text-slate-700 mb-1">Prioridad *</label>
-            <select id="formProjPrioridad" required class="w-full border rounded-lg p-2 font-semibold">
+            <select id="formProjPrioridad" required class="w-full border border-slate-200 rounded-lg p-2 font-semibold">
               <option value="MUY ALTA">🚨 Muy Alta</option>
               <option value="ALTA">🟠 Alta</option>
               <option value="MEDIA" selected>🟡 Media</option>
@@ -339,39 +392,39 @@
 
         <div>
           <label class="block font-bold text-slate-700 mb-1">Requerimiento / Asunto *</label>
-          <textarea id="formProjRequerimiento" rows="2" required placeholder="Nombre descriptivo del proyecto..." class="w-full border rounded-lg p-2 font-medium"></textarea>
+          <textarea id="formProjRequerimiento" rows="2" required placeholder="Nombre descriptivo del proyecto..." class="w-full border border-slate-200 rounded-lg p-2 font-medium"></textarea>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label class="block font-bold text-slate-700 mb-1">Unidad Solicitante</label>
-            <input type="text" id="formProjUnidad" placeholder="Ej. Subdirección de Operaciones, Urgencia..." class="w-full border rounded-lg p-2">
+            <input type="text" id="formProjUnidad" placeholder="Ej. Subdirección de Operaciones, Urgencia..." class="w-full border border-slate-200 rounded-lg p-2">
           </div>
           <div>
             <label class="block font-bold text-slate-700 mb-1">Solicitante (Persona)</label>
-            <input type="text" id="formProjSolicitante" placeholder="Nombre de quien solicita..." class="w-full border rounded-lg p-2">
+            <input type="text" id="formProjSolicitante" placeholder="Nombre de quien solicita..." class="w-full border border-slate-200 rounded-lg p-2">
           </div>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
             <label class="block font-bold text-slate-700 mb-1">Piso</label>
-            <input type="text" id="formProjPiso" placeholder="Ej. -1, 1, 2, 3..." class="w-full border rounded-lg p-2">
+            <input type="text" id="formProjPiso" placeholder="Ej. -1, 1, 2, 3..." class="w-full border border-slate-200 rounded-lg p-2">
           </div>
           <div>
             <label class="block font-bold text-slate-700 mb-1">Recinto / Emplazamiento</label>
-            <input type="text" id="formProjUbicacion" placeholder="Ej. Terraza, Box..." class="w-full border rounded-lg p-2">
+            <input type="text" id="formProjUbicacion" placeholder="Ej. Terraza, Box..." class="w-full border border-slate-200 rounded-lg p-2">
           </div>
           <div>
             <label class="block font-bold text-slate-700 mb-1">Código PMA</label>
-            <input type="text" id="formProjPMA" placeholder="Ej. D-3-40, G-S1-45" class="w-full border rounded-lg p-2">
+            <input type="text" id="formProjPMA" placeholder="Ej. D-3-40, G-S1-45" class="w-full border border-slate-200 rounded-lg p-2">
           </div>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-indigo-50/50 p-3 rounded-xl border border-indigo-100">
           <div>
             <label class="block font-bold text-indigo-900 mb-1">Fase / Estado *</label>
-            <select id="formProjEstado" required class="w-full border rounded-lg p-2 font-bold text-indigo-950">
+            <select id="formProjEstado" required class="w-full border border-slate-200 rounded-lg p-2 font-bold text-indigo-950">
               <option value="PENDIENTE">📋 Pendiente / En Evaluación</option>
               <option value="Propuesta enviada">📑 Propuesta Enviada</option>
               <option value="EN PROCESO">🏗️ En Proceso / En Obras</option>
@@ -380,11 +433,11 @@
           </div>
           <div>
             <label class="block font-bold text-indigo-900 mb-1">Fecha de Ingreso</label>
-            <input type="date" id="formProjFechaIngreso" class="w-full border rounded-lg p-2">
+            <input type="date" id="formProjFechaIngreso" class="w-full border border-slate-200 rounded-lg p-2">
           </div>
           <div>
             <label class="block font-bold text-indigo-900 mb-1">Última Actualización</label>
-            <input type="date" id="formProjFechaActualizacion" class="w-full border rounded-lg p-2">
+            <input type="date" id="formProjFechaActualizacion" class="w-full border border-slate-200 rounded-lg p-2">
           </div>
         </div>
 
@@ -395,15 +448,15 @@
 
         <div>
           <label class="block font-bold text-slate-700 mb-1">Memoria Descriptiva y Especificaciones</label>
-          <textarea id="formProjDescripcion" rows="4" placeholder="Detalle técnico de los trabajos, materiales..." class="w-full border rounded-lg p-2"></textarea>
+          <textarea id="formProjDescripcion" rows="4" placeholder="Detalle técnico de los trabajos, materiales..." class="w-full border border-slate-200 rounded-lg p-2"></textarea>
         </div>
 
-        <div class="pt-4 border-t flex items-center justify-between">
+        <div class="pt-4 border-t border-slate-100 flex items-center justify-between">
           <button type="button" id="btnDeleteProject" onclick="window.app.deleteProject()" class="text-rose-600 hover:text-rose-800 font-bold flex items-center gap-1">
             <i class="fa-solid fa-trash-can"></i> Eliminar Proyecto
           </button>
           <div class="flex items-center gap-2">
-            <button type="button" onclick="window.app.closeProjectModal()" class="px-4 py-2 border rounded-lg font-bold">Cancelar</button>
+            <button type="button" onclick="window.app.closeProjectModal()" class="px-4 py-2 border border-slate-200 rounded-lg font-bold">Cancelar</button>
             <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-bold shadow">
               <i class="fa-solid fa-floppy-disk mr-1"></i> Guardar Proyecto
             </button>
@@ -414,21 +467,18 @@
   </div>
 
   <!-- Modal Crear OT -->
-  <div id="createOtModal" class="hidden fixed inset-0 z-50 bg-slate-900/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-    <div class="bg-white w-full max-w-lg rounded-2xl p-5 shadow-2xl border max-h-[92vh] flex flex-col">
-      <div class="flex items-center justify-between pb-3 border-b">
-        <div>
-          <h3 class="text-base font-black text-slate-900">Nueva Orden de Trabajo (OT)</h3>
-          <p id="createOtSubtitle" class="text-xs text-slate-400">Emisión operativa para cuadrilla en terreno</p>
-        </div>
-        <button onclick="window.app.closeCreateOtModal()" class="text-slate-400 text-xl font-bold">✕</button>
+  <div id="createModal" class="hidden fixed inset-0 z-50 bg-slate-900/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white w-full max-w-lg rounded-2xl p-5 shadow-2xl border border-slate-200 max-h-[92vh] flex flex-col">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <h3 class="text-base font-black text-slate-900">Nueva Orden de Trabajo</h3>
+        <button onclick="window.app.closeCreateModal()" class="text-slate-400 hover:text-slate-700 text-xl font-bold p-1" aria-label="Cerrar">✕</button>
       </div>
-      <form id="createOtForm" onsubmit="window.app.handleCreateOT(event)" class="space-y-3 pt-3 overflow-y-auto custom-scroll flex-1 text-xs">
+      <form id="createOtForm" onsubmit="window.app.handleCreateOT(event)" class="space-y-3 pt-3 overflow-y-auto custom-scroll flex-1">
         <input type="hidden" id="newOtSourceProjectId">
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label for="newOtEspecialidad" class="block font-bold text-slate-600 mb-1">Especialidad</label>
-            <select id="newOtEspecialidad" required class="w-full p-2 bg-slate-50 border rounded-lg">
+            <label for="newOtEspecialidad" class="block text-xs font-bold text-slate-600 mb-1">Especialidad</label>
+            <select id="newOtEspecialidad" required class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium">
               <option value="Infraestructura">Infraestructura</option>
               <option value="Climatización">Climatización</option>
               <option value="Electricidad">Electricidad</option>
@@ -437,8 +487,8 @@
             </select>
           </div>
           <div>
-            <label for="newOtPrioridad" class="block font-bold text-slate-600 mb-1">Prioridad</label>
-            <select id="newOtPrioridad" required class="w-full p-2 bg-slate-50 border rounded-lg">
+            <label for="newOtPrioridad" class="block text-xs font-bold text-slate-600 mb-1">Prioridad</label>
+            <select id="newOtPrioridad" required class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium">
               <option value="Urgente">🚨 Urgente</option>
               <option value="Alta" selected>🟠 Alta</option>
               <option value="Media">🟡 Media</option>
@@ -446,64 +496,420 @@
             </select>
           </div>
         </div>
-
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label for="newOtRecinto" class="block font-bold text-slate-600 mb-1">Recinto / Servicio</label>
-            <input type="text" id="newOtRecinto" required class="w-full p-2 bg-slate-50 border rounded-lg">
+            <label for="newOtRecinto" class="block text-xs font-bold text-slate-600 mb-1">Recinto / Servicio</label>
+            <input type="text" id="newOtRecinto" required placeholder="Ej: Pabellón 3" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium">
           </div>
           <div>
-            <label for="newOtTicket" class="block font-bold text-slate-600 mb-1">PMA / Ticket</label>
-            <input type="text" id="newOtTicket" class="w-full p-2 bg-slate-50 border rounded-lg">
+            <label for="newOtTicket" class="block text-xs font-bold text-slate-600 mb-1">PMA</label>
+            <input type="text" id="newOtTicket" placeholder="Ej: PMA-8941" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium">
           </div>
         </div>
-
-        <div>
-          <label for="newOtSolicitante" class="block font-bold text-slate-600 mb-1">Solicitante</label>
-          <input type="text" id="newOtSolicitante" required class="w-full p-2 bg-slate-50 border rounded-lg">
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label for="newOtSolicitante" class="block text-xs font-bold text-slate-600 mb-1">Solicitante</label>
+            <input type="text" id="newOtSolicitante" required placeholder="Nombre o cargo" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium">
+          </div>
+          <div>
+            <label for="newOtEncargado" class="block text-xs font-bold text-slate-600 mb-1">Técnico Asignado</label>
+            <select id="newOtEncargado" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium dynamic-tech-select"></select>
+          </div>
         </div>
-
         <div>
-          <label for="newOtDescripcion" class="block font-bold text-slate-600 mb-1">Descripción del Trabajo Operativo</label>
-          <textarea id="newOtDescripcion" required rows="4" class="w-full p-2 bg-slate-50 border rounded-lg"></textarea>
+          <label for="newOtDescripcion" class="block text-xs font-bold text-slate-600 mb-1">Descripción del Trabajo</label>
+          <textarea id="newOtDescripcion" required rows="5" placeholder="Detalle técnico de la anomalía o trabajo requerido..." class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium"></textarea>
         </div>
-
+        <div>
+          <label for="newOtInstrucciones" class="block text-xs font-bold text-slate-600 mb-1">Instrucciones de Jefatura (Opcional)</label>
+          <textarea id="newOtInstrucciones" rows="2" placeholder="Directriz inicial para la cuadrilla..." class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium"></textarea>
+        </div>
         <div class="pt-2 flex justify-end space-x-2">
-          <button type="button" onclick="window.app.closeCreateOtModal()" class="px-4 py-2 font-bold bg-slate-100 rounded-lg">Cancelar</button>
-          <button type="submit" class="px-5 py-2 font-black text-white bg-blue-600 rounded-lg">Crear y Despachar OT</button>
+          <button type="button" onclick="window.app.closeCreateModal()" class="px-4 py-2 text-xs font-bold text-slate-600 bg-slate-100 rounded-lg">Cancelar</button>
+          <button type="submit" class="px-5 py-2 text-xs font-black text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-md">Crear y Despachar OT</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- Modal Configuración Global -->
-  <div id="settingsModal" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-3">
-    <div class="bg-white w-full max-w-md rounded-2xl p-5 shadow-2xl border text-xs">
-      <div class="flex justify-between items-center pb-3 border-b">
-        <h3 class="font-black text-sm text-slate-900">Configuración Global</h3>
-        <button onclick="window.app.closeSettingsModal()" class="text-slate-400 font-bold">✕</button>
+  <!-- Ficha Operativa Unificada (UI Minimal 2026 Layout) -->
+  <div id="unifiedOperativeView" class="hidden fixed inset-0 z-40 overflow-y-auto">
+    <div class="max-w-6xl mx-auto px-4 py-6 md:py-8 min-h-screen relative flex flex-col md:flex-row gap-8 pb-32">
+      
+      <!-- Top Header / Back Button (Mobile) -->
+      <div class="absolute top-0 left-0 right-0 p-3 sm:p-4 flex justify-between items-center bg-white/90 backdrop-blur-md border-b border-slate-200 md:hidden z-10 shadow-sm">
+        <button onclick="window.app.closeOperativeView()" class="px-4 py-2 text-sm font-black text-slate-700 bg-white hover:bg-slate-50 active:bg-slate-100 border border-slate-200 shadow-sm rounded-xl flex items-center gap-2 transition-all">
+          <span class="text-lg leading-none" aria-hidden="true">←</span> <span>Volver</span>
+        </button>
+        <div class="flex items-center gap-3">
+          <button type="button" id="uovWhatsappBtnMobile" class="text-[#25D366] transition-transform active:scale-95" title="Compartir por WhatsApp">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+          </button>
+          <span id="uovStatusBadgeMobile" class="text-xs font-bold px-2 py-1 rounded-md bg-amber-100 text-amber-800">En Ejecución</span>
+        </div>
       </div>
-      <form onsubmit="window.app.saveSystemSettings(event)" class="space-y-3 pt-3">
-        <div>
-          <label class="block font-bold text-slate-700 mb-1">Nombre Establecimiento</label>
-          <input type="text" id="cfgHospitalName" required class="w-full p-2 bg-slate-50 border rounded-lg font-medium">
+
+      <!-- Sidebar Navigation (Desktop) -->
+      <aside class="uov-nav hidden md:block w-64 shrink-0 sticky top-8 self-start space-y-6">
+        <button onclick="window.app.closeOperativeView()" class="w-full py-3 px-4 bg-white border border-slate-200 text-sm font-black text-slate-700 hover:bg-slate-50 hover:text-slate-900 hover:border-slate-300 rounded-xl flex items-center gap-3 transition-all shadow-sm group">
+          <span class="text-xl leading-none transition-transform group-hover:-translate-x-1" aria-hidden="true">←</span> <span>Volver al listado</span>
+        </button>
+        <nav class="space-y-1">
+          <a href="#sec-info" class="uov-nav-link active">
+            <span class="text-xl" aria-hidden="true">📋</span> Información
+          </a>
+          <a href="#sec-consults" class="uov-nav-link">
+            <span class="text-xl" aria-hidden="true">💬</span> Consultas
+          </a>
+          <a href="#sec-report" class="uov-nav-link">
+            <span class="text-xl" aria-hidden="true">📝</span> Informe y Cierre
+          </a>
+        </nav>
+      </aside>
+
+      <!-- Main Content Area -->
+      <div class="uov-content flex-1 space-y-6 pt-16 md:pt-0 max-w-3xl">
+        
+        <div class="flex justify-between items-end border-b border-slate-200 pb-4">
+          <div>
+            <div class="flex items-center gap-3">
+              <h2 id="uovFolio" class="text-2xl font-black tracking-tight text-slate-900">OT-000</h2>
+              <button type="button" id="uovWhatsappBtnTop" class="text-[#25D366] hover:bg-[#25D366]/10 p-1.5 rounded-full transition-colors cursor-pointer" title="Compartir por WhatsApp">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+              </button>
+            </div>
+            <p id="uovRecintoHeader" class="text-slate-500 font-medium mt-1">Recinto</p>
+          </div>
+          <span id="uovStatusBadge" class="hidden md:inline-flex text-sm font-bold px-3 py-1 rounded-md bg-amber-100 text-amber-800">En Ejecución</span>
         </div>
-        <div>
-          <label class="block font-bold text-slate-700 mb-1">Prefijo de Folio OT</label>
-          <input type="text" id="cfgFolioPrefix" required class="w-full p-2 bg-slate-50 border rounded-lg font-medium">
+
+        <div id="uovLockBanner" class="hidden p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs font-bold text-rose-700 flex items-center gap-2">
+          <span aria-hidden="true">🔒</span> OT Terminada. Datos bloqueados. Solo lectura.
         </div>
-        <div class="pt-2 flex justify-between items-center">
-          <button type="button" onclick="window.app.hardResetProjects()" class="text-rose-600 hover:underline font-bold">🔄 Recargar 46 Proyectos</button>
+
+        <div id="uovReviewSection" class="hidden bg-indigo-50 border border-indigo-200 p-5 rounded-xl space-y-3">
+          <h4 class="text-sm font-black text-indigo-900 uppercase tracking-wide">Validación de Jefatura</h4>
+          <p class="text-xs text-indigo-700">La cuadrilla ha solicitado el cierre. Ingrese instrucciones abajo si desea reabrirla, o autorice el cierre definitivo.</p>
+          <div class="flex gap-3 pt-2">
+            <button type="button" onclick="window.app.reopenOrder()" class="flex-1 py-3 bg-white border-2 border-rose-500 text-rose-600 hover:bg-rose-50 font-black rounded-xl shadow-sm transition-transform active:scale-95">
+              ❌ Reabrir OT
+            </button>
+            <button type="button" onclick="window.app.authorizeClosure()" class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl shadow-sm transition-transform active:scale-95">
+              ✅ Autorizar Cierre
+            </button>
+          </div>
+        </div>
+
+        <form id="uovForm" onsubmit="window.app.saveOperativeData(event)" class="space-y-6">
+          <input type="hidden" id="uovId">
+
+          <!-- Sec 1: Info -->
+          <section id="sec-info" class="uov-section-card space-y-4">
+            <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-2 mb-4">
+              <span aria-hidden="true">📋</span> Información de la Orden de Trabajo
+            </h3>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 uov-editable">
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Especialidad</label>
+                <select id="uovEspecialidad" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium">
+                  <option value="Infraestructura">Infraestructura</option>
+                  <option value="Climatización">Climatización</option>
+                  <option value="Electricidad">Electricidad</option>
+                  <option value="Equipos Industriales">Equipos Industriales</option>
+                  <option value="Equipos Clinicos">Equipos Clínicos</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Prioridad</label>
+                <select id="uovPrioridad" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium">
+                  <option value="Urgente">🚨 Urgente</option>
+                  <option value="Alta">🟠 Alta</option>
+                  <option value="Media">🟡 Media</option>
+                  <option value="Baja">🟢 Baja</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 uov-editable">
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Recinto / Servicio</label>
+                <input type="text" id="uovRecinto" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">PMA recinto</label>
+                <input type="text" id="uovTicket" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 uov-editable">
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Solicitante</label>
+                <input type="text" id="uovSolicitante" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Técnico Asignado</label>
+                <select id="uovEncargado" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium dynamic-tech-select"></select>
+              </div>
+            </div>
+
+            <div class="uov-editable">
+              <label class="block text-xs font-bold text-slate-600 mb-1">Descripción del Trabajo</label>
+              <textarea id="uovDescripcion" rows="6" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium"></textarea>
+            </div>
+
+            <div class="uov-editable" id="uovInstContainer">
+              <label class="block text-xs font-bold text-slate-600 mb-1">Instrucciones de Jefatura</label>
+              <textarea id="uovInstrucciones" rows="2" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium"></textarea>
+            </div>
+
+            <!-- Estado y Tiempos consolidado -->
+            <div class="pt-4 border-t border-slate-100 mt-4">
+              <h4 class="text-xs font-bold text-slate-800 mb-3 uppercase tracking-wide">Estado y Tiempos</h4>
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                 <div class="uov-editable" id="uovFechaInicioContainer">
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Fecha de Inicio</label>
+                    <input type="datetime-local" id="uovFechaInicio" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium">
+                 </div>
+                 <div class="uov-editable" id="uovEstadoContainer">
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Estado Administrativo</label>
+                    <select id="uovEstado" class="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-800">
+                      <option value="Pendiente">Pendiente</option>
+                      <option value="En Ejecución">En Ejecución</option>
+                      <option value="Solicitud Cierre">Solicitud Cierre (En Revisión)</option>
+                      <option value="Terminada">Terminada (Cerrada)</option>
+                    </select>
+                </div>
+                <div>
+                   <label class="block text-xs font-bold text-slate-600 mb-1">Última Modificación</label>
+                   <div id="uovLastModText" class="w-full p-2.5 bg-slate-50 border border-slate-100 rounded-xl text-sm font-medium text-slate-700">-</div>
+                </div>
+                <div>
+                   <label class="block text-xs font-bold text-slate-600 mb-1">Tiempo Transcurrido</label>
+                   <div id="uovElapsedText" class="w-full p-2.5 bg-slate-50 border border-slate-100 rounded-xl text-sm font-medium text-slate-700">-</div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Sec 3: Consultas -->
+          <section id="sec-consults" class="uov-section-card space-y-4">
+            <h3 class="text-sm font-bold text-slate-800 flex items-center justify-between border-b border-slate-100 pb-2 mb-4">
+              <span class="flex items-center gap-2"><span aria-hidden="true">💬</span> Historial de Actividad</span>
+            </h3>
+            
+            <div id="uovConsultationHistory" class="space-y-3 text-sm"></div>
+
+            <div id="uovRequestForm" class="pt-4 border-t border-slate-100 space-y-3">
+              <label class="block text-xs font-bold text-slate-700">Emitir Consulta o Contingencia a Jefatura:</label>
+              <select id="uovNewRequestType" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium">
+                <option value="Bloqueo o Contingencia en Terreno">Bloqueo o Contingencia en Terreno</option>
+                <option value="Permisos / IAAS / Acceso Restringido">Permisos / IAAS / Acceso Restringido</option>
+                <option value="Asistencia Técnica Adicional">Asistencia Técnica Adicional</option>
+                <option value="Consulta Operativa a Supervisión">Consulta Operativa a Supervisión</option>
+              </select>
+              <textarea id="uovNewRequestDetails" rows="2" placeholder="Detalle del requerimiento..." class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium"></textarea>
+              <button type="button" onclick="window.app.submitTechnicianRequest()" class="w-full py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-sm font-black rounded-xl shadow-sm transition-transform active:scale-95">
+                📤 Enviar Consulta
+              </button>
+            </div>
+          </section>
+
+          <!-- Sec 4: Informe y Cierre -->
+          <section id="sec-report" class="uov-section-card space-y-4">
+            <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-2 mb-4">
+              <span aria-hidden="true">📝</span> Informe de Trabajo
+            </h3>
+            
+            <div class="uov-editable-tech">
+              <label class="block text-xs font-bold text-slate-600 mb-1">Diagnóstico y Solución Aplicada</label>
+              <textarea id="uovDiagnosticoSolucion" rows="4" placeholder="Detalle de trabajos ejecutados..." class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium"></textarea>
+            </div>
+            
+            <!-- Acciones Técnico -->
+            <div id="uovTechActions" class="pt-4 flex flex-col sm:flex-row gap-3">
+              <button type="button" onclick="window.app.saveOperativeData(event, false)" class="flex-1 py-3 bg-slate-800 hover:bg-slate-900 text-white text-sm font-black rounded-xl transition-transform active:scale-95">
+                💾 Guardar Progreso
+              </button>
+              <button type="button" onclick="window.app.saveOperativeData(event, true)" class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-black rounded-xl shadow-md transition-transform active:scale-95">
+                ⚡ Solicitar Cierre a Jefatura
+              </button>
+            </div>
+          </section>
+        </form>
+      </div>
+      
+      <!-- Sticky Bottom Bar (Supervisor Save/Delete Actions) -->
+      <div id="uovBottomBar" class="uov-bottom-bar hidden">
+          <div class="max-w-6xl mx-auto flex items-center justify-between px-4">
+              <button type="button" onclick="window.app.deleteOrderFromModal()" class="uov-action-btn uov-btn-danger flex items-center gap-2">
+                 <span>🗑️</span> <span class="hidden sm:inline">Eliminar OT</span>
+              </button>
+              <div class="flex gap-3">
+                  <button type="button" onclick="window.app.closeOperativeView()" class="uov-action-btn bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200">
+                      Cancelar
+                  </button>
+                  <button type="button" onclick="document.getElementById('uovForm').dispatchEvent(new Event('submit'))" id="uovSaveBtn" class="uov-action-btn uov-btn-primary flex items-center gap-2">
+                      <span>💾</span> <span class="hidden sm:inline">Guardar y Sincronizar</span> <span class="sm:hidden">Guardar</span>
+                  </button>
+              </div>
+          </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Configuración -->
+  <div id="settingsModal" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white w-full max-w-md rounded-2xl p-5 shadow-2xl border border-slate-200 max-h-[92vh] flex flex-col">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <h3 class="text-base font-black text-slate-900 flex items-center space-x-2">
+          <span aria-hidden="true">⚙️</span> <span>Configuración Global</span>
+        </h3>
+        <button onclick="window.app.closeSettingsModal()" class="text-slate-400 hover:text-slate-700 text-xl font-bold p-1" aria-label="Cerrar">✕</button>
+      </div>
+
+      <form onsubmit="window.app.saveSystemSettings(event)" class="space-y-4 pt-3 overflow-y-auto custom-scroll flex-1 text-xs">
+        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+          <label class="block font-bold text-slate-700">Logo de la Institución</label>
+          <div class="flex items-center space-x-3">
+            <div id="settingsLogoPreview" class="w-12 h-12 rounded-lg bg-white border border-slate-300 flex items-center justify-center overflow-hidden shrink-0">
+              <span class="text-2xl" aria-hidden="true">🏥</span>
+            </div>
+            <div class="flex-1 space-y-1">
+              <label for="logoFileInput" class="sr-only">Subir Logo</label>
+              <input type="file" id="logoFileInput" accept="image/*" onchange="window.app.handleLogoUpload(event)" class="text-[11px] w-full text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+              <button type="button" onclick="window.app.resetLogo()" class="text-[10px] text-rose-600 font-bold block">Restablecer Logo</button>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label for="cfgHospitalName" class="block font-bold text-slate-700 mb-1">Nombre del Establecimiento</label>
+          <input type="text" id="cfgHospitalName" required class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg font-medium">
+        </div>
+
+        <div>
+          <label for="cfgFolioPrefix" class="block font-bold text-slate-700 mb-1">Prefijo de Folio OT</label>
+          <input type="text" id="cfgFolioPrefix" required placeholder="Ej: OT-INFRA" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg font-medium">
+        </div>
+
+        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+          <span class="block font-bold text-slate-800">PINs de Acceso (Déjelo en blanco si no desea cambiarlo)</span>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label for="cfgPinSupervisor" class="block text-slate-600 mb-1">Nuevo PIN Supervisor</label>
+              <input type="password" id="cfgPinSupervisor" maxlength="4" placeholder="••••" class="w-full p-2 bg-white border border-slate-200 rounded-lg text-center font-bold tracking-widest">
+            </div>
+            <div>
+              <label for="cfgPinTecnico" class="block text-slate-600 mb-1">Nuevo PIN Técnico</label>
+              <input type="password" id="cfgPinTecnico" maxlength="4" placeholder="••••" class="w-full p-2 bg-white border border-slate-200 rounded-lg text-center font-bold tracking-widest">
+            </div>
+          </div>
+        </div>
+
+        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+          <label class="block font-bold text-slate-800">Gestión de Técnicos</label>
           <div class="flex gap-2">
-            <button type="button" onclick="window.app.closeSettingsModal()" class="px-4 py-2 font-bold bg-slate-100 rounded-lg">Cancelar</button>
-            <button type="submit" class="px-5 py-2 font-black text-white bg-indigo-600 rounded-lg">Guardar</button>
+            <label for="newTechInput" class="sr-only">Nombre del técnico</label>
+            <input type="text" id="newTechInput" placeholder="Nombre técnico..." class="flex-1 p-2 bg-white border border-slate-200 rounded-lg">
+            <button type="button" onclick="window.app.addTechnician()" class="px-3 bg-blue-600 text-white rounded-lg font-bold">Añadir</button>
+          </div>
+          <ul id="settingsTechList" class="mt-2 space-y-1 max-h-24 overflow-y-auto custom-scroll"></ul>
+        </div>
+
+        <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl space-y-1">
+          <span class="block font-bold text-emerald-900">Respaldo y Base de Datos</span>
+          <p class="text-[10px] text-emerald-700 mb-2">Descarga el registro histórico completo de todas las OTs en formato compatible con Microsoft Excel.</p>
+          <button type="button" onclick="window.app.exportToExcel()" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 transition-transform text-white rounded-lg font-bold flex justify-center items-center gap-2 shadow-sm">
+            <span aria-hidden="true">📊</span> Descargar BD Completa (Excel / CSV)
+          </button>
+        </div>
+
+        <div class="pt-2 flex items-center justify-between">
+          <button type="button" onclick="window.app.hardResetDatabase()" class="px-3 py-2 text-rose-600 bg-rose-50 border border-rose-200 hover:bg-rose-100 font-bold rounded-lg" title="Borrar todas las OTs">⚠️ Borrar OTs</button>
+          <div class="flex space-x-2">
+            <button type="button" onclick="window.app.closeSettingsModal()" class="px-4 py-2 font-bold text-slate-600 bg-slate-100 rounded-lg">Cancelar</button>
+            <button type="submit" class="px-5 py-2 font-black text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-md">Guardar Global</button>
           </div>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- SDO Cloud Master Engine Script -->
+  <!-- Modal Reporte de Avance -->
+  <div id="advanceReportModal" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white w-full max-w-2xl rounded-2xl p-5 shadow-2xl border border-slate-200 max-h-[94vh] flex flex-col text-xs">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <div>
+          <h3 class="text-base font-black text-slate-900">📈 Reporte Ejecutivo de Avance</h3>
+          <p class="text-slate-500">Métricas de OTs entre fechas</p>
+        </div>
+        <button onclick="window.app.closeAdvanceReportModal()" class="text-slate-400 hover:text-slate-700 text-xl font-bold p-1" aria-label="Cerrar">✕</button>
+      </div>
+
+      <div class="space-y-3 pt-3 overflow-y-auto custom-scroll flex-1">
+        <div class="grid grid-cols-2 gap-2 bg-slate-50 p-3 rounded-xl border border-slate-200">
+          <div>
+            <label for="repDateFrom" class="block font-bold text-slate-700 mb-1">Fecha Desde:</label>
+            <input type="date" id="repDateFrom" class="w-full p-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold">
+          </div>
+          <div>
+            <label for="repDateTo" class="block font-bold text-slate-700 mb-1">Fecha Hasta:</label>
+            <input type="date" id="repDateTo" class="w-full p-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold">
+          </div>
+        </div>
+
+        <button onclick="window.app.generateAdvanceStats()" class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-lg shadow-sm">
+          Calcular Estadísticas
+        </button>
+
+        <div id="reportStatsContainer" class="hidden space-y-3">
+          <div class="grid grid-cols-2 gap-2">
+            <div class="bg-blue-50 border border-blue-200 p-2.5 rounded-xl text-center">
+              <span class="block text-[10px] uppercase font-bold text-blue-800">Total OTs</span>
+              <span id="statTotalOts" class="text-xl font-black text-blue-900">0</span>
+            </div>
+            <div class="bg-indigo-50 border border-indigo-200 p-2.5 rounded-xl text-center">
+              <span class="block text-[10px] uppercase font-bold text-indigo-800">Promedio Atención</span>
+              <span id="statAvgTime" class="text-xl font-black text-indigo-900">0h</span>
+            </div>
+          </div>
+
+          <div class="border border-slate-200 rounded-xl overflow-hidden">
+            <table class="w-full text-left">
+              <thead class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+                <tr>
+                  <th class="p-2">Folio</th>
+                  <th class="p-2">Recinto</th>
+                  <th class="p-2">Estado</th>
+                  <th class="p-2 text-right">Tiempo</th>
+                </tr>
+              </thead>
+              <tbody id="reportTableBody" class="divide-y divide-slate-100 bg-white"></tbody>
+            </table>
+          </div>
+
+          <button onclick="window.app.exportReportPDF()" class="w-full py-2.5 bg-slate-900 hover:bg-black text-white font-black rounded-lg shadow-md">
+            📄 Descargar Informe Gerencial (PDF)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Custom Confirm -->
+  <div id="customConfirmModal" class="hidden fixed inset-0 z-[100] bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl p-5 max-w-sm w-full text-center shadow-2xl border border-slate-200">
+      <h3 id="confirmModalTitle" class="text-lg font-black text-slate-900 mb-2"></h3>
+      <p id="confirmModalText" class="text-sm text-slate-600 mb-5"></p>
+      <div class="flex gap-2">
+        <button onclick="window.app.closeConfirmModal()" class="flex-1 py-2 bg-slate-100 text-slate-700 font-bold rounded-lg">Cancelar</button>
+        <button id="confirmModalBtnYes" class="flex-1 py-2 bg-rose-600 text-white font-bold rounded-lg shadow-sm">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SDO Cloud Master Unified Logic -->
   <script>
     const SGM_CONFIG = {
       supabaseUrl: "https://izyxyycwhszkmosyszzx.supabase.co",
@@ -562,14 +968,21 @@
       { id: 46, codigo: "PROY-046", ticket: "", tipologia: "REPARACION", unidad: "Subdirección de Operaciones", solicitante: "", ubicacion: "SALA DE RECUPERACION", piso: "2", pma: "", requerimiento: "MEJORA LAVAMANOS / INCORPORA CERAMICA", estado: "PENDIENTE", fecha_ingreso: "2026-05-26", fecha_actualizacion: "2026-05-26", descripcion: "Revestimiento cerámico lavamanos", pendiente: "", prioridad: "MEDIA" }
     ];
 
-    function escapeHtml(u) {
-      return u ? u.toString().replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;") : '';
+    function escapeHtml(unsafe) {
+      if (!unsafe) return '';
+      return unsafe.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
 
     async function hashPin(pin) {
-      if (!window.crypto?.subtle) return 'fb_' + pin;
-      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pin));
-      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+      if (!window.crypto || !window.crypto.subtle) {
+        let h = 0;
+        for(let i=0; i<pin.length; i++) h = Math.imul(31, h) + pin.charCodeAt(i) | 0;
+        return 'fallback_' + h;
+      }
+      const msgBuffer = new TextEncoder().encode(pin);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     }
 
     class UnifiedPlatformApp {
@@ -581,97 +994,132 @@
 
         this.projects = [];
         this.orders = [];
+        this.viewMode = 'cards';
         this.projectsViewMode = 'kanban';
         this.projectStatusFilter = 'ALL';
-        this.otFilterStatus = 'TODOS';
-
+        this.filterStatus = 'TODOS';
+        this.activeOperativeOt = null;
         this.currentProjectInModal = null;
         this.draggedProjectId = null;
-        this.hashes = { supervisor: "", tecnico: "" };
-        this.supabase = null;
+        this.reportFilteredList = [];
 
-        this.initApp();
+        this.hospitalName = SGM_CONFIG.defaultHospital;
+        this.folioPrefix = SGM_CONFIG.defaultPrefix;
+        this.customLogo = null;
+        this.technicians = ["Pablo Loira", "Rafael", "Ángel Asencio"];
+        this.hashes = { supervisor: "", tecnico: "" };
+
+        this.supabase = null;
+        this.syncing = false;
+
+        this.initAuth();
+        this.initScrollSpy();
+
+        window.addEventListener('popstate', () => {
+          if (!document.getElementById('unifiedOperativeView').classList.contains('hidden')) {
+            this.closeOperativeView(true);
+          }
+        });
       }
 
-      async initApp() {
-        this.loadInitialStores();
-        
+      async initAuth() {
         this.hashes.supervisor = await hashPin(SGM_CONFIG.defaultPins.supervisor);
         this.hashes.tecnico = await hashPin(SGM_CONFIG.defaultPins.tecnico);
+        
+        this.loadInitialStores();
+        this.initSupabase();
+
+        setInterval(() => this.updateTimeElapsedElements(), 60000);
 
         const cachedRole = sessionStorage.getItem('sdo_active_role');
         if (cachedRole) {
           this.currentRole = cachedRole;
+          this.applyRoleRestrictions();
+        } else {
+          this.applyRoleRestrictions();
         }
-        this.applyRoleRestrictions();
-
-        this.initSupabaseDirect();
       }
 
-      initSupabaseDirect() {
-        const badge = document.getElementById('supabaseStatusBadge');
-        try {
-          if (window.supabase && SGM_CONFIG.supabaseUrl && SGM_CONFIG.supabaseAnonKey) {
-            this.supabase = window.supabase.createClient(SGM_CONFIG.supabaseUrl, SGM_CONFIG.supabaseAnonKey);
-            
-            this.supabase.channel('unified_realtime')
-              .on('postgres_changes', { event: '*', schema: 'public', table: 'projects_hbqp' }, () => this.fetchProjects())
-              .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => this.fetchOrders())
-              .subscribe();
-            
-            this.fetchProjects();
-            this.fetchOrders();
-
-            if (badge) {
-              badge.className = "text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/30 flex items-center gap-1";
-              badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> <span>Supabase En Línea</span>';
+      initScrollSpy() {
+        const links = document.querySelectorAll('.uov-nav-link');
+        links.forEach(link => {
+          link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = link.getAttribute('href').substring(1);
+            const targetEl = document.getElementById(targetId);
+            if (targetEl) {
+              const yOffset = -20;
+              const y = targetEl.getBoundingClientRect().top + window.pageYOffset + yOffset;
+              window.scrollTo({ top: y, behavior: 'smooth' });
+              links.forEach(l => l.classList.remove('active'));
+              link.classList.add('active');
             }
+          });
+        });
+      }
+
+      initSupabase() {
+        try {
+          if (window.supabase && SGM_CONFIG.supabaseUrl.startsWith("https://")) {
+            this.supabase = window.supabase.createClient(SGM_CONFIG.supabaseUrl, SGM_CONFIG.supabaseAnonKey);
+            this.subscribeRealtime();
           }
-        } catch(e) {
-          console.warn("Supabase local fallback:", e);
-        }
+        } catch (e) { console.warn("Supabase local mode"); }
       }
 
-      loadInitialStores() {
-        const storedProjects = localStorage.getItem('hbqp_projects_live_v2');
-        if (storedProjects) {
-          try {
-            const parsed = JSON.parse(storedProjects);
-            this.projects = (parsed && parsed.length > 0) ? parsed : INITIAL_PROJECTS;
-          } catch(e) {
-            this.projects = INITIAL_PROJECTS;
+      subscribeRealtime() {
+        if (!this.supabase) return;
+        this.supabase.channel('unified_realtime')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, (payload) => {
+            if (payload.eventType === 'DELETE') {
+              this.orders = this.orders.filter(o => o.id !== payload.old.id);
+            } else {
+              const idx = this.orders.findIndex(o => o.id === payload.new.id);
+              if (idx !== -1) {
+                this.orders[idx] = payload.new.data;
+              } else {
+                this.orders.unshift(payload.new.data);
+              }
+            }
+            localStorage.setItem('sdo_orders_cache_v5', JSON.stringify(this.orders));
+            this.updateKpis();
+            this.renderOrdersList();
+
+            if (this.activeOperativeOt && payload.new && payload.new.id === this.activeOperativeOt.id) {
+              this.activeOperativeOt = payload.new.data;
+              this.renderOperativeHistory(this.activeOperativeOt);
+            }
+          })
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'projects_hbqp' }, () => {
+            this.fetchProjectsFromSupabase();
+          })
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'system_settings' }, () => {
+            this.fetchConfigFromSupabase();
+          })
+          .subscribe();
+      }
+
+      async fetchOrdersFromSupabase() {
+        if (!this.supabase) return;
+        try {
+          const { data, error } = await this.supabase.from('orders').select('*');
+          if (!error && data) {
+            this.orders = data.map(row => row.data);
+            this.updateKpis();
+            this.renderOrdersList();
+            localStorage.setItem('sdo_orders_cache_v5', JSON.stringify(this.orders));
           }
-        } else {
-          this.projects = JSON.parse(JSON.stringify(INITIAL_PROJECTS));
-          localStorage.setItem('hbqp_projects_live_v2', JSON.stringify(this.projects));
-        }
-
-        const storedOrders = localStorage.getItem('sdo_orders_live_v2');
-        if (storedOrders) {
-          try { this.orders = JSON.parse(storedOrders); } catch(e) { this.orders = []; }
-        } else {
-          this.orders = [];
-        }
+        } catch (e) {}
       }
 
-      hardResetProjects() {
-        if (confirm('¿Restablecer el catálogo con los 46 proyectos originales de la planilla?')) {
-          this.projects = JSON.parse(JSON.stringify(INITIAL_PROJECTS));
-          localStorage.setItem('hbqp_projects_live_v2', JSON.stringify(this.projects));
-          this.closeSettingsModal();
-          this.renderProjects();
-          this.showToast('46 Proyectos restablecidos');
-        }
-      }
-
-      async fetchProjects() {
+      async fetchProjectsFromSupabase() {
         if (!this.supabase) return;
         try {
           const { data, error } = await this.supabase.from('projects_hbqp').select('*');
           if (!error && data) {
             if (data.length > 0) {
-              this.projects = data.map(r => r.data);
-              localStorage.setItem('hbqp_projects_live_v2', JSON.stringify(this.projects));
+              this.projects = data.map(row => row.data);
+              localStorage.setItem('hbqp_projects_store_v5', JSON.stringify(this.projects));
               this.renderProjects();
             } else if (this.projects.length > 0) {
               for (const p of this.projects) {
@@ -683,23 +1131,125 @@
               }
             }
           }
-        } catch(e) {}
+        } catch (e) {}
       }
 
-      async fetchOrders() {
+      async fetchConfigFromSupabase() {
         if (!this.supabase) return;
         try {
-          const { data, error } = await this.supabase.from('orders').select('*');
-          if (!error && data && data.length > 0) {
-            this.orders = data.map(r => r.data);
-            localStorage.setItem('sdo_orders_live_v2', JSON.stringify(this.orders));
-            this.renderOrders();
+          const { data, error } = await this.supabase.from('system_settings').select('*').eq('id', 'global_config').single();
+          if (!error && data) {
+            const cfg = data.config_data;
+            this.hospitalName = cfg.hospitalName || this.hospitalName;
+            this.folioPrefix = cfg.folioPrefix || this.folioPrefix;
+            this.customLogo = cfg.customLogo || null;
+            this.technicians = cfg.technicians || this.technicians;
+            if (cfg.hashes) {
+              this.hashes.supervisor = cfg.hashes.supervisor || this.hashes.supervisor;
+              this.hashes.tecnico = cfg.hashes.tecnico || this.hashes.tecnico;
+            }
+            this.updateUIWithConfig();
+            localStorage.setItem('sdo_settings_cache_v5', JSON.stringify(cfg));
           }
-        } catch(e) {}
+        } catch (e) {}
+      }
+
+      loadInitialStores() {
+        const storedCfg = localStorage.getItem('sdo_settings_cache_v5');
+        if (storedCfg) {
+          try {
+            const cfg = JSON.parse(storedCfg);
+            this.hospitalName = cfg.hospitalName || this.hospitalName;
+            this.folioPrefix = cfg.folioPrefix || this.folioPrefix;
+            this.customLogo = cfg.customLogo || null;
+            this.technicians = cfg.technicians || this.technicians;
+            if (cfg.hashes) {
+              this.hashes.supervisor = cfg.hashes.supervisor || this.hashes.supervisor;
+              this.hashes.tecnico = cfg.hashes.tecnico || this.hashes.tecnico;
+            }
+          } catch(e) {}
+        }
+        this.updateUIWithConfig();
+
+        const storedProjects = localStorage.getItem('hbqp_projects_store_v5');
+        if (storedProjects) {
+          try {
+            const parsed = JSON.parse(storedProjects);
+            this.projects = (parsed && parsed.length > 0) ? parsed : INITIAL_PROJECTS;
+          } catch (e) { this.projects = INITIAL_PROJECTS; }
+        } else {
+          this.projects = JSON.parse(JSON.stringify(INITIAL_PROJECTS));
+          localStorage.setItem('hbqp_projects_store_v5', JSON.stringify(this.projects));
+        }
+
+        const storedOrders = localStorage.getItem('sdo_orders_cache_v5');
+        if (storedOrders) {
+          try { this.orders = JSON.parse(storedOrders); } catch (e) { this.orders = []; }
+        } else {
+          this.orders = [];
+        }
+
+        if (this.supabase) {
+          this.fetchConfigFromSupabase();
+          this.fetchOrdersFromSupabase();
+          this.fetchProjectsFromSupabase();
+        }
+
+        this.updateKpis();
+        this.renderOrdersList();
+        this.renderProjects();
+        this.checkDeepLink();
+      }
+
+      updateUIWithConfig() {
+        const headerHosp = document.getElementById('headerHospitalName');
+        if (headerHosp) headerHosp.textContent = this.hospitalName;
+
+        const containers = ['headerLogoContainer', 'authLogoContainer', 'settingsLogoPreview'];
+        containers.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) {
+            if (this.customLogo) { el.innerHTML = '<img src="' + escapeHtml(this.customLogo) + '" class="w-full h-full object-contain">'; } 
+            else { el.innerHTML = '<span class="text-xl" aria-hidden="true">🏥</span>'; }
+          }
+        });
+        this.populateTechDropdowns();
+      }
+
+      populateTechDropdowns() {
+        const options = this.technicians.map(t => '<option value="' + escapeHtml(t) + '">' + escapeHtml(t) + '</option>').join('');
+        document.querySelectorAll('.dynamic-tech-select').forEach(sel => {
+          const val = sel.value;
+          sel.innerHTML = options;
+          if (this.technicians.includes(val)) sel.value = val;
+        });
+      }
+
+      checkDeepLink() {
+        const params = new URLSearchParams(window.location.search);
+        const otId = params.get('ot');
+        if (otId) {
+          setTimeout(() => {
+            const target = this.orders.find(o => o.id === otId || o.folio === otId);
+            if (target && this.currentRole) this.openOperativeView(target.id);
+          }, 600);
+        }
+      }
+
+      async syncOrderToCloud(order) {
+        localStorage.setItem('sdo_orders_cache_v5', JSON.stringify(this.orders));
+        if (this.supabase) {
+          this.syncing = true;
+          try {
+            const { error } = await this.supabase.from('orders').upsert({ id: order.id, data: order, created_at: order.fechaCreacion });
+            if (error) throw error;
+            this.showToast('Sincronizado con Supabase');
+          } catch (e) { this.showToast('Guardado local (Sin conexión)', '⚠️'); } finally { this.syncing = false; }
+        } else { this.showToast('Guardado localmente'); }
       }
 
       async syncProject(p) {
-        localStorage.setItem('hbqp_projects_live_v2', JSON.stringify(this.projects));
+        localStorage.setItem('hbqp_projects_store_v5', JSON.stringify(this.projects));
         if (this.supabase) {
           try {
             await this.supabase.from('projects_hbqp').upsert({
@@ -712,70 +1262,74 @@
         }
       }
 
-      async syncOrder(o) {
-        localStorage.setItem('sdo_orders_live_v2', JSON.stringify(this.orders));
+      async syncConfigToCloud() {
+        const cfg = { hospitalName: this.hospitalName, folioPrefix: this.folioPrefix, customLogo: this.customLogo, technicians: this.technicians, hashes: this.hashes };
+        localStorage.setItem('sdo_settings_cache_v5', JSON.stringify(cfg));
         if (this.supabase) {
           try {
-            await this.supabase.from('orders').upsert({
-              id: o.id,
-              data: o,
-              created_at: o.fechaCreacion
-            });
-          } catch(e) {}
-        }
+            await this.supabase.from('system_settings').upsert({ id: 'global_config', config_data: cfg });
+            this.showToast('Configuración sincronizada');
+          } catch (e) { this.showToast('Configuración guardada localmente', '⚠️'); }
+        } else { this.showToast('Configuración guardada localmente'); }
       }
 
-      showToast(msg, icon = '✅') {
-        const c = document.getElementById('toastContainer');
-        if (!c) return;
+      showToast(message, icon = '✅') {
+        const container = document.getElementById('toastContainer');
+        if (!container) return;
         const t = document.createElement('div');
-        t.className = 'bg-slate-900 text-white px-4 py-2 rounded-xl shadow-2xl text-xs font-bold flex items-center gap-2 border border-slate-700 toast-anim';
-        t.innerHTML = '<span>' + icon + '</span> <span>' + escapeHtml(msg) + '</span>';
-        c.appendChild(t);
-        setTimeout(() => { t.remove(); }, 2600);
+        t.className = 'bg-slate-900 text-white px-4 py-2 rounded-lg shadow-xl text-xs font-bold flex items-center gap-2 toast-anim border border-slate-700';
+        t.innerHTML = '<span>' + icon + '</span> <span>' + escapeHtml(message) + '</span>';
+        container.appendChild(t);
+        setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 3000);
       }
 
-      openAuthModal() { document.getElementById('authModal')?.classList.remove('hidden'); }
-      closeAuthModal() { document.getElementById('authModal')?.classList.add('hidden'); }
-      selectAuthRole(r) {
-        this.selectedAuthRole = r;
+      openAuthModal() {
+        this.enteredPin = '';
+        this.updatePinDots();
+        document.getElementById('authErrorMsg')?.classList.add('hidden');
+        document.getElementById('authModal')?.classList.remove('hidden');
+      }
+      closeAuthModal() { if (this.currentRole) document.getElementById('authModal')?.classList.add('hidden'); }
+
+      selectAuthRole(role) {
+        this.selectedAuthRole = role;
         const btnSup = document.getElementById('roleBtnSupervisor');
         const btnTec = document.getElementById('roleBtnTecnico');
-        if (btnSup && btnTec) {
-          if (r === 'supervisor') {
-            btnSup.className = "py-2 text-xs font-bold rounded-lg border-2 border-indigo-600 bg-indigo-50 text-indigo-700";
-            btnTec.className = "py-2 text-xs font-bold rounded-lg border-2 border-slate-200 bg-white text-slate-600";
-          } else {
-            btnTec.className = "py-2 text-xs font-bold rounded-lg border-2 border-indigo-600 bg-indigo-50 text-indigo-700";
-            btnSup.className = "py-2 text-xs font-bold rounded-lg border-2 border-slate-200 bg-white text-slate-600";
-          }
+        if (role === 'supervisor') {
+          if (btnSup) btnSup.className = "py-2 text-xs font-bold rounded-lg border-2 border-indigo-600 bg-indigo-50 text-indigo-700";
+          if (btnTec) btnTec.className = "py-2 text-xs font-bold rounded-lg border-2 border-slate-200 bg-white text-slate-600";
+        } else {
+          if (btnTec) btnTec.className = "py-2 text-xs font-bold rounded-lg border-2 border-indigo-600 bg-indigo-50 text-indigo-700";
+          if (btnSup) btnSup.className = "py-2 text-xs font-bold rounded-lg border-2 border-slate-200 bg-white text-slate-600";
         }
       }
-      typePin(n) {
+
+      typePin(num) {
         if (this.enteredPin.length < 4) {
-          this.enteredPin += n;
+          this.enteredPin += num;
           this.updatePinDots();
           if (this.enteredPin.length === 4) setTimeout(() => this.validatePin(), 50);
         }
       }
-      clearPin() { this.enteredPin = ''; this.updatePinDots(); }
       deletePin() { this.enteredPin = this.enteredPin.slice(0, -1); this.updatePinDots(); }
+      clearPin() { this.enteredPin = ''; this.updatePinDots(); }
+
       updatePinDots() {
         for (let i = 0; i < 4; i++) {
           const dot = document.getElementById('pinDot' + i);
           if (dot) dot.className = i < this.enteredPin.length ? "w-3.5 h-3.5 rounded-full border-2 border-indigo-600 bg-indigo-600" : "w-3.5 h-3.5 rounded-full border-2 border-slate-300 bg-white";
         }
       }
+
       async validatePin() {
-        const h = await hashPin(this.enteredPin);
-        const expected = this.selectedAuthRole === 'supervisor' ? this.hashes.supervisor : this.hashes.tecnico;
-        if (h === expected) {
+        const inputHash = await hashPin(this.enteredPin);
+        const expectedHash = this.selectedAuthRole === 'supervisor' ? this.hashes.supervisor : this.hashes.tecnico;
+        if (inputHash === expectedHash) {
           this.currentRole = this.selectedAuthRole;
           sessionStorage.setItem('sdo_active_role', this.currentRole);
           this.applyRoleRestrictions();
           this.closeAuthModal();
           this.clearPin();
-          document.getElementById('authErrorMsg')?.classList.add('hidden');
         } else {
           document.getElementById('authErrorMsg')?.classList.remove('hidden');
           this.clearPin();
@@ -783,6 +1337,7 @@
       }
 
       applyRoleRestrictions() {
+        if (!this.currentRole) return;
         const badge = document.getElementById('roleBadge');
         const switcher = document.getElementById('moduleSwitcher');
         const mob = document.getElementById('mobileModuleOptions');
@@ -791,7 +1346,7 @@
         if (this.currentRole === 'supervisor') {
           if (badge) {
             badge.textContent = 'SUPERVISOR';
-            badge.className = 'text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-indigo-600 text-white';
+            badge.className = 'text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-indigo-600 text-white';
           }
           switcher?.classList.remove('hidden');
           mob?.classList.remove('hidden');
@@ -800,7 +1355,7 @@
         } else {
           if (badge) {
             badge.textContent = 'TÉCNICO';
-            badge.className = 'text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-amber-600 text-white';
+            badge.className = 'text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-amber-600 text-white';
           }
           switcher?.classList.add('hidden');
           mob?.classList.add('hidden');
@@ -831,7 +1386,7 @@
           viewO?.classList.remove('hidden');
           viewP?.classList.add('hidden');
           if (btnText) btnText.textContent = "Nueva OT";
-          this.renderOrders();
+          this.renderOrdersList();
         }
       }
 
@@ -841,6 +1396,7 @@
       }
 
       toggleMenu() { document.getElementById('appMenuDropdown')?.classList.toggle('hidden'); }
+      renderActiveModule() { this.switchModule(this.activeModule); }
 
       // --- PROYECTOS (KANBAN) ---
       normalizeProjectStatus(s) {
@@ -867,7 +1423,7 @@
         const procCount = this.projects.filter(p => this.normalizeProjectStatus(p.estado) === 'EN PROCESO').length;
         const doneCount = this.projects.filter(p => this.normalizeProjectStatus(p.estado) === 'TERMINADO').length;
 
-        if (sum) {
+        if (sum && this.activeModule === 'projects') {
           sum.innerHTML = `
             <span>Total Proyectos: <strong class="text-white font-bold">${this.projects.length}</strong></span>
             <span class="text-slate-600">|</span>
@@ -1128,16 +1684,16 @@
       deleteProject() {
         const id = document.getElementById('formProjectId')?.value;
         if (!id) return;
-        if (confirm('¿Eliminar este proyecto del sistema?')) {
+        this.customConfirm("Eliminar Proyecto", "¿Estás seguro de eliminar este proyecto del sistema?", async () => {
           this.projects = this.projects.filter(p => p.id != id);
           if (this.supabase) {
-            try { this.supabase.from('projects_hbqp').delete().eq('id', String(id)); } catch(e) {}
+            try { await this.supabase.from('projects_hbqp').delete().eq('id', String(id)); } catch(e) {}
           }
-          localStorage.setItem('hbqp_projects_live_v2', JSON.stringify(this.projects));
+          localStorage.setItem('hbqp_projects_store_v5', JSON.stringify(this.projects));
           this.closeProjectModal();
           this.renderProjects();
           this.showToast('Proyecto eliminado');
-        }
+        });
       }
 
       // --- DERIVAR PROYECTO A OT ---
@@ -1150,168 +1706,828 @@
         if (form) form.reset();
 
         const inSrc = document.getElementById('newOtSourceProjectId');
-        const inSub = document.getElementById('createOtSubtitle');
         const inRec = document.getElementById('newOtRecinto');
         const inTick = document.getElementById('newOtTicket');
         const inSol = document.getElementById('newOtSolicitante');
         const inDesc = document.getElementById('newOtDescripcion');
 
         if (inSrc) inSrc.value = p.id;
-        if (inSub) inSub.innerText = 'Derivando desde Proyecto: ' + p.codigo;
         if (inRec) inRec.value = 'Piso ' + (p.piso || '-') + ' - ' + (p.ubicacion || p.unidad);
         if (inTick) inTick.value = p.pma || p.ticket || p.codigo;
         if (inSol) inSol.value = p.solicitante || p.unidad || 'Subdirección de Operaciones';
         if (inDesc) inDesc.value = '[' + p.codigo + '] ' + p.requerimiento + '\n\n' + (p.descripcion || '');
 
-        document.getElementById('createOtModal')?.classList.remove('hidden');
+        document.getElementById('createModal')?.classList.remove('hidden');
       }
 
-      // --- ORDENES DE TRABAJO ---
-      renderOrders() {
-        const c = document.getElementById('ordersContainer');
+      exportProjectsCSV() {
+        const headers = ["Código", "N° Ticket", "Tipología", "Unidad Solicitante", "Solicitante", "Piso", "Recinto", "PMA", "Requerimiento", "Estado", "Hito Pendiente", "Prioridad"];
+        const rows = this.projects.map(p => [
+          p.codigo,
+          `"${(p.ticket || '').replace(/"/g, '""')}"`,
+          p.tipologia || '',
+          `"${(p.unidad || '').replace(/"/g, '""')}"`,
+          `"${(p.solicitante || '').replace(/"/g, '""')}"`,
+          p.piso || '',
+          `"${(p.ubicacion || '').replace(/"/g, '""')}"`,
+          p.pma || '',
+          `"${(p.requerimiento || p.descripcion || '').replace(/"/g, '""')}"`,
+          p.estado || '',
+          `"${(p.pendiente || '').replace(/"/g, '""')}"`,
+          p.prioridad || ''
+        ]);
+        const csv = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+        const a = document.createElement("a");
+        a.href = encodeURI(csv);
+        a.download = `Proyectos_HBQP_${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+
+      // ==========================================================
+      // GESTIÓN DE ÓRDENES DE TRABAJO (OTs) - 100% SDO CLOUD ORIGINAL
+      // ==========================================================
+      setViewMode(mode) {
+        this.viewMode = mode;
+        const btnCards = document.getElementById('viewCardsBtn');
+        const btnTable = document.getElementById('viewTableBtn');
+        if (mode === 'cards') {
+          if (btnCards) btnCards.className = "px-3 py-1.5 text-xs font-bold rounded-md bg-white text-slate-800 shadow-sm transition";
+          if (btnTable) btnTable.className = "px-3 py-1.5 text-xs font-bold rounded-md text-slate-600 hover:text-slate-900 transition";
+        } else {
+          if (btnTable) btnTable.className = "px-3 py-1.5 text-xs font-bold rounded-md bg-white text-slate-800 shadow-sm transition";
+          if (btnCards) btnCards.className = "px-3 py-1.5 text-xs font-bold rounded-md text-slate-600 hover:text-slate-900 transition";
+        }
+        this.renderOrdersList();
+      }
+
+      setFilterStatus(status) {
+        this.filterStatus = status;
+        document.querySelectorAll('.status-filter-btn').forEach(btn => {
+          btn.className = btn.dataset.status === status ? "status-filter-btn px-3 py-1 text-xs font-bold rounded-full bg-slate-800 text-white whitespace-nowrap" : "status-filter-btn px-3 py-1 text-xs font-bold rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap";
+        });
+        this.renderOrdersList();
+      }
+
+      calculateElapsedTimeInfo(order) {
+        const created = new Date(order.fechaCreacion || Date.now());
+        const endRef = order.fechaTermino ? new Date(order.fechaTermino) : new Date();
+        const elapsedMs = Math.max(0, endRef - created);
+        const elapsedHours = elapsedMs / 3600000;
+        const elapsedDays = Math.floor(elapsedHours / 24);
+        const remHours = Math.floor(elapsedHours % 24);
+
+        const elapsedString = elapsedDays > 0 ? `${elapsedDays}d ${remHours}h` : `${remHours}h`;
+        
+        let colorClass = "text-slate-700";
+        if (elapsedDays >= 5) colorClass = "text-rose-700 font-bold";
+        else if (elapsedDays >= 2) colorClass = "text-amber-700 font-bold";
+
+        return { elapsedString, textClass: colorClass };
+      }
+
+      updateTimeElapsedElements() { this.renderOrdersList(); }
+
+      updateKpis() {
+        const p = this.orders.filter(o => o.estado === 'Pendiente').length;
+        const e = this.orders.filter(o => o.estado === 'En Ejecución').length;
+        const r = this.orders.filter(o => o.estado === 'Solicitud Cierre').length;
+        const t = this.orders.filter(o => o.estado === 'Terminada').length;
+
+        const kP = document.getElementById('kpiPendientes');
+        const kE = document.getElementById('kpiEjecucion');
+        const kR = document.getElementById('kpiSolicitudCierre');
+        const kT = document.getElementById('kpiTerminadas');
         const sum = document.getElementById('moduleStatsSummary');
-        if (!c) return;
 
-        const q = (document.getElementById('searchOtInput')?.value || '').toLowerCase().trim();
+        if (kP) kP.textContent = p;
+        if (kE) kE.textContent = e;
+        if (kR) kR.textContent = r;
+        if (kT) kT.textContent = t;
 
-        const pending = this.orders.filter(o => o.estado === 'Pendiente').length;
-        const exec = this.orders.filter(o => o.estado === 'En Ejecución').length;
-        const review = this.orders.filter(o => o.estado === 'Solicitud Cierre').length;
-        const done = this.orders.filter(o => o.estado === 'Terminada').length;
-
-        const kP = document.getElementById('kpiOtPendientes');
-        const kE = document.getElementById('kpiOtEjecucion');
-        const kR = document.getElementById('kpiOtSolicitudCierre');
-        const kT = document.getElementById('kpiOtTerminadas');
-
-        if (kP) kP.textContent = pending;
-        if (kE) kE.textContent = exec;
-        if (kR) kR.textContent = review;
-        if (kT) kT.textContent = done;
-
-        if (sum) {
+        if (sum && this.activeModule === 'orders') {
           sum.innerHTML = `
             <span>Total OTs: <strong class="text-white font-bold">${this.orders.length}</strong></span>
             <span class="text-slate-600">|</span>
-            <span>En Curso: <strong class="text-amber-300">${pending}</strong></span>
-            <span>En Ejecución: <strong class="text-blue-300">${exec}</strong></span>
-            <span>Solicitud Cierre: <strong class="text-indigo-300">${review}</strong></span>
-            <span>Terminadas: <strong class="text-emerald-300">${done}</strong></span>
+            <span>En Curso: <strong class="text-amber-300 font-bold">${p}</strong></span>
+            <span>En Ejecución: <strong class="text-blue-300 font-bold">${e}</strong></span>
+            <span>Solicitud Cierre: <strong class="text-indigo-300 font-bold">${r}</strong></span>
+            <span>Terminadas: <strong class="text-emerald-300 font-bold">${t}</strong></span>
           `;
         }
+      }
 
-        const filtered = this.orders.filter(o => !q || o.folio?.toLowerCase().includes(q) || o.recinto?.toLowerCase().includes(q));
+      hasUnreadMessages(o) {
+        if (!o.solicitudes_terreno || o.solicitudes_terreno.length === 0) return false;
+        if (this.currentRole === 'supervisor') {
+          return o.solicitudes_terreno.some(r => r.visto_supervisor === false);
+        } else {
+          return o.solicitudes_terreno.some(r => r.respuesta && r.visto_tecnico === false);
+        }
+      }
+
+      renderOrdersList() {
+        const container = document.getElementById('ordersContainer');
+        if (!container) return;
+
+        const query = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
+
+        const filtered = this.orders.filter(o => {
+          const match = !query || o.folio?.toLowerCase().includes(query) || o.recinto?.toLowerCase().includes(query) || (o.ticket && o.ticket.toLowerCase().includes(query)) || (o.solicitante && o.solicitante.toLowerCase().includes(query));
+          const matchStatus = this.filterStatus === 'TODOS' || o.estado === this.filterStatus;
+          return match && matchStatus;
+        });
 
         if (filtered.length === 0) {
-          c.innerHTML = `<div class="bg-white p-12 rounded-2xl border text-center text-slate-400"><p class="text-sm font-semibold">No se encontraron Órdenes de Trabajo</p></div>`;
+          container.innerHTML = '<div class="bg-white p-8 rounded-2xl border text-center text-slate-400"><span class="text-3xl mb-2 block" aria-hidden="true">📋</span><p class="text-sm font-semibold">No se encontraron órdenes de trabajo</p></div>';
           return;
         }
 
-        c.innerHTML = '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">' + filtered.map(o => `
-          <div class="bg-white p-4 rounded-xl border shadow-sm cursor-pointer hover:border-slate-300 transition flex flex-col justify-between space-y-2">
+        if (this.viewMode === 'cards') {
+          container.innerHTML = '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">' + filtered.map(o => this.renderOrderCard(o)).join('') + '</div>';
+        } else {
+          container.innerHTML = '<div class="bg-white rounded-xl border overflow-hidden"><div class="overflow-x-auto custom-scroll"><table class="w-full text-left text-xs"><thead class="bg-slate-50 text-slate-700 font-bold border-b"><tr><th class="p-3">Folio</th><th class="p-3">Recinto / PMA</th><th class="p-3">Prioridad / Descripción</th><th class="p-3">Estado</th><th class="p-3">Tiempo Corrido</th><th class="p-3 text-right">Acciones</th></tr></thead><tbody class="divide-y divide-slate-100">' + filtered.map(o => this.renderOrderRow(o)).join('') + '</tbody></table></div></div>';
+        }
+      }
+
+      renderOrderCard(o) {
+        const timeInfo = this.calculateElapsedTimeInfo(o);
+        const bg = o.estado === 'Terminada' ? 'bg-emerald-100 text-emerald-800' : (o.estado === 'Solicitud Cierre' ? 'bg-indigo-100 text-indigo-800' : (o.estado === 'En Ejecución' ? 'bg-blue-100 text-blue-800' : 'bg-amber-100 text-amber-800'));
+        const unreadBadge = this.hasUnreadMessages(o) ? '<span class="bg-rose-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full ml-2 badge-pulse">🔔 NUEVO</span>' : '';
+        const btnText = (this.currentRole === 'supervisor' && o.estado !== 'Terminada') ? '⚙️ Gestionar' : '📋 Ver Ficha';
+        const emojis = { Urgente: '🚨', Alta: '🟠', Media: '🟡', Baja: '🟢' };
+        
+        return `
+          <div class="bg-white p-4 rounded-xl border shadow-sm flex flex-col justify-between space-y-3 cursor-pointer hover:border-slate-300 transition" onclick="window.app.openOperativeView('${o.id}')">
             <div>
-              <div class="flex justify-between text-xs mb-1 font-bold">
-                <span>${o.folio}</span>
-                <span class="px-2 py-0.5 rounded-full text-[10px] bg-slate-100">${o.estado}</span>
+              <div class="flex justify-between items-center mb-1">
+                <span class="font-black text-xs flex items-center">${escapeHtml(o.folio)} ${unreadBadge}</span>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${bg}">${escapeHtml(o.estado)}</span>
               </div>
-              <h4 class="font-bold text-sm text-slate-900 mb-1 truncate">${escapeHtml(o.recinto)}</h4>
-              <p class="text-xs text-slate-600 line-clamp-2">${escapeHtml(o.descripcion)}</p>
+              <h4 class="font-bold text-sm truncate">${escapeHtml(o.recinto)}</h4>
+              <p class="text-[11px] text-slate-500 font-medium truncate mb-1">PMA: ${escapeHtml(o.ticket)} • Prioridad: ${emojis[o.prioridad]||''} ${escapeHtml(o.prioridad)}</p>
+              <p class="text-[11px] text-slate-600 leading-tight line-clamp-2">${escapeHtml(o.descripcion)}</p>
+              <div class="mt-2 bg-slate-50 p-2 rounded-lg border">
+                <div class="flex justify-between text-[11px] font-semibold"><span>Tiempo transcurrido:</span><span class="${timeInfo.textClass}">${timeInfo.elapsedString}</span></div>
+              </div>
             </div>
-          </div>
-        `).join('') + '</div>';
+            <div class="pt-2 border-t flex items-center justify-between gap-1.5">
+              <button class="flex-1 py-2 bg-slate-800 text-white text-xs font-bold rounded-lg pointer-events-none">${btnText}</button>
+              <button type="button" onclick="event.stopPropagation(); window.app.shareWhatsApp('${o.id}')" class="pointer-events-auto cursor-pointer px-3 py-2 bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-lg transition-transform active:scale-95 shadow-sm" title="Compartir por WhatsApp">
+                 <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+              </button>
+            </div>
+          </div>`;
+      }
+
+      renderOrderRow(o) {
+        const timeInfo = this.calculateElapsedTimeInfo(o);
+        const bg = o.estado === 'Terminada' ? 'bg-emerald-100 text-emerald-800' : (o.estado === 'Solicitud Cierre' ? 'bg-indigo-100 text-indigo-800' : (o.estado === 'En Ejecución' ? 'bg-blue-100 text-blue-800' : 'bg-amber-100 text-amber-800'));
+        const unreadBadge = this.hasUnreadMessages(o) ? '<span class="bg-rose-500 text-white text-[9px] px-1 rounded-full ml-1 badge-pulse" title="Mensaje Nuevo">🔔</span>' : '';
+        const btnText = (this.currentRole === 'supervisor' && o.estado !== 'Terminada') ? '⚙️ Gestionar' : 'Ficha';
+        const emojis = { Urgente: '🚨', Alta: '🟠', Media: '🟡', Baja: '🟢' };
+        
+        return `
+          <tr class="hover:bg-slate-50 cursor-pointer" onclick="window.app.openOperativeView('${o.id}')">
+            <td class="p-3 font-bold">${escapeHtml(o.folio)} ${unreadBadge}</td>
+            <td class="p-3"><span class="font-bold block">${escapeHtml(o.recinto)}</span><span class="text-[10px] text-slate-400">PMA: ${escapeHtml(o.ticket)}</span></td>
+            <td class="p-3">
+               <div class="mb-0.5"><span class="text-[10px] font-bold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">${emojis[o.prioridad]||''} ${escapeHtml(o.prioridad)}</span></div>
+               <div class="text-[11px] text-slate-600 truncate max-w-[150px] sm:max-w-[200px] lg:max-w-[280px]" title="${escapeHtml(o.descripcion)}">${escapeHtml(o.descripcion)}</div>
+            </td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${bg}">${escapeHtml(o.estado)}</span></td>
+            <td class="p-3"><div class="text-[11px] font-semibold ${timeInfo.textClass}">${timeInfo.elapsedString}</div></td>
+            <td class="p-3 text-right whitespace-nowrap">
+              <div class="flex items-center justify-end space-x-1.5">
+                  <button type="button" onclick="event.stopPropagation(); window.app.shareWhatsApp('${o.id}')" class="pointer-events-auto cursor-pointer px-2 py-1.5 bg-[#25D366] hover:bg-[#20bd5a] text-white rounded text-xs font-bold transition-transform active:scale-95" title="Compartir">
+                     <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+                  </button>
+                  <button class="px-2.5 py-1.5 bg-slate-800 text-white rounded text-xs font-bold pointer-events-none">${btnText}</button>
+              </div>
+            </td>
+          </tr>`;
       }
 
       openCreateOtModal() {
+        if (this.currentRole !== 'supervisor') return;
         document.getElementById('createOtForm')?.reset();
         const inSrc = document.getElementById('newOtSourceProjectId');
         if (inSrc) inSrc.value = '';
-        const inSub = document.getElementById('createOtSubtitle');
-        if (inSub) inSub.innerText = "Emisión operativa para cuadrilla en terreno";
-        document.getElementById('createOtModal')?.classList.remove('hidden');
+        document.getElementById('createModal')?.classList.remove('hidden');
       }
-      closeCreateOtModal() { document.getElementById('createOtModal')?.classList.add('hidden'); }
+      closeCreateModal() { document.getElementById('createModal')?.classList.add('hidden'); }
 
-      handleCreateOT(e) {
-        e.preventDefault();
+      formatDateLocal(iso) {
+        if (!iso) return '';
+        const d = new Date(iso);
+        return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+      }
+
+      logActivity(order, detail, type = 'Sistema') {
+        if (!order.solicitudes_terreno) order.solicitudes_terreno = [];
+        order.solicitudes_terreno.push({
+          tipo: type,
+          detalle: detail,
+          fecha: new Date().toISOString(),
+          respuesta: null,
+          visto_supervisor: true,
+          visto_tecnico: false,
+          isSystem: true
+        });
+      }
+
+      handleCreateOT(event) {
+        event.preventDefault();
         const year = new Date().getFullYear();
-        let maxCorr = 0;
+        let maxCorrelative = 0;
         this.orders.forEach(o => {
-          const parts = (o.folio || '').split('-');
+          const parts = o.folio.split('-');
           if (parts.length >= 3) {
-            const n = parseInt(parts[parts.length - 2], 10);
-            if (!isNaN(n) && n > maxCorr) maxCorr = n;
+            const num = parseInt(parts[parts.length - 2], 10);
+            if (!isNaN(num) && parts[parts.length - 1] === String(year)) {
+              if (num > maxCorrelative) maxCorrelative = num;
+            }
           }
         });
+        
+        const folio = `${this.folioPrefix}-${String(maxCorrelative + 1).padStart(3, '0')}-${year}`;
+        const uuid = `id_${Date.now()}`;
+        const nowIso = new Date().toISOString();
 
-        const folio = 'OT-INFRA-' + String(maxCorr + 1).padStart(3, '0') + '-' + year;
-        const uuid = 'ot_' + Date.now();
-
-        const newOt = {
-          id: uuid,
-          folio: folio,
-          especialidad: document.getElementById('newOtEspecialidad')?.value || 'Infraestructura',
-          prioridad: document.getElementById('newOtPrioridad')?.value || 'Alta',
-          recinto: document.getElementById('newOtRecinto')?.value.trim() || '',
-          ticket: document.getElementById('newOtTicket')?.value.trim() || '',
-          solicitante: document.getElementById('newOtSolicitante')?.value.trim() || '',
-          descripcion: document.getElementById('newOtDescripcion')?.value.trim() || '',
-          estado: 'Pendiente',
-          fechaCreacion: new Date().toISOString()
+        const newOrder = {
+          id: uuid, folio: folio,
+          especialidad: document.getElementById('newOtEspecialidad').value,
+          prioridad: document.getElementById('newOtPrioridad').value,
+          recinto: document.getElementById('newOtRecinto').value.trim(),
+          ticket: document.getElementById('newOtTicket').value.trim() || 'N/A',
+          solicitante: document.getElementById('newOtSolicitante').value.trim(),
+          encargado: document.getElementById('newOtEncargado').value,
+          descripcion: document.getElementById('newOtDescripcion').value.trim(),
+          instrucciones: document.getElementById('newOtInstrucciones').value.trim(),
+          estado: 'Pendiente', 
+          fechaCreacion: nowIso, 
+          fechaUltimoEstado: nowIso,
+          fechaTermino: null, 
+          solicitudes_terreno: []
         };
 
-        this.orders.unshift(newOt);
-        this.syncOrder(newOt);
+        this.orders.unshift(newOrder);
+        this.syncOrderToCloud(newOrder);
 
         const srcId = document.getElementById('newOtSourceProjectId')?.value;
         if (srcId) {
           const p = this.projects.find(item => item.id == srcId);
           if (p) {
             p.estado = 'EN PROCESO';
-            p.pendiente = 'Derivado a OT: ' + folio;
+            p.pendiente = `Derivado a OT: ${folio}`;
             this.syncProject(p);
           }
         }
 
-        this.closeCreateOtModal();
-        this.showToast('OT ' + folio + ' emitida con éxito');
+        this.closeCreateModal();
+        this.updateKpis();
+        this.renderOrdersList();
+        this.showToast(`OT ${folio} emitida con éxito`);
         this.switchModule('orders');
       }
 
-      exportActiveDataCSV() {
-        if (this.activeModule === 'projects') {
-          const headers = ["Código", "N° Ticket", "Tipología", "Unidad Solicitante", "Solicitante", "Piso", "Recinto", "PMA", "Requerimiento", "Estado", "Hito Pendiente", "Prioridad"];
-          const rows = this.projects.map(p => [
-            p.codigo,
-            `"${(p.ticket || '').replace(/"/g, '""')}"`,
-            p.tipologia || '',
-            `"${(p.unidad || '').replace(/"/g, '""')}"`,
-            `"${(p.solicitante || '').replace(/"/g, '""')}"`,
-            p.piso || '',
-            `"${(p.ubicacion || '').replace(/"/g, '""')}"`,
-            p.pma || '',
-            `"${(p.requerimiento || p.descripcion || '').replace(/"/g, '""')}"`,
-            p.estado || '',
-            `"${(p.pendiente || '').replace(/"/g, '""')}"`,
-            p.prioridad || ''
-          ]);
-          const csv = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
-          const a = document.createElement("a");
-          a.href = encodeURI(csv);
-          a.download = `Proyectos_HBQP_${new Date().toISOString().split('T')[0]}.csv`;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
+      // --- FICHA OPERATIVA UNIFICADA ---
+      openOperativeView(id) {
+        const o = this.orders.find(item => item.id === id);
+        if (!o) return;
+
+        let changed = false;
+        if (o.solicitudes_terreno) {
+          o.solicitudes_terreno.forEach(r => { 
+            if (this.currentRole === 'tecnico' && r.respuesta && r.visto_tecnico === false) { r.visto_tecnico = true; changed = true; }
+            if (this.currentRole === 'supervisor' && r.visto_supervisor === false) { r.visto_supervisor = true; changed = true; }
+          });
+          if (changed) this.syncOrderToCloud(o);
+        }
+
+        this.activeOperativeOt = o;
+        const isSupervisor = this.currentRole === 'supervisor';
+        const isReview = o.estado === 'Solicitud Cierre';
+        const isClosed = o.estado === 'Terminada';
+        const isLocked = isReview || isClosed;
+
+        document.getElementById('uovId').value = o.id;
+        document.getElementById('uovFolio').textContent = o.folio;
+        document.getElementById('uovRecintoHeader').textContent = o.recinto;
+        document.getElementById('uovStatusBadge').textContent = o.estado;
+        document.getElementById('uovStatusBadgeMobile').textContent = o.estado;
+        
+        document.getElementById('uovLockBanner').classList.toggle('hidden', !isClosed);
+        document.getElementById('uovReviewSection').classList.toggle('hidden', !(isSupervisor && isReview));
+        
+        document.getElementById('uovEspecialidad').value = o.especialidad;
+        document.getElementById('uovPrioridad').value = o.prioridad;
+        document.getElementById('uovRecinto').value = o.recinto;
+        document.getElementById('uovTicket').value = o.ticket || '';
+        document.getElementById('uovSolicitante').value = o.solicitante;
+        document.getElementById('uovEncargado').value = o.encargado || '';
+        document.getElementById('uovDescripcion').value = o.descripcion;
+        document.getElementById('uovInstrucciones').value = o.instrucciones || '';
+        document.getElementById('uovFechaInicio').value = this.formatDateLocal(o.fechaCreacion);
+        
+        const disableSec1 = !isSupervisor || isClosed || isReview;
+        document.querySelectorAll('.uov-editable').forEach(el => {
+          el.querySelectorAll('input, select, textarea').forEach(input => {
+            if (input.id === 'uovEstado') {
+              input.disabled = (!isSupervisor || isClosed);
+            } else {
+              input.disabled = disableSec1;
+            }
+            
+            if(input.disabled) {
+              input.classList.remove('bg-white', 'border-slate-200');
+              input.classList.add('bg-slate-50', 'border-transparent', 'text-slate-700');
+            } else {
+              input.classList.add('bg-white', 'border-slate-200');
+              input.classList.remove('bg-slate-50', 'border-transparent', 'text-slate-700');
+            }
+          });
+        });
+        
+        document.getElementById('uovWhatsappBtnTop').onclick = () => this.shareWhatsApp(o.id);
+        document.getElementById('uovWhatsappBtnMobile').onclick = () => this.shareWhatsApp(o.id);
+        
+        document.getElementById('uovEstado').value = o.estado;
+        const timeInfo = this.calculateElapsedTimeInfo(o);
+        document.getElementById('uovElapsedText').textContent = timeInfo.elapsedString + " corridas";
+        const dateRef = o.fechaUltimoEstado || o.fechaCreacion;
+        document.getElementById('uovLastModText').textContent = new Date(dateRef).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' });
+
+        this.renderOperativeHistory(o);
+        document.getElementById('uovRequestForm').style.display = (isLocked || isSupervisor) ? 'none' : 'block';
+
+        document.getElementById('uovDiagnosticoSolucion').value = o.diagnostico || '';
+        
+        const disableTechFields = isClosed || isReview || isSupervisor;
+        document.getElementById('uovDiagnosticoSolucion').disabled = disableTechFields;
+        if(disableTechFields) {
+          document.getElementById('uovDiagnosticoSolucion').classList.add('bg-slate-50', 'border-transparent');
+        } else {
+          document.getElementById('uovDiagnosticoSolucion').classList.remove('bg-slate-50', 'border-transparent');
+        }
+        
+        document.getElementById('uovTechActions').style.display = (isLocked || isSupervisor) ? 'none' : 'flex';
+        document.getElementById('uovEstadoContainer').style.display = isSupervisor ? 'block' : 'none';
+
+        document.getElementById('uovBottomBar').classList.toggle('hidden', !isSupervisor || isClosed);
+        
+        window.scrollTo(0,0);
+        document.querySelectorAll('.uov-nav-link').forEach(l => l.classList.remove('active'));
+        document.querySelector('.uov-nav-link[href="#sec-info"]')?.classList.add('active');
+
+        if (window.location.hash !== `#ot=${id}`) {
+          history.pushState({ modalOpen: true }, "", `#ot=${id}`);
+        }
+
+        document.getElementById('unifiedOperativeView').classList.remove('hidden');
+      }
+      
+      closeOperativeView(fromPopState = false) { 
+        document.getElementById('unifiedOperativeView').classList.add('hidden'); 
+        this.activeOperativeOt = null; 
+        
+        if (!fromPopState && window.location.hash.startsWith('#ot=')) {
+          history.pushState("", document.title, window.location.pathname + window.location.search);
         }
       }
 
-      openSettingsModal() { document.getElementById('settingsModal')?.classList.remove('hidden'); }
-      closeSettingsModal() { document.getElementById('settingsModal')?.classList.add('hidden'); }
-      saveSystemSettings(e) { e.preventDefault(); this.closeSettingsModal(); this.showToast('Configuración guardada'); }
+      renderOperativeHistory(o) {
+        const hist = document.getElementById('uovConsultationHistory');
+        const isSupervisor = this.currentRole === 'supervisor';
+        const isClosed = o.estado === 'Terminada';
+
+        if (o.solicitudes_terreno && o.solicitudes_terreno.length) {
+          hist.innerHTML = o.solicitudes_terreno.map((r, i) => {
+            if (r.tipo === 'Sistema' || r.isSystem) {
+              const f = new Date(r.fecha).toLocaleString([], {dateStyle:'short', timeStyle:'short'});
+              return `<div class="bg-slate-100 p-2 rounded-lg border border-slate-200 flex justify-between items-center text-slate-500">
+                         <span class="text-[11px] font-bold">⚙️ ${escapeHtml(r.detalle)}</span>
+                         <span class="text-[9px]">${f}</span>
+                      </div>`;
+            } else {
+              return `
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                  <span class="font-bold text-slate-700 text-[10px] block mb-1">${escapeHtml(r.tipo)}</span>
+                  <p class="font-medium text-slate-800">"${escapeHtml(r.detalle)}"</p>
+                  ${r.respuesta ? `<div class="mt-2 pt-2 border-t text-blue-800 text-[11px]"><b>Respuesta:</b> "${escapeHtml(r.respuesta)}"</div>` : 
+                    (isSupervisor && !isClosed ? 
+                      `<div class="mt-2 flex gap-2"><label for="respInput_${i}" class="sr-only">Respuesta</label><input type="text" id="respInput_${i}" placeholder="Responder..." class="flex-1 p-1.5 bg-white border border-slate-300 rounded text-xs"><button type="button" onclick="window.app.answerRequest('${o.id}', ${i})" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-bold transition-transform active:scale-95">Enviar</button></div>` 
+                    : `<span class="text-[10px] text-amber-600 font-bold block mt-1">⏳ Pendiente de respuesta</span>`)}
+                </div>
+              `;
+            }
+          }).join('');
+        } else {
+          hist.innerHTML = '<p class="text-slate-400 italic">No hay registros de actividad.</p>';
+        }
+      }
+
+      answerRequest(otId, reqIndex) {
+        const input = document.getElementById(`respInput_${reqIndex}`);
+        if (!input || !input.value.trim()) return;
+        const o = this.orders.find(item => item.id === otId);
+        if (o && o.estado !== 'Terminada') {
+          o.solicitudes_terreno[reqIndex].respuesta = input.value.trim();
+          o.solicitudes_terreno[reqIndex].fecha_respuesta = new Date().toISOString();
+          o.solicitudes_terreno[reqIndex].visto_tecnico = false;
+          this.syncOrderToCloud(o);
+          this.renderOperativeHistory(o);
+        }
+      }
+
+      submitTechnicianRequest() {
+        if (!this.activeOperativeOt || this.activeOperativeOt.estado === 'Solicitud Cierre' || this.activeOperativeOt.estado === 'Terminada' || this.currentRole === 'supervisor') return;
+        const details = document.getElementById('uovNewRequestDetails').value.trim();
+        if (!details) return;
+        
+        if (!this.activeOperativeOt.solicitudes_terreno) this.activeOperativeOt.solicitudes_terreno = [];
+        this.activeOperativeOt.solicitudes_terreno.push({
+          tipo: document.getElementById('uovNewRequestType').value,
+          detalle: details,
+          fecha: new Date().toISOString(),
+          respuesta: null,
+          visto_supervisor: false,
+          visto_tecnico: true
+        });
+
+        this.syncOrderToCloud(this.activeOperativeOt);
+        document.getElementById('uovNewRequestDetails').value = '';
+        this.renderOperativeHistory(this.activeOperativeOt);
+      }
+
+      saveOperativeData(event, isTechRequestClose = false) {
+        if(event) event.preventDefault();
+        
+        const o = this.activeOperativeOt;
+        if (!o || o.estado === 'Terminada') return;
+
+        if (this.currentRole === 'supervisor') {
+          if(o.estado !== 'Solicitud Cierre') {
+            o.especialidad = document.getElementById('uovEspecialidad').value;
+            o.prioridad = document.getElementById('uovPrioridad').value;
+            o.recinto = document.getElementById('uovRecinto').value.trim();
+            o.ticket = document.getElementById('uovTicket').value.trim();
+            o.solicitante = document.getElementById('uovSolicitante').value.trim();
+            o.encargado = document.getElementById('uovEncargado').value;
+            o.descripcion = document.getElementById('uovDescripcion').value.trim();
+            o.instrucciones = document.getElementById('uovInstrucciones').value.trim();
+            
+            const newDate = document.getElementById('uovFechaInicio').value;
+            if (newDate) {
+              const newIso = new Date(newDate).toISOString();
+              if (o.fechaCreacion !== newIso) {
+                this.logActivity(o, `Fecha de inicio modificada a: ${new Date(newDate).toLocaleString()}`);
+                o.fechaCreacion = newIso;
+              }
+            }
+          }
+          
+          const newState = document.getElementById('uovEstado').value;
+          if (o.estado !== newState) {
+            this.logActivity(o, `Estado actualizado a: ${newState}`);
+            o.fechaUltimoEstado = new Date().toISOString();
+            if (newState === 'Terminada' && !o.fechaTermino) o.fechaTermino = new Date().toISOString();
+            if (newState !== 'Terminada' && newState !== 'Solicitud Cierre') o.fechaTermino = null; 
+          }
+          o.estado = newState;
+          
+          this.showToast('Cambios Guardados', '💾');
+          this.syncOrderToCloud(o);
+          this.closeOperativeView();
+          
+        } else if (this.currentRole === 'tecnico') {
+          if(o.estado === 'Solicitud Cierre') return;
+          
+          o.diagnostico = document.getElementById('uovDiagnosticoSolucion').value.trim();
+          
+          if (isTechRequestClose) {
+            o.estado = 'Solicitud Cierre';
+            o.fechaUltimoEstado = new Date().toISOString();
+            if (!o.fechaTermino) o.fechaTermino = new Date().toISOString();
+            this.logActivity(o, 'El técnico solicitó el cierre de la OT');
+            this.showToast('Cierre solicitado a Jefatura', '⚡');
+          } else {
+            if (o.estado === 'Pendiente') {
+              o.estado = 'En Ejecución';
+              o.fechaUltimoEstado = new Date().toISOString();
+              this.logActivity(o, 'El técnico inició la ejecución (Pendiente -> En Ejecución)');
+            }
+            this.showToast('Progreso guardado', '💾');
+          }
+          this.syncOrderToCloud(o);
+          this.closeOperativeView();
+        }
+
+        this.updateKpis();
+        this.renderOrdersList();
+      }
+
+      authorizeClosure() {
+        const o = this.activeOperativeOt;
+        if (!o) return;
+        o.estado = 'Terminada';
+        o.fechaUltimoEstado = new Date().toISOString();
+        if (!o.fechaTermino) o.fechaTermino = new Date().toISOString();
+        this.logActivity(o, 'Jefatura autorizó el cierre definitivo de la OT');
+        this.syncOrderToCloud(o);
+        this.closeOperativeView();
+        this.updateKpis();
+        this.renderOrdersList();
+        this.showToast('OT Cerrada Definitivamente', '✅');
+      }
+
+      reopenOrder() {
+        const o = this.activeOperativeOt;
+        if (!o) return;
+        const instructions = document.getElementById('uovInstrucciones').value.trim();
+        o.estado = 'En Ejecución';
+        o.fechaUltimoEstado = new Date().toISOString();
+        o.fechaTermino = null;
+        o.instrucciones = instructions;
+        if (!o.solicitudes_terreno) o.solicitudes_terreno = [];
+        o.solicitudes_terreno.push({
+          tipo: 'Rechazo de Cierre',
+          detalle: 'Jefatura ha reabierto la OT.',
+          fecha: new Date().toISOString(),
+          respuesta: instructions || 'Revisar y continuar trabajos.',
+          fecha_respuesta: new Date().toISOString(),
+          visto_tecnico: false,
+          visto_supervisor: true
+        });
+        this.logActivity(o, 'Jefatura rechazó el cierre y reabrió la OT');
+        this.syncOrderToCloud(o);
+        this.closeOperativeView();
+        this.updateKpis();
+        this.renderOrdersList();
+        this.showToast('OT Reabierta', '⚠️');
+      }
+
+      async deleteOrderFromModal() {
+        if (!this.activeOperativeOt) return;
+        const id = this.activeOperativeOt.id;
+        
+        this.customConfirm("Eliminar OT", "Esta acción es irreversible y borrará la orden de todos los dispositivos.", async () => {
+          if (this.supabase) {
+            try {
+              const { error } = await this.supabase.from('orders').delete().eq('id', id);
+              if (error) throw error;
+              this.orders = this.orders.filter(o => o.id !== id);
+              localStorage.setItem('sdo_orders_cache_v5', JSON.stringify(this.orders));
+              this.closeOperativeView();
+              this.updateKpis();
+              this.renderOrdersList();
+              this.showToast('OT Eliminada permanentemente');
+            } catch(e) {
+              this.showToast('La nube bloqueó el borrado (Faltan permisos)', '⚠️');
+            }
+          } else {
+            this.orders = this.orders.filter(o => o.id !== id);
+            localStorage.setItem('sdo_orders_cache_v5', JSON.stringify(this.orders));
+            this.closeOperativeView();
+            this.updateKpis();
+            this.renderOrdersList();
+            this.showToast('OT Eliminada localmente');
+          }
+        });
+      }
+
+      // --- CONFIGURACIÓN GLOBAL & REPORTES ---
+      openSettingsModal() {
+        if (this.currentRole !== 'supervisor') return;
+        document.getElementById('cfgHospitalName').value = this.hospitalName;
+        document.getElementById('cfgFolioPrefix').value = this.folioPrefix;
+        document.getElementById('cfgPinSupervisor').value = "";
+        document.getElementById('cfgPinTecnico').value = "";
+        this.renderTechList();
+        document.getElementById('settingsModal').classList.remove('hidden');
+      }
+      closeSettingsModal() { document.getElementById('settingsModal').classList.add('hidden'); }
+
+      handleLogoUpload(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const maxW = 300, maxH = 300;
+            let w = img.width, h = img.height;
+            if (w > maxW) { h *= maxW / w; w = maxW; }
+            if (h > maxH) { h *= maxH / h; h = maxH; }
+            canvas.width = w; canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            this.customLogo = canvas.toDataURL('image/jpeg', 0.8);
+            this.updateUIWithConfig();
+          };
+          img.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+      resetLogo() { this.customLogo = null; this.updateUIWithConfig(); }
+
+      addTechnician() {
+        const input = document.getElementById('newTechInput');
+        const name = input.value.trim();
+        if (name && !this.technicians.includes(name)) {
+          this.technicians.push(name);
+          input.value = '';
+          this.renderTechList();
+          this.populateTechDropdowns();
+        }
+      }
+
+      removeTechnician(name) {
+        this.customConfirm("¿Eliminar técnico?", `¿Seguro que desea eliminar a ${escapeHtml(name)}?`, () => {
+          this.technicians = this.technicians.filter(t => t !== name);
+          this.renderTechList();
+          this.populateTechDropdowns();
+        });
+      }
+
+      renderTechList() {
+        const ul = document.getElementById('settingsTechList');
+        ul.innerHTML = this.technicians.map(t => `<li class="flex justify-between items-center bg-white p-2 border rounded"><span class="font-bold">${escapeHtml(t)}</span><button type="button" onclick="window.app.removeTechnician('${escapeHtml(t)}')" class="text-rose-600 font-bold text-[10px]">✕ Eliminar</button></li>`).join('');
+      }
+
+      async saveSystemSettings(event) {
+        event.preventDefault();
+        this.hospitalName = document.getElementById('cfgHospitalName').value.trim();
+        this.folioPrefix = document.getElementById('cfgFolioPrefix').value.trim();
+        
+        const pinSup = document.getElementById('cfgPinSupervisor').value;
+        const pinTec = document.getElementById('cfgPinTecnico').value;
+        if (pinSup.length === 4) this.hashes.supervisor = await hashPin(pinSup);
+        if (pinTec.length === 4) this.hashes.tecnico = await hashPin(pinTec);
+
+        await this.syncConfigToCloud();
+        this.updateUIWithConfig();
+        this.closeSettingsModal();
+      }
+
+      async hardResetDatabase() {
+        this.customConfirm("⚠️ BORRAR BASE DE DATOS COMPLETA", "Esto eliminará TODAS las OTs de forma permanente en todos los dispositivos. No se puede deshacer. ¿Proceder?", async () => {
+          if (this.supabase) {
+            try {
+              const { error } = await this.supabase.from('orders').delete().neq('id', '0');
+              if (error) throw error;
+              this.orders = [];
+              localStorage.removeItem('sdo_orders_cache_v5');
+              this.showToast('Base de datos reiniciada');
+              this.closeSettingsModal();
+              this.updateKpis();
+              this.renderOrdersList();
+            } catch (e) {
+              this.showToast('Error al borrar la nube (Permisos insuficientes)', '⚠️');
+            }
+          }
+        });
+      }
+
+      openAdvanceReportModal() {
+        if (this.currentRole !== 'supervisor') return;
+        const today = new Date().toISOString().split('T')[0];
+        const past = new Date(Date.now() - 30 * 86400000).toISOString().split('T')[0];
+        document.getElementById('repDateFrom').value = past;
+        document.getElementById('repDateTo').value = today;
+        document.getElementById('reportStatsContainer').classList.add('hidden');
+        document.getElementById('advanceReportModal').classList.remove('hidden');
+      }
+      closeAdvanceReportModal() { document.getElementById('advanceReportModal').classList.add('hidden'); }
+
+      generateAdvanceStats() {
+        const fromStr = document.getElementById('repDateFrom').value;
+        const toStr = document.getElementById('repDateTo').value;
+        if (!fromStr || !toStr) return;
+        
+        const from = new Date(fromStr);
+        const to = new Date(toStr);
+        to.setHours(23, 59, 59);
+
+        this.reportFilteredList = this.orders.filter(o => {
+          const d = new Date(o.fechaCreacion);
+          return d >= from && d <= to;
+        });
+
+        const total = this.reportFilteredList.length;
+        let totalHrs = 0;
+
+        this.reportFilteredList.forEach(o => {
+          const end = o.fechaTermino ? new Date(o.fechaTermino) : new Date();
+          totalHrs += Math.max(0, (end - new Date(o.fechaCreacion)) / 3600000);
+        });
+
+        document.getElementById('statTotalOts').textContent = total;
+        document.getElementById('statAvgTime').textContent = total > 0 ? `${(totalHrs / total).toFixed(1)}h` : '0h';
+
+        document.getElementById('reportTableBody').innerHTML = this.reportFilteredList.map(o => {
+          const timeInfo = this.calculateElapsedTimeInfo(o);
+          return `<tr><td class="p-2 font-bold">${escapeHtml(o.folio)}</td><td class="p-2">${escapeHtml(o.recinto)}</td><td class="p-2">${escapeHtml(o.estado)}</td><td class="p-2 text-right font-semibold ${timeInfo.textClass}">${timeInfo.elapsedString}</td></tr>`;
+        }).join('');
+
+        document.getElementById('reportStatsContainer').classList.remove('hidden');
+      }
+
+      exportReportPDF() {
+        if (!window.jspdf || this.reportFilteredList.length === 0) return;
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        doc.setFontSize(14);
+        doc.text(`INFORME DE AVANCE - ${this.hospitalName}`, 14, 15);
+        doc.setFontSize(9);
+        doc.text(`Rango: ${document.getElementById('repDateFrom').value} al ${document.getElementById('repDateTo').value}`, 14, 22);
+
+        doc.autoTable({
+          head: [["Folio", "Recinto", "Especialidad", "Estado", "Tiempo"]],
+          body: this.reportFilteredList.map(o => [o.folio, o.recinto, o.especialidad, o.estado, this.calculateElapsedTimeInfo(o).elapsedString]),
+          startY: 28,
+          theme: 'grid',
+          styles: { fontSize: 8 }
+        });
+        doc.save(`Avance_${Date.now()}.pdf`);
+      }
+
+      exportToExcel() {
+        if (!this.orders || this.orders.length === 0) {
+          this.showToast('No hay órdenes para exportar', '⚠️');
+          return;
+        }
+
+        const headers = [
+          'Folio', 'Recinto', 'PMA', 'Especialidad', 'Prioridad', 'Solicitante', 
+          'Técnico Asignado', 'Estado', 'Fecha Creación', 'Fecha Término', 
+          'Descripción del Trabajo', 'Instrucciones Jefatura', 'Diagnóstico y Solución'
+        ];
+
+        const escapeCSV = (str) => {
+          if (str === null || str === undefined) return '""';
+          const stringified = String(str);
+          return `"${stringified.replace(/"/g, '""')}"`;
+        };
+
+        const rows = this.orders.map(o => {
+          return [
+            o.folio,
+            o.recinto,
+            o.ticket || 'N/A',
+            o.especialidad,
+            o.prioridad,
+            o.solicitante,
+            o.encargado || 'No asignado',
+            o.estado,
+            o.fechaCreacion ? new Date(o.fechaCreacion).toLocaleString() : '',
+            o.fechaTermino ? new Date(o.fechaTermino).toLocaleString() : '',
+            o.descripcion,
+            o.instrucciones,
+            o.diagnostico
+          ].map(escapeCSV).join(';');
+        });
+
+        const csvContent = headers.map(escapeCSV).join(';') + '\n' + rows.join('\n');
+        const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        
+        link.setAttribute('href', url);
+        link.setAttribute('download', `SDO_BaseDatos_${new Date().toISOString().split('T')[0]}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        this.showToast('Base de datos descargada', '📊');
+      }
+
+      shareWhatsApp(id) {
+        const o = this.orders.find(item => item.id === id);
+        if (!o) return;
+        const link = `${window.location.origin}${window.location.pathname}?ot=${encodeURIComponent(o.id)}`;
+        const msg = `*${this.hospitalName.toUpperCase()}*\n*OT: ${o.folio}*\n------------------\n📌 *Prioridad:* ${o.prioridad}\n📍 *Recinto:* ${o.recinto}\n🛠️ *Especialidad:* ${o.especialidad}\n🎫 *PMA:* ${o.ticket || 'N/A'}\n------------------\n📝 *Problema:*\n${o.descripcion}\n${o.instrucciones ? `\n📋 *Instrucción:*\n${o.instrucciones}` : ''}\n------------------\n🔗 *Enlace directo:*\n${link}`;
+        const a = document.createElement('a');
+        a.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        a.click();
+      }
+
+      customConfirm(title, text, onYes) {
+        document.getElementById('confirmModalTitle').textContent = title;
+        document.getElementById('confirmModalText').textContent = text;
+        const btn = document.getElementById('confirmModalBtnYes');
+        btn.onclick = () => { this.closeConfirmModal(); onYes(); };
+        document.getElementById('customConfirmModal').classList.remove('hidden');
+      }
+      closeConfirmModal() { document.getElementById('customConfirmModal').classList.add('hidden'); }
     }
 
-    window.addEventListener('DOMContentLoaded', () => {
-      window.app = new UnifiedPlatformApp();
-    });
+    window.addEventListener('DOMContentLoaded', () => { window.app = new UnifiedPlatformApp(); });
   </script>
 </body>
 </html>
