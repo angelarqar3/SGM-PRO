@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-  <title>SDO Cloud HBQP - Proyectos y Órdenes de Trabajo</title>
+  <title>SDO Cloud HBQP - Control de Proyectos y Órdenes de Trabajo</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -14,21 +14,16 @@
   <style>
     * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
     html, body { touch-action: manipulation; -webkit-text-size-adjust: 100%; }
-    input, textarea, select { font-size: 15px !important; touch-action: manipulation; }
+    input, textarea, select { font-size: 14px !important; touch-action: manipulation; }
     .custom-scroll::-webkit-scrollbar { height: 5px; width: 5px; }
     .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-    .custom-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     @keyframes slideUpFade { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
     .toast-anim { animation: slideUpFade 0.3s ease forwards; }
 
     :root {
-      --sdo-bg: #f5f7fb; --sdo-surface: #ffffff; --sdo-surface-soft: #f8fafc;
-      --sdo-ink: #0f172a; --sdo-muted: #64748b; --sdo-line: #e2e8f0; --sdo-line-soft: #edf1f6;
-      --sdo-navy: #111827; --sdo-accent: #4f46e5; --sdo-blue: #2563eb; --sdo-green: #059669;
-      --sdo-amber: #d97706; --sdo-rose: #e11d48; --sdo-radius: 16px; --sdo-radius-sm: 11px;
-      --sdo-shadow: 0 1px 2px rgba(15,23,42,.035), 0 8px 24px rgba(15,23,42,.045);
+      --sdo-bg: #f5f7fb; --sdo-surface: #ffffff; --sdo-ink: #0f172a; --sdo-muted: #64748b;
+      --sdo-line: #e2e8f0; --sdo-navy: #111827; --sdo-accent: #4f46e5; --sdo-blue: #2563eb;
     }
-
     body {
       background: radial-gradient(circle at 85% -10%, rgba(79,70,229,.055), transparent 28rem), var(--sdo-bg) !important;
       color: var(--sdo-ink) !important;
@@ -63,7 +58,7 @@
     }
     .project-card {
       background: #ffffff;
-      border: 1px solid var(--sdo-line-soft);
+      border: 1px solid #e2e8f0;
       border-radius: 12px;
       padding: 13px;
       box-shadow: 0 1px 3px rgba(15,23,42,.04);
@@ -76,24 +71,13 @@
     .badge-proyecto { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
     .badge-reparacion { background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
     .badge-apoyo { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
-
-    .uov-section-card { background: #ffffff; border: 1px solid var(--sdo-line-soft); border-radius: var(--sdo-radius); padding: 1.5rem; }
-    .uov-nav-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: var(--sdo-radius-sm); color: var(--sdo-muted); font-weight: 600; }
-    .uov-nav-link.active, .uov-nav-link:hover { background: #eef2ff; color: var(--sdo-accent); }
-    .uov-bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-top: 1px solid var(--sdo-line); padding: 1rem; z-index: 45; }
-    .uov-action-btn { min-height: 42px; border-radius: var(--sdo-radius-sm); font-weight: 700; padding: 0 1.25rem; }
-
-    @media (max-width: 768px) {
-      .uov-nav { display: none; }
-      .uov-content { margin-left: 0 !important; width: 100% !important; padding-bottom: 80px; }
-    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col font-sans pb-12">
 
   <div id="toastContainer" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-[70] flex flex-col gap-2 pointer-events-none"></div>
 
-  <!-- Header Institucional -->
+  <!-- Header Superior -->
   <header class="bg-slate-900 text-white sticky top-0 z-30 shadow-md">
     <div class="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between gap-3">
       
@@ -110,7 +94,7 @@
         </div>
       </div>
 
-      <!-- Switcher de Módulos (Exclusivo Supervisor) -->
+      <!-- Selector de Módulo -->
       <nav id="moduleSwitcher" class="hidden md:flex items-center bg-slate-800/90 p-1 rounded-xl border border-slate-700 text-xs font-bold">
         <button id="navBtnProjects" onclick="window.app.switchModule('projects')" class="px-3.5 py-1.5 rounded-lg bg-indigo-600 text-white shadow transition flex items-center gap-1.5">
           <i class="fa-solid fa-diagram-project"></i> <span>Módulo Proyectos</span>
@@ -120,9 +104,10 @@
         </button>
       </nav>
 
+      <!-- Botón Principal y Menú -->
       <div class="flex items-center space-x-2 relative">
-        <button id="btnHeaderAction" onclick="window.app.handleHeaderPrimaryAction()" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
-          <span id="btnHeaderActionIcon">➕</span> <span id="btnHeaderActionText" class="hidden sm:inline">Nuevo Proyecto</span>
+        <button id="btnHeaderAction" onclick="window.app.handleHeaderPrimaryAction()" class="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+          <span id="btnHeaderActionIcon">➕</span> <span id="btnHeaderActionText">Nuevo Proyecto</span>
         </button>
 
         <button onclick="window.app.toggleMenu()" aria-label="Abrir Menú" class="p-2 rounded-lg bg-slate-800 text-slate-200 border border-slate-700 flex items-center space-x-1">
@@ -130,7 +115,7 @@
           <span class="text-xs font-semibold hidden sm:inline">Menú</span>
         </button>
 
-        <div id="appMenuDropdown" class="hidden absolute right-0 top-12 w-60 bg-white rounded-xl shadow-2xl border text-slate-800 z-50 py-1 text-sm">
+        <div id="appMenuDropdown" class="hidden absolute right-0 top-12 w-64 bg-white rounded-xl shadow-2xl border text-slate-800 z-50 py-1 text-sm">
           <div id="mobileModuleOptions" class="md:hidden px-3 py-2 border-b bg-slate-50 space-y-1">
             <span class="text-[10px] font-bold text-slate-400 uppercase block">Cambiar Módulo</span>
             <button onclick="window.app.switchModule('projects'); window.app.toggleMenu();" class="w-full text-left px-2 py-1.5 rounded text-xs font-bold text-indigo-700 hover:bg-indigo-50">
@@ -143,22 +128,22 @@
 
           <div id="supervisorMenuOptions">
             <button onclick="window.app.openCreateProjectModal(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left hover:bg-slate-50 flex items-center gap-2 font-medium text-indigo-600">
-              <span>➕</span> <span>Nuevo Proyecto</span>
+              <i class="fa-solid fa-plus text-indigo-500"></i> <span>Nuevo Proyecto</span>
             </button>
             <button onclick="window.app.openCreateOtModal(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left hover:bg-slate-50 flex items-center gap-2 font-medium text-blue-600">
-              <span>🔧</span> <span>Nueva Orden de Trabajo (OT)</span>
+              <i class="fa-solid fa-wrench text-blue-500"></i> <span>Nueva Orden de Trabajo (OT)</span>
             </button>
             <button onclick="window.app.exportActiveDataCSV(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left hover:bg-slate-50 flex items-center gap-2 font-medium">
-              <span>📥</span> <span>Exportar Planilla CSV</span>
+              <i class="fa-solid fa-file-csv text-emerald-600"></i> <span>Exportar Planilla CSV</span>
             </button>
             <button onclick="window.app.openSettingsModal(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left hover:bg-slate-50 flex items-center gap-2 font-medium">
-              <span>⚙️</span> <span>Configuración & PINs</span>
+              <i class="fa-solid fa-gear text-slate-500"></i> <span>Configuración & PINs</span>
             </button>
           </div>
 
           <hr class="my-1 border-slate-100">
           <button onclick="window.app.openAuthModal(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left hover:bg-slate-50 flex items-center gap-2 font-medium text-amber-700">
-            <span>🔄</span> <span>Cambiar Rol / PIN</span>
+            <i class="fa-solid fa-arrows-rotate text-amber-600"></i> <span>Cambiar Rol / PIN</span>
           </button>
         </div>
       </div>
@@ -175,15 +160,13 @@
     </div>
   </header>
 
-  <!-- ==========================================
-       VISTA 1: MÓDULO DE PROYECTOS (SUPERVISOR)
-       ========================================== -->
+  <!-- VISTA 1: MÓDULO DE PROYECTOS (SUPERVISOR) -->
   <section id="moduleProjectsView" class="max-w-7xl w-full mx-auto px-3 sm:px-4 py-4 flex-1">
     <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm mb-4 space-y-2.5">
       <div class="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center justify-between">
         <div class="relative flex-1">
           <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-          <input type="text" id="searchProjectsInput" oninput="window.app.renderProjects()" placeholder="Buscar por requerimiento, unidad, recinto, PMA..." 
+          <input type="text" id="searchProjectsInput" oninput="window.app.renderProjects()" placeholder="Buscar proyectos por requerimiento, unidad, recinto, PMA..." 
                  class="w-full pl-8 pr-3 py-2 bg-slate-50 border rounded-lg text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
         </div>
 
@@ -193,6 +176,9 @@
           </button>
           <button id="btnProjViewCards" onclick="window.app.setProjectsViewMode('cards')" class="px-3 py-1.5 rounded-md text-slate-600">
             <i class="fa-solid fa-grip mr-1"></i> Cuadrícula
+          </button>
+          <button id="btnProjViewTable" onclick="window.app.setProjectsViewMode('table')" class="px-3 py-1.5 rounded-md text-slate-600">
+            <i class="fa-solid fa-table-list mr-1"></i> Matriz
           </button>
         </div>
       </div>
@@ -207,7 +193,7 @@
           </select>
           <select id="filterProjPiso" onchange="window.app.renderProjects()" class="bg-slate-50 border rounded-lg px-2.5 py-1">
             <option value="">Todos los Pisos</option>
-            <option value="-1">Piso -1</option>
+            <option value="-1">Piso -1 (Subsuelo)</option>
             <option value="1">Piso 1</option>
             <option value="2">Piso 2</option>
             <option value="3">Piso 3</option>
@@ -232,9 +218,7 @@
     <div id="projectsContainer"></div>
   </section>
 
-  <!-- ==========================================
-       VISTA 2: MÓDULO DE ORDENES DE TRABAJO (OTs)
-       ========================================== -->
+  <!-- VISTA 2: MÓDULO DE ÓRDENES DE TRABAJO (OTs) -->
   <section id="moduleOrdersView" class="hidden max-w-7xl w-full mx-auto px-3 sm:px-4 py-4 flex-1">
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-4">
       <div onclick="window.app.setOtFilterStatus('Pendiente')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer">
@@ -255,20 +239,15 @@
       </div>
     </div>
 
-    <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm mb-4 space-y-2.5">
-      <div class="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center justify-between">
-        <div class="relative flex-1">
-          <input type="text" id="searchOtInput" oninput="window.app.renderOrders()" placeholder="Buscar folio OT, recinto, PMA..." 
-                 class="w-full pl-9 pr-3 py-2 bg-slate-50 border rounded-lg text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
-          <span class="absolute left-3 top-2.5 text-slate-400 text-xs">🔍</span>
-        </div>
-      </div>
+    <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm mb-4">
+      <input type="text" id="searchOtInput" oninput="window.app.renderOrders()" placeholder="Buscar folio OT, recinto, PMA..." 
+             class="w-full pl-4 pr-3 py-2 bg-slate-50 border rounded-lg text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
     </div>
 
     <div id="ordersContainer"></div>
   </section>
 
-  <!-- Modal Ficha de Proyecto (Con Derivación a OT) -->
+  <!-- Modal Ficha de Proyecto / Nuevo Proyecto -->
   <div id="projectModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
     <div class="bg-white rounded-2xl max-w-3xl w-full shadow-2xl overflow-hidden border my-6 max-h-[92vh] flex flex-col">
       <div class="bg-slate-900 text-white px-6 py-4 flex items-center justify-between">
@@ -277,7 +256,6 @@
           <p class="text-xs text-slate-400">Control arquitectónico y de infraestructura</p>
         </div>
         <div class="flex items-center gap-2">
-          <!-- Acción Clave: Derivar a OT -->
           <button type="button" id="btnConvertToOt" onclick="window.app.convertCurrentProjectToOT()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-lg transition shadow-sm flex items-center gap-1.5">
             <i class="fa-solid fa-bolt"></i> <span>Derivar a OT</span>
           </button>
@@ -287,14 +265,15 @@
 
       <form id="projectForm" onsubmit="window.app.saveProject(event)" class="p-6 space-y-4 text-xs overflow-y-auto custom-scroll flex-1">
         <input type="hidden" id="formProjectId">
+
         <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 bg-slate-50 p-3 rounded-xl border">
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Código</label>
+            <label class="block font-bold text-slate-700 mb-1">Código Proyecto *</label>
             <input type="text" id="formProjCodigo" required class="w-full border rounded-lg p-2 font-bold text-indigo-700">
           </div>
           <div>
             <label class="block font-bold text-slate-700 mb-1">Ticket / OC</label>
-            <input type="text" id="formProjTicket" class="w-full border rounded-lg p-2">
+            <input type="text" id="formProjTicket" class="w-full border rounded-lg p-2" placeholder="Ej. #66458">
           </div>
           <div>
             <label class="block font-bold text-slate-700 mb-1">Tipología *</label>
@@ -317,27 +296,38 @@
 
         <div>
           <label class="block font-bold text-slate-700 mb-1">Requerimiento / Asunto *</label>
-          <textarea id="formProjRequerimiento" rows="2" required class="w-full border rounded-lg p-2 font-medium"></textarea>
+          <textarea id="formProjRequerimiento" rows="2" required placeholder="Nombre descriptivo del proyecto..." class="w-full border rounded-lg p-2 font-medium"></textarea>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Unidad Solicitante</label>
+            <input type="text" id="formProjUnidad" placeholder="Ej. Subdirección de Operaciones, Urgencia..." class="w-full border rounded-lg p-2">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Solicitante (Persona)</label>
+            <input type="text" id="formProjSolicitante" placeholder="Nombre de quien solicita..." class="w-full border rounded-lg p-2">
+          </div>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
             <label class="block font-bold text-slate-700 mb-1">Piso</label>
-            <input type="text" id="formProjPiso" class="w-full border rounded-lg p-2">
+            <input type="text" id="formProjPiso" placeholder="Ej. -1, 1, 2, 3..." class="w-full border rounded-lg p-2">
           </div>
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Recinto</label>
-            <input type="text" id="formProjUbicacion" class="w-full border rounded-lg p-2">
+            <label class="block font-bold text-slate-700 mb-1">Recinto / Emplazamiento</label>
+            <input type="text" id="formProjUbicacion" placeholder="Ej. Terraza, Box..." class="w-full border rounded-lg p-2">
           </div>
           <div>
             <label class="block font-bold text-slate-700 mb-1">Código PMA</label>
-            <input type="text" id="formProjPMA" class="w-full border rounded-lg p-2">
+            <input type="text" id="formProjPMA" placeholder="Ej. D-3-40, G-S1-45" class="w-full border rounded-lg p-2">
           </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-indigo-50/50 p-3 rounded-xl border border-indigo-100">
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Fase / Estado *</label>
+            <label class="block font-bold text-indigo-900 mb-1">Fase / Estado *</label>
             <select id="formProjEstado" required class="w-full border rounded-lg p-2 font-bold text-indigo-950">
               <option value="PENDIENTE">📋 Pendiente / En Evaluación</option>
               <option value="Propuesta enviada">📑 Propuesta Enviada</option>
@@ -346,25 +336,41 @@
             </select>
           </div>
           <div>
-            <label class="block font-bold text-amber-900 mb-1">Hito Pendiente</label>
-            <input type="text" id="formProjPendiente" class="w-full border border-amber-300 bg-amber-50 rounded-lg p-2 text-amber-950 font-semibold">
+            <label class="block font-bold text-indigo-900 mb-1">Fecha de Ingreso</label>
+            <input type="date" id="formProjFechaIngreso" class="w-full border rounded-lg p-2">
+          </div>
+          <div>
+            <label class="block font-bold text-indigo-900 mb-1">Última Actualización</label>
+            <input type="date" id="formProjFechaActualizacion" class="w-full border rounded-lg p-2">
           </div>
         </div>
 
         <div>
-          <label class="block font-bold text-slate-700 mb-1">Memoria Descriptiva y Especificaciones</label>
-          <textarea id="formProjDescripcion" rows="4" class="w-full border rounded-lg p-2"></textarea>
+          <label class="block font-bold text-amber-900 mb-1">Hito Pendiente / Bloqueante</label>
+          <input type="text" id="formProjPendiente" placeholder="Ej: Control Centralizado envía EE.TT., Reunión 07/JULIO..." class="w-full border border-amber-300 bg-amber-50 rounded-lg p-2 text-amber-950 font-semibold">
         </div>
 
-        <div class="pt-4 border-t flex justify-end gap-2">
-          <button type="button" onclick="window.app.closeProjectModal()" class="px-4 py-2 border rounded-lg font-bold">Cancelar</button>
-          <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-bold">Guardar Proyecto</button>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Memoria Descriptiva y Especificaciones</label>
+          <textarea id="formProjDescripcion" rows="4" placeholder="Detalle técnico de los trabajos, materiales..." class="w-full border rounded-lg p-2"></textarea>
+        </div>
+
+        <div class="pt-4 border-t flex items-center justify-between">
+          <button type="button" id="btnDeleteProject" onclick="window.app.deleteProject()" class="text-rose-600 hover:text-rose-800 font-bold flex items-center gap-1">
+            <i class="fa-solid fa-trash-can"></i> Eliminar Proyecto
+          </button>
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="window.app.closeProjectModal()" class="px-4 py-2 border rounded-lg font-bold">Cancelar</button>
+            <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-bold shadow">
+              <i class="fa-solid fa-floppy-disk mr-1"></i> Guardar Proyecto
+            </button>
+          </div>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- Modal Crear Nueva OT -->
+  <!-- Modal Crear OT -->
   <div id="createOtModal" class="hidden fixed inset-0 z-50 bg-slate-900/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
     <div class="bg-white w-full max-w-lg rounded-2xl p-5 shadow-2xl border max-h-[92vh] flex flex-col">
       <div class="flex items-center justify-between pb-3 border-b">
@@ -427,7 +433,7 @@
     </div>
   </div>
 
-  <!-- SDO Cloud Engine Script -->
+  <!-- SDO Cloud Master Engine Script -->
   <script>
     const SGM_CONFIG = {
       supabaseUrl: "https://xtrzyioxbanyjvjeqedw.supabase.co",
@@ -437,7 +443,13 @@
       defaultPins: { supervisor: "1234", tecnico: "5678" }
     };
 
-    function escapeHtml(u) { return u ? u.toString().replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;") : ''; }
+    // 46 Proyectos precargados desde la planilla original
+    const INITIAL_PROJECTS = """ + projects_json + """;
+
+    function escapeHtml(u) {
+      return u ? u.toString().replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;") : '';
+    }
+
     async function hashPin(pin) {
       if (!window.crypto?.subtle) return `fb_${pin}`;
       const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pin));
@@ -450,25 +462,35 @@
         this.enteredPin = '';
         this.selectedAuthRole = 'supervisor';
         this.activeModule = 'projects';
+
         this.projects = [];
         this.orders = [];
         this.projectsViewMode = 'kanban';
         this.projectStatusFilter = 'ALL';
         this.otFilterStatus = 'TODOS';
+
         this.currentProjectInModal = null;
         this.draggedProjectId = null;
         this.hashes = { supervisor: "", tecnico: "" };
         this.supabase = null;
+
         this.initAuth();
       }
 
       async initAuth() {
         this.hashes.supervisor = await hashPin(SGM_CONFIG.defaultPins.supervisor);
         this.hashes.tecnico = await hashPin(SGM_CONFIG.defaultPins.tecnico);
-        this.initSupabase();
+
         this.loadInitialStores();
+        this.initSupabase();
+
         const role = sessionStorage.getItem('sdo_active_role');
-        if (role) { this.currentRole = role; this.applyRoleRestrictions(); } else { this.openAuthModal(); }
+        if (role) {
+          this.currentRole = role;
+          this.applyRoleRestrictions();
+        } else {
+          this.openAuthModal();
+        }
       }
 
       initSupabase() {
@@ -476,60 +498,128 @@
           try {
             this.supabase = window.supabase.createClient(SGM_CONFIG.supabaseUrl, SGM_CONFIG.supabaseAnonKey);
             this.supabase.channel('unified_realtime')
-              .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => this.fetchOrders())
               .on('postgres_changes', { event: '*', schema: 'public', table: 'projects_hbqp' }, () => this.fetchProjects())
+              .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => this.fetchOrders())
               .subscribe();
-            this.fetchOrders();
+            
             this.fetchProjects();
+            this.fetchOrders();
           } catch(e) {}
         }
       }
 
       loadInitialStores() {
-        const sp = localStorage.getItem('hbqp_projects_store');
-        this.projects = sp ? JSON.parse(sp) : [
-          { id: 7, codigo: "PROY-007", tipologia: "PROYECTO", unidad: "Subdirección de Operaciones", solicitante: "Hospitalización Domiciliaria", ubicacion: "HD", piso: "3", pma: "D-3-40", requerimiento: "Conclusión de trabajos de infraestructura en oficinas, kitchenette y bodega", estado: "PENDIENTE", pendiente: "Reunión Programada 07/JULIO" },
-          { id: 16, codigo: "PROY-016", tipologia: "REPARACION", unidad: "UMQ", solicitante: "José Rocabado", ubicacion: "Terrazas 5to Piso", piso: "5", pma: "N-5-23", requerimiento: "Solicita instalación de Mallas en terrazas para el 5to Piso", estado: "PENDIENTE", pendiente: "Planos y EE.TT" },
-          { id: 18, codigo: "PROY-018", tipologia: "PROYECTO", unidad: "UHYS", solicitante: "Higiene", ubicacion: "Bodega UHYS", piso: "-1", requerimiento: "BODEGA UHYS", estado: "EN PROCESO", pendiente: "PUERTA Y CELOSIA" }
-        ];
+        const storedProjects = localStorage.getItem('hbqp_projects_store_v2');
+        if (storedProjects) {
+          try { this.projects = JSON.parse(storedProjects); } catch(e) { this.projects = INITIAL_PROJECTS; }
+        } else {
+          this.projects = JSON.parse(JSON.stringify(INITIAL_PROJECTS));
+          localStorage.setItem('hbqp_projects_store_v2', JSON.stringify(this.projects));
+        }
 
-        const so = localStorage.getItem('sdo_orders_cache');
-        this.orders = so ? JSON.parse(so) : [];
+        const storedOrders = localStorage.getItem('sdo_orders_cache_v2');
+        if (storedOrders) {
+          try { this.orders = JSON.parse(storedOrders); } catch(e) { this.orders = []; }
+        } else {
+          this.orders = [];
+        }
+      }
+
+      async fetchProjects() {
+        if (!this.supabase) return;
+        const { data } = await this.supabase.from('projects_hbqp').select('*');
+        if (data && data.length > 0) {
+          this.projects = data.map(r => r.data);
+          localStorage.setItem('hbqp_projects_store_v2', JSON.stringify(this.projects));
+          this.renderProjects();
+        }
       }
 
       async fetchOrders() {
         if (!this.supabase) return;
         const { data } = await this.supabase.from('orders').select('*');
-        if (data) { this.orders = data.map(r => r.data); this.renderOrders(); }
-      }
-      async fetchProjects() {
-        if (!this.supabase) return;
-        const { data } = await this.supabase.from('projects_hbqp').select('*');
-        if (data) { this.projects = data.map(r => r.data); this.renderProjects(); }
+        if (data && data.length > 0) {
+          this.orders = data.map(r => r.data);
+          localStorage.setItem('sdo_orders_cache_v2', JSON.stringify(this.orders));
+          this.renderOrders();
+        }
       }
 
-      showToast(msg) {
+      async syncProject(p) {
+        localStorage.setItem('hbqp_projects_store_v2', JSON.stringify(this.projects));
+        if (this.supabase) {
+          try {
+            await this.supabase.from('projects_hbqp').upsert({
+              id: String(p.id),
+              codigo: p.codigo,
+              data: p,
+              updated_at: new Date().toISOString()
+            });
+          } catch(e) {}
+        }
+      }
+
+      async syncOrder(o) {
+        localStorage.setItem('sdo_orders_cache_v2', JSON.stringify(this.orders));
+        if (this.supabase) {
+          try {
+            await this.supabase.from('orders').upsert({
+              id: o.id,
+              data: o,
+              created_at: o.fechaCreacion
+            });
+          } catch(e) {}
+        }
+      }
+
+      showToast(msg, icon = '✅') {
         const c = document.getElementById('toastContainer');
         const t = document.createElement('div');
-        t.className = 'bg-slate-900 text-white px-4 py-2 rounded-xl shadow text-xs font-bold toast-anim';
-        t.innerText = msg;
+        t.className = 'bg-slate-900 text-white px-4 py-2 rounded-xl shadow-2xl text-xs font-bold flex items-center gap-2 border border-slate-700 toast-anim';
+        t.innerHTML = `<span>${icon}</span> <span>${escapeHtml(msg)}</span>`;
         c.appendChild(t);
-        setTimeout(() => t.remove(), 2500);
+        setTimeout(() => { t.remove(); }, 2600);
       }
 
+      // --- AUTH & ROLES ---
       openAuthModal() { document.getElementById('authModal').classList.remove('hidden'); }
       closeAuthModal() { if (this.currentRole) document.getElementById('authModal').classList.add('hidden'); }
-      selectAuthRole(r) { this.selectedAuthRole = r; }
-      typePin(n) { if (this.enteredPin.length < 4) { this.enteredPin += n; if (this.enteredPin.length === 4) this.validatePin(); } }
-      clearPin() { this.enteredPin = ''; }
-      deletePin() { this.enteredPin = this.enteredPin.slice(0, -1); }
+      selectAuthRole(r) {
+        this.selectedAuthRole = r;
+        const btnSup = document.getElementById('roleBtnSupervisor');
+        const btnTec = document.getElementById('roleBtnTecnico');
+        if (r === 'supervisor') {
+          btnSup.className = "py-2 text-xs font-bold rounded-lg border-2 border-indigo-600 bg-indigo-50 text-indigo-700";
+          btnTec.className = "py-2 text-xs font-bold rounded-lg border-2 border-slate-200 bg-white text-slate-600";
+        } else {
+          btnTec.className = "py-2 text-xs font-bold rounded-lg border-2 border-indigo-600 bg-indigo-50 text-indigo-700";
+          btnSup.className = "py-2 text-xs font-bold rounded-lg border-2 border-slate-200 bg-white text-slate-600";
+        }
+      }
+      typePin(n) {
+        if (this.enteredPin.length < 4) {
+          this.enteredPin += n;
+          this.updatePinDots();
+          if (this.enteredPin.length === 4) setTimeout(() => this.validatePin(), 50);
+        }
+      }
+      clearPin() { this.enteredPin = ''; this.updatePinDots(); }
+      deletePin() { this.enteredPin = this.enteredPin.slice(0, -1); this.updatePinDots(); }
+      updatePinDots() {
+        for (let i = 0; i < 4; i++) {
+          const dot = document.getElementById(`pinDot${i}`);
+          dot.className = i < this.enteredPin.length ? "w-3.5 h-3.5 rounded-full border-2 border-indigo-600 bg-indigo-600" : "w-3.5 h-3.5 rounded-full border-2 border-slate-300 bg-white";
+        }
+      }
       async validatePin() {
         const h = await hashPin(this.enteredPin);
-        if (h === (this.selectedAuthRole === 'supervisor' ? this.hashes.supervisor : this.hashes.tecnico)) {
+        const expected = this.selectedAuthRole === 'supervisor' ? this.hashes.supervisor : this.hashes.tecnico;
+        if (h === expected) {
           this.currentRole = this.selectedAuthRole;
           sessionStorage.setItem('sdo_active_role', this.currentRole);
           this.applyRoleRestrictions();
           document.getElementById('authModal').classList.add('hidden');
+          this.clearPin();
         } else {
           document.getElementById('authErrorMsg').classList.remove('hidden');
           this.clearPin();
@@ -555,7 +645,7 @@
           switcher.classList.add('hidden');
           mob.classList.add('hidden');
           sup.classList.add('hidden');
-          this.switchModule('orders'); // Técnico NUNCA ve el módulo de proyectos
+          this.switchModule('orders');
         }
       }
 
@@ -605,9 +695,10 @@
       renderProjects() {
         const c = document.getElementById('projectsContainer');
         const sum = document.getElementById('moduleStatsSummary');
-        const q = (document.getElementById('searchProjectsInput').value || '').toLowerCase();
+        const q = (document.getElementById('searchProjectsInput').value || '').toLowerCase().trim();
         const tipo = (document.getElementById('filterProjTipologia').value || '').toUpperCase();
         const piso = document.getElementById('filterProjPiso').value;
+        const prio = (document.getElementById('filterProjPrioridad').value || '').toUpperCase();
 
         const pCount = this.projects.filter(p => this.normalizeProjectStatus(p.estado) === 'PENDIENTE').length;
         const propCount = this.projects.filter(p => this.normalizeProjectStatus(p.estado) === 'Propuesta enviada').length;
@@ -617,56 +708,95 @@
         sum.innerHTML = `
           <span>Total Proyectos: <strong class="text-white font-bold">${this.projects.length}</strong></span>
           <span class="text-slate-600">|</span>
-          <span>Pendientes: <strong class="text-amber-300 font-bold">${pCount}</strong></span>
-          <span>Propuesta: <strong class="text-blue-300 font-bold">${propCount}</strong></span>
-          <span>En Obras: <strong class="text-indigo-300 font-bold">${procCount}</strong></span>
-          <span>Concluidos: <strong class="text-emerald-300 font-bold">${doneCount}</strong></span>
+          <span class="cursor-pointer" onclick="window.app.setProjectStatusFilter('PENDIENTE')"><span class="w-2 h-2 rounded-full bg-amber-400 inline-block mr-1"></span>Pendientes: <strong class="text-amber-300 font-bold">${pCount}</strong></span>
+          <span class="cursor-pointer" onclick="window.app.setProjectStatusFilter('Propuesta enviada')"><span class="w-2 h-2 rounded-full bg-blue-400 inline-block mr-1"></span>Propuestas: <strong class="text-blue-300 font-bold">${propCount}</strong></span>
+          <span class="cursor-pointer" onclick="window.app.setProjectStatusFilter('EN PROCESO')"><span class="w-2 h-2 rounded-full bg-indigo-400 inline-block mr-1"></span>En Obras: <strong class="text-indigo-300 font-bold">${procCount}</strong></span>
+          <span class="cursor-pointer" onclick="window.app.setProjectStatusFilter('TERMINADO')"><span class="w-2 h-2 rounded-full bg-emerald-400 inline-block mr-1"></span>Concluidos: <strong class="text-emerald-300 font-bold">${doneCount}</strong></span>
         `;
 
         const filtered = this.projects.filter(p => {
-          const matchQ = !q || p.codigo?.toLowerCase().includes(q) || p.requerimiento?.toLowerCase().includes(q) || p.unidad?.toLowerCase().includes(q);
-          const matchS = this.projectStatusFilter === 'ALL' || this.normalizeProjectStatus(p.estado) === this.projectStatusFilter;
+          const norm = this.normalizeProjectStatus(p.estado);
+          const matchQ = !q || p.codigo?.toLowerCase().includes(q) || p.requerimiento?.toLowerCase().includes(q) || p.unidad?.toLowerCase().includes(q) || p.solicitante?.toLowerCase().includes(q) || p.pma?.toLowerCase().includes(q);
+          const matchS = this.projectStatusFilter === 'ALL' || norm === this.projectStatusFilter;
           const matchT = !tipo || p.tipologia?.toUpperCase().includes(tipo);
           const matchP = !piso || String(p.piso).includes(piso);
-          return matchQ && matchS && matchT && matchP;
+          const matchPrio = !prio || p.prioridad?.toUpperCase().includes(prio);
+          return matchQ && matchS && matchT && matchP && matchPrio;
         });
 
         if (this.projectsViewMode === 'kanban') {
           const cols = [
-            { key: 'PENDIENTE', title: 'En Evaluación', color: 'bg-amber-500' },
-            { key: 'Propuesta enviada', title: 'Propuesta Enviada', color: 'bg-blue-500' },
-            { key: 'EN PROCESO', title: 'En Ejecución / Obras', color: 'bg-indigo-500' },
-            { key: 'TERMINADO', title: 'Concluidos / Entregados', color: 'bg-emerald-500' }
+            { key: 'PENDIENTE', title: 'En Evaluación / Pendientes', color: 'bg-amber-500', badge: 'bg-amber-100 text-amber-900' },
+            { key: 'Propuesta enviada', title: 'Propuesta Enviada', color: 'bg-blue-500', badge: 'bg-blue-100 text-blue-900' },
+            { key: 'EN PROCESO', title: 'En Ejecución / Obras', color: 'bg-indigo-500', badge: 'bg-indigo-100 text-indigo-900' },
+            { key: 'TERMINADO', title: 'Concluidos / Entregados', color: 'bg-emerald-500', badge: 'bg-emerald-100 text-emerald-900' }
           ];
+
           c.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 items-start">${cols.map(col => `
             <div class="kanban-col-container shadow-sm">
-              <div class="flex justify-between pb-2 mb-2 border-b">
-                <span class="font-bold text-xs flex items-center gap-1.5 uppercase"><span class="w-2.5 h-2.5 rounded-full ${col.color}"></span> ${col.title}</span>
-                <span class="text-xs font-bold text-slate-500">${filtered.filter(p => this.normalizeProjectStatus(p.estado) === col.key).length}</span>
+              <div class="flex justify-between items-center pb-2 mb-2.5 border-b border-slate-300">
+                <span class="font-bold text-xs flex items-center gap-1.5 uppercase text-slate-800"><span class="w-2.5 h-2.5 rounded-full ${col.color}"></span> ${col.title}</span>
+                <span class="text-xs font-bold px-2 py-0.5 rounded-full ${col.badge}">${filtered.filter(p => this.normalizeProjectStatus(p.estado) === col.key).length}</span>
               </div>
-              <div class="kanban-cards-wrapper" ondragover="event.preventDefault(); this.classList.add('drag-over');" ondragleave="this.classList.remove('drag-over');" ondrop="window.app.handleProjectDrop(event, '${col.key}')">
+              <div class="kanban-cards-wrapper custom-scroll" ondragover="event.preventDefault(); this.classList.add('drag-over');" ondragleave="this.classList.remove('drag-over');" ondrop="window.app.handleProjectDrop(event, '${col.key}')">
                 ${filtered.filter(p => this.normalizeProjectStatus(p.estado) === col.key).map(p => `
-                  <div class="project-card" draggable="true" ondragstart="window.app.draggedProjectId=${p.id}" onclick="window.app.openEditProjectModal(${p.id})">
-                    <div class="flex justify-between text-[10px] mb-1 font-bold">
-                      <span class="text-slate-900 font-black">${p.codigo}</span>
-                      <span class="px-1.5 py-0.5 rounded ${p.tipologia === 'REPARACION' ? 'badge-reparacion' : 'badge-proyecto'}">${p.tipologia || 'PROYECTO'}</span>
+                  <div class="project-card group" draggable="true" ondragstart="window.app.draggedProjectId=${p.id}" onclick="window.app.openEditProjectModal(${p.id})">
+                    <div class="flex justify-between items-center text-xs mb-1.5">
+                      <span class="font-black text-slate-900">${escapeHtml(p.codigo || 'PROY-' + p.id)}</span>
+                      <span class="px-2 py-0.5 rounded text-[10px] font-bold ${p.tipologia === 'REPARACION' ? 'badge-reparacion' : (p.tipologia === 'APOYO TECNICO' ? 'badge-apoyo' : 'badge-proyecto')}">${p.tipologia || 'PROYECTO'}</span>
                     </div>
-                    <h4 class="text-xs font-bold text-slate-900 mb-1 line-clamp-2">${escapeHtml(p.requerimiento)}</h4>
-                    ${p.unidad ? `<p class="text-[11px] text-slate-600 mb-1">🏢 ${escapeHtml(p.unidad)}</p>` : ''}
-                    ${p.pendiente ? `<div class="p-1 bg-amber-50 text-amber-900 text-[10px] font-bold rounded mb-1">⚠️ ${escapeHtml(p.pendiente)}</div>` : ''}
+                    <h4 class="text-xs font-bold text-slate-900 mb-1.5 group-hover:text-indigo-600 transition line-clamp-2">${escapeHtml(p.requerimiento || p.descripcion)}</h4>
+                    ${p.unidad ? `<p class="text-[11px] text-slate-600 mb-1 truncate">🏢 ${escapeHtml(p.unidad)}</p>` : ''}
+                    <div class="flex items-center gap-1 flex-wrap mb-2 text-[10px] text-slate-500">
+                      ${p.piso ? `<span class="bg-slate-100 px-1.5 py-0.5 rounded">Piso ${escapeHtml(p.piso)}</span>` : ''}
+                      ${p.pma ? `<span class="bg-cyan-50 text-cyan-800 px-1.5 py-0.5 rounded border border-cyan-200 font-bold">PMA: ${escapeHtml(p.pma)}</span>` : ''}
+                    </div>
+                    ${p.pendiente ? `<div class="p-1.5 bg-amber-50 rounded text-amber-900 text-[10px] font-bold mb-2">⚠️ ${escapeHtml(p.pendiente)}</div>` : ''}
+                    <div class="pt-2 border-t flex items-center justify-between text-[10px] text-slate-400">
+                      <span>${p.fecha_ingreso || ''}</span>
+                      <span class="text-indigo-600 font-bold opacity-0 group-hover:opacity-100 transition">Ver Ficha →</span>
+                    </div>
                   </div>
                 `).join('')}
               </div>
             </div>
           `).join('')}</div>`;
-        } else {
-          c.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">${filtered.map(p => `
-            <div class="bg-white p-4 rounded-xl border shadow-sm cursor-pointer" onclick="window.app.openEditProjectModal(${p.id})">
-              <span class="font-bold text-xs text-indigo-700">${p.codigo}</span>
-              <h4 class="font-bold text-sm text-slate-900 mb-1">${escapeHtml(p.requerimiento)}</h4>
-              <p class="text-xs text-slate-500">🏢 ${escapeHtml(p.unidad || '')}</p>
+        } else if (this.projectsViewMode === 'cards') {
+          c.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">${filtered.map(p => `
+            <div class="bg-white p-4 rounded-xl border shadow-sm cursor-pointer hover:border-slate-300 transition" onclick="window.app.openEditProjectModal(${p.id})">
+              <div class="flex justify-between items-center mb-1">
+                <span class="font-bold text-xs text-indigo-700">${escapeHtml(p.codigo || 'PROY-' + p.id)}</span>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100">${p.estado}</span>
+              </div>
+              <h4 class="font-bold text-sm text-slate-900 mb-1 truncate">${escapeHtml(p.requerimiento || p.descripcion)}</h4>
+              <p class="text-xs text-slate-500 mb-1">🏢 ${escapeHtml(p.unidad || '')} · Piso ${escapeHtml(p.piso || '-')}</p>
+              ${p.pendiente ? `<p class="text-xs font-semibold text-amber-700 truncate">⚠️ ${escapeHtml(p.pendiente)}</p>` : ''}
             </div>
           `).join('')}</div>`;
+        } else {
+          c.innerHTML = `
+            <div class="bg-white rounded-xl border overflow-hidden shadow-sm">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 text-slate-700 font-bold border-b">
+                  <tr><th class="p-3">Código</th><th class="p-3">Tipología</th><th class="p-3">Requerimiento</th><th class="p-3">Unidad</th><th class="p-3">Piso / Recinto</th><th class="p-3">PMA</th><th class="p-3">Hito Pendiente</th><th class="p-3">Fase</th></tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  ${filtered.map(p => `
+                    <tr class="hover:bg-slate-50 cursor-pointer" onclick="window.app.openEditProjectModal(${p.id})">
+                      <td class="p-3 font-bold text-indigo-700">${escapeHtml(p.codigo || 'PROY-' + p.id)}</td>
+                      <td class="p-3">${p.tipologia}</td>
+                      <td class="p-3 font-medium max-w-xs truncate">${escapeHtml(p.requerimiento || p.descripcion)}</td>
+                      <td class="p-3 text-slate-600">${escapeHtml(p.unidad || '-')}</td>
+                      <td class="p-3">Piso ${escapeHtml(p.piso || '-')} · ${escapeHtml(p.ubicacion || '')}</td>
+                      <td class="p-3 font-mono">${escapeHtml(p.pma || '-')}</td>
+                      <td class="p-3 font-bold text-amber-700">${escapeHtml(p.pendiente || '-')}</td>
+                      <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100">${p.estado}</span></td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          `;
         }
       }
 
@@ -677,55 +807,118 @@
       handleProjectDrop(e, st) {
         e.preventDefault();
         e.currentTarget.classList.remove('drag-over');
+        if (!this.draggedProjectId) return;
         const p = this.projects.find(item => item.id == this.draggedProjectId);
-        if (p) {
+        if (p && this.normalizeProjectStatus(p.estado) !== st) {
           p.estado = st;
-          localStorage.setItem('hbqp_projects_store', JSON.stringify(this.projects));
-          if (this.supabase) this.supabase.from('projects_hbqp').upsert({ id: String(p.id), data: p });
+          p.fecha_actualizacion = new Date().toISOString().split('T')[0];
+          this.syncProject(p);
           this.renderProjects();
           this.showToast(`Proyecto ${p.codigo} movido a ${st}`);
         }
+        this.draggedProjectId = null;
+      }
+
+      openCreateProjectModal() {
+        document.getElementById('projectForm').reset();
+        document.getElementById('formProjectId').value = '';
+        const nextId = this.projects.length > 0 ? Math.max(...this.projects.map(p => Number(p.id) || 0)) + 1 : 1;
+        document.getElementById('formProjCodigo').value = `PROY-${String(nextId).padStart(3, '0')}`;
+        document.getElementById('modalProjectTitle').innerText = 'Nuevo Proyecto de Infraestructura';
+        document.getElementById('btnDeleteProject').classList.add('hidden');
+        document.getElementById('btnConvertToOt').classList.add('hidden');
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('formProjFechaIngreso').value = today;
+        document.getElementById('formProjFechaActualizacion').value = today;
+        document.getElementById('projectModal').classList.remove('hidden');
       }
 
       openEditProjectModal(id) {
         const p = this.projects.find(item => item.id == id);
         if (!p) return;
         this.currentProjectInModal = p;
+
         document.getElementById('formProjectId').value = p.id;
         document.getElementById('formProjCodigo').value = p.codigo || `PROY-${p.id}`;
         document.getElementById('formProjTicket').value = p.ticket || '';
         document.getElementById('formProjTipologia').value = p.tipologia || 'PROYECTO';
         document.getElementById('formProjPrioridad').value = p.prioridad || 'MEDIA';
-        document.getElementById('formProjRequerimiento').value = p.requerimiento || '';
+        document.getElementById('formProjRequerimiento').value = p.requerimiento || p.descripcion || '';
+        document.getElementById('formProjUnidad').value = p.unidad || '';
+        document.getElementById('formProjSolicitante').value = p.solicitante || '';
         document.getElementById('formProjPiso').value = p.piso || '';
         document.getElementById('formProjUbicacion').value = p.ubicacion || '';
         document.getElementById('formProjPMA').value = p.pma || '';
         document.getElementById('formProjEstado').value = p.estado || 'PENDIENTE';
+        document.getElementById('formProjFechaIngreso').value = p.fecha_ingreso || '';
+        document.getElementById('formProjFechaActualizacion').value = p.fecha_actualizacion || '';
         document.getElementById('formProjPendiente').value = p.pendiente || '';
         document.getElementById('formProjDescripcion').value = p.descripcion || '';
+
+        document.getElementById('modalProjectTitle').innerText = `Ficha Técnica: ${p.codigo || 'PROY-' + p.id}`;
+        document.getElementById('btnDeleteProject').classList.remove('hidden');
+        document.getElementById('btnConvertToOt').classList.remove('hidden');
         document.getElementById('projectModal').classList.remove('hidden');
       }
+
       closeProjectModal() { document.getElementById('projectModal').classList.add('hidden'); }
 
       saveProject(e) {
         e.preventDefault();
         const id = document.getElementById('formProjectId').value;
-        const p = this.projects.find(item => item.id == id);
-        if (p) {
-          p.codigo = document.getElementById('formProjCodigo').value;
-          p.requerimiento = document.getElementById('formProjRequerimiento').value;
-          p.estado = document.getElementById('formProjEstado').value;
-          p.pendiente = document.getElementById('formProjPendiente').value;
-          p.descripcion = document.getElementById('formProjDescripcion').value;
-          localStorage.setItem('hbqp_projects_store', JSON.stringify(this.projects));
-          if (this.supabase) this.supabase.from('projects_hbqp').upsert({ id: String(p.id), data: p });
+        const today = new Date().toISOString().split('T')[0];
+
+        const projectData = {
+          codigo: document.getElementById('formProjCodigo').value.trim(),
+          ticket: document.getElementById('formProjTicket').value.trim(),
+          tipologia: document.getElementById('formProjTipologia').value,
+          prioridad: document.getElementById('formProjPrioridad').value,
+          requerimiento: document.getElementById('formProjRequerimiento').value.trim(),
+          unidad: document.getElementById('formProjUnidad').value.trim(),
+          solicitante: document.getElementById('formProjSolicitante').value.trim(),
+          piso: document.getElementById('formProjPiso').value.trim(),
+          ubicacion: document.getElementById('formProjUbicacion').value.trim(),
+          pma: document.getElementById('formProjPMA').value.trim(),
+          estado: document.getElementById('formProjEstado').value,
+          fecha_ingreso: document.getElementById('formProjFechaIngreso').value || today,
+          fecha_actualizacion: today,
+          pendiente: document.getElementById('formProjPendiente').value.trim(),
+          descripcion: document.getElementById('formProjDescripcion').value.trim()
+        };
+
+        if (id) {
+          const idx = this.projects.findIndex(p => p.id == id);
+          if (idx !== -1) {
+            this.projects[idx] = { ...this.projects[idx], ...projectData };
+            this.syncProject(this.projects[idx]);
+            this.showToast(`Proyecto ${projectData.codigo} actualizado`);
+          }
+        } else {
+          const newId = this.projects.length > 0 ? Math.max(...this.projects.map(p => Number(p.id) || 0)) + 1 : 1;
+          const newProj = { id: newId, ...projectData };
+          this.projects.unshift(newProj);
+          this.syncProject(newProj);
+          this.showToast(`Nuevo proyecto ${projectData.codigo} creado`);
+        }
+
+        this.closeProjectModal();
+        this.renderProjects();
+      }
+
+      deleteProject() {
+        const id = document.getElementById('formProjectId').value;
+        if (!id) return;
+        if (confirm('¿Eliminar este proyecto?')) {
+          this.projects = this.projects.filter(p => p.id != id);
+          if (this.supabase) this.supabase.from('projects_hbqp').delete().eq('id', String(id));
+          localStorage.setItem('hbqp_projects_store_v2', JSON.stringify(this.projects));
           this.closeProjectModal();
           this.renderProjects();
-          this.showToast('Proyecto guardado');
+          this.showToast('Proyecto eliminado');
         }
       }
 
-      // --- INTEROPERABILIDAD: DERIVAR PROYECTO A OT ---
+      // --- DERIVAR PROYECTO A OT ---
       convertCurrentProjectToOT() {
         if (!this.currentProjectInModal) return;
         const p = this.currentProjectInModal;
@@ -744,6 +937,7 @@
       // --- LOGICA DE ORDENES DE TRABAJO ---
       renderOrders() {
         const c = document.getElementById('ordersContainer');
+        const sum = document.getElementById('moduleStatsSummary');
         const q = (document.getElementById('searchOtInput').value || '').toLowerCase();
         const filtered = this.orders.filter(o => !q || o.folio?.toLowerCase().includes(q) || o.recinto?.toLowerCase().includes(q));
 
@@ -784,7 +978,7 @@
         };
 
         this.orders.unshift(newOt);
-        localStorage.setItem('sdo_orders_cache', JSON.stringify(this.orders));
+        localStorage.setItem('sdo_orders_cache_v2', JSON.stringify(this.orders));
         if (this.supabase) this.supabase.from('orders').upsert({ id: newOt.id, data: newOt });
 
         const srcId = document.getElementById('newOtSourceProjectId').value;
@@ -793,8 +987,7 @@
           if (p) {
             p.estado = 'EN PROCESO';
             p.pendiente = `Derivado a OT: ${folio}`;
-            localStorage.setItem('hbqp_projects_store', JSON.stringify(this.projects));
-            if (this.supabase) this.supabase.from('projects_hbqp').upsert({ id: String(p.id), data: p });
+            this.syncProject(p);
           }
         }
 
@@ -804,16 +997,29 @@
       }
 
       exportActiveDataCSV() {
-        const rows = this.activeModule === 'projects' ? 
-          this.projects.map(p => [p.codigo, p.tipologia, p.unidad, `"${p.requerimiento}"`, p.estado]) :
-          this.orders.map(o => [o.folio, o.recinto, `"${o.descripcion}"`, o.estado]);
-        const csv = "data:text/csv;charset=utf-8,Codigo,Detalle,Unidad,Descripcion,Estado\n" + rows.map(r => r.join(",")).join("\n");
-        const a = document.createElement("a"); a.href = encodeURI(csv); a.download = `HBQP_${this.activeModule}.csv`; a.click();
+        const headers = ["Código", "N° Ticket", "Tipología", "Unidad Solicitante", "Solicitante", "Piso", "Recinto", "PMA", "Requerimiento", "Estado", "Hito Pendiente", "Prioridad"];
+        const rows = this.projects.map(p => [
+          p.codigo,
+          `"${(p.ticket || '').replace(/"/g, '""')}"`,
+          p.tipologia || '',
+          `"${(p.unidad || '').replace(/"/g, '""')}"`,
+          `"${(p.solicitante || '').replace(/"/g, '""')}"`,
+          p.piso || '',
+          `"${(p.ubicacion || '').replace(/"/g, '""')}"`,
+          p.pma || '',
+          `"${(p.requerimiento || p.descripcion || '').replace(/"/g, '""')}"`,
+          p.estado || '',
+          `"${(p.pendiente || '').replace(/"/g, '""')}"`,
+          p.prioridad || ''
+        ]);
+        const csv = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+        const a = document.createElement("a");
+        a.href = encodeURI(csv);
+        a.download = `Proyectos_HBQP_${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
       }
-
-      openSettingsModal() { document.getElementById('settingsModal').classList.remove('hidden'); }
-      closeSettingsModal() { document.getElementById('settingsModal').classList.add('hidden'); }
-      saveSystemSettings(e) { e.preventDefault(); this.closeSettingsModal(); this.showToast('Configuración guardada'); }
     }
 
     window.addEventListener('DOMContentLoaded', () => { window.app = new UnifiedPlatformApp(); });
