@@ -17,13 +17,16 @@
     input, textarea, select { font-size: 14px !important; touch-action: manipulation; }
     .custom-scroll::-webkit-scrollbar { height: 5px; width: 5px; }
     .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    .custom-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     @keyframes slideUpFade { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
     .toast-anim { animation: slideUpFade 0.3s ease forwards; }
 
     :root {
-      --sdo-bg: #f5f7fb; --sdo-surface: #ffffff; --sdo-ink: #0f172a; --sdo-muted: #64748b;
+      --sdo-bg: #f8fafc; --sdo-surface: #ffffff; --sdo-ink: #0f172a; --sdo-muted: #64748b;
       --sdo-line: #e2e8f0; --sdo-navy: #111827; --sdo-accent: #4f46e5; --sdo-blue: #2563eb;
+      --sdo-green: #059669; --sdo-amber: #d97706; --sdo-rose: #e11d48;
     }
+
     body {
       background: radial-gradient(circle at 85% -10%, rgba(79,70,229,.055), transparent 28rem), var(--sdo-bg) !important;
       color: var(--sdo-ink) !important;
@@ -51,21 +54,22 @@
       gap: 10px;
       padding: 3px;
       border-radius: 10px;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
     }
     .kanban-cards-wrapper.drag-over {
-      background-color: rgba(224, 242, 254, 0.8) !important;
+      background-color: rgba(224, 242, 254, 0.85) !important;
       border: 2px dashed #0284c7 !important;
     }
     .project-card {
       background: #ffffff;
-      border: 1px solid #e2e8f0;
+      border: 1px solid var(--sdo-line);
       border-radius: 12px;
       padding: 13px;
       box-shadow: 0 1px 3px rgba(15,23,42,.04);
       cursor: grab;
       transition: transform 0.16s ease, box-shadow 0.16s ease;
     }
-    .project-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(15,23,42,.07); }
+    .project-card:hover { transform: translateY(-2px); border-color: #cbd5e1; box-shadow: 0 8px 20px rgba(15,23,42,.07); }
     .project-card.dragging { opacity: 0.35; transform: scale(0.96); }
 
     .badge-proyecto { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
@@ -77,7 +81,7 @@
 
   <div id="toastContainer" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-[70] flex flex-col gap-2 pointer-events-none"></div>
 
-  <!-- Header Superior -->
+  <!-- Header Institucional -->
   <header class="bg-slate-900 text-white sticky top-0 z-30 shadow-md">
     <div class="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between gap-3">
       
@@ -95,7 +99,7 @@
       </div>
 
       <!-- Selector de Módulo -->
-      <nav id="moduleSwitcher" class="hidden md:flex items-center bg-slate-800/90 p-1 rounded-xl border border-slate-700 text-xs font-bold">
+      <nav id="moduleSwitcher" class="flex items-center bg-slate-800/90 p-1 rounded-xl border border-slate-700 text-xs font-bold">
         <button id="navBtnProjects" onclick="window.app.switchModule('projects')" class="px-3.5 py-1.5 rounded-lg bg-indigo-600 text-white shadow transition flex items-center gap-1.5">
           <i class="fa-solid fa-diagram-project"></i> <span>Módulo Proyectos</span>
         </button>
@@ -160,8 +164,12 @@
     </div>
   </header>
 
-  <!-- VISTA 1: MÓDULO DE PROYECTOS (SUPERVISOR) -->
+  <!-- ==========================================================
+       VISTA 1: MÓDULO DE PROYECTOS (SUPERVISOR)
+       ========================================================== -->
   <section id="moduleProjectsView" class="max-w-7xl w-full mx-auto px-3 sm:px-4 py-4 flex-1">
+    
+    <!-- Filtros y Vistas de Proyectos -->
     <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm mb-4 space-y-2.5">
       <div class="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center justify-between">
         <div class="relative flex-1">
@@ -202,6 +210,13 @@
             <option value="6">Piso 6</option>
             <option value="7">Piso 7</option>
           </select>
+          <select id="filterProjPrioridad" onchange="window.app.renderProjects()" class="bg-slate-50 border rounded-lg px-2.5 py-1">
+            <option value="">Todas las Prioridades</option>
+            <option value="MUY ALTA">Muy Alta</option>
+            <option value="ALTA">Alta</option>
+            <option value="MEDIA">Media</option>
+            <option value="BAJA">Baja</option>
+          </select>
           <button onclick="window.app.clearProjectFilters()" class="text-slate-400 hover:text-slate-700 px-2 py-1 bg-slate-100 rounded font-semibold">✕ Limpiar</button>
         </div>
 
@@ -215,10 +230,13 @@
       </div>
     </div>
 
+    <!-- Contenedor del Tablero de Proyectos -->
     <div id="projectsContainer"></div>
   </section>
 
-  <!-- VISTA 2: MÓDULO DE ÓRDENES DE TRABAJO (OTs) -->
+  <!-- ==========================================================
+       VISTA 2: MÓDULO DE ÓRDENES DE TRABAJO (OTs)
+       ========================================================== -->
   <section id="moduleOrdersView" class="hidden max-w-7xl w-full mx-auto px-3 sm:px-4 py-4 flex-1">
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-4">
       <div onclick="window.app.setOtFilterStatus('Pendiente')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer">
@@ -246,6 +264,45 @@
 
     <div id="ordersContainer"></div>
   </section>
+
+  <!-- ==========================================================
+       MODALES
+       ========================================================== -->
+
+  <!-- Modal Auth (PIN Pad) -->
+  <div id="authModal" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-xs rounded-2xl p-5 shadow-2xl border text-center relative">
+      <button onclick="window.app.closeAuthModal()" class="absolute top-3 right-3 text-slate-400 hover:text-slate-600">✕</button>
+      <div class="w-12 h-12 mx-auto rounded-xl bg-slate-100 flex items-center justify-center mb-2 overflow-hidden border"><span class="text-2xl">🏥</span></div>
+      <h3 class="font-black text-lg text-slate-900">Acceso SDO Cloud</h3>
+      <p class="text-xs text-slate-500 mb-4">Seleccione su rol e ingrese PIN</p>
+      <div class="grid grid-cols-2 gap-2 mb-4">
+        <button id="roleBtnSupervisor" onclick="window.app.selectAuthRole('supervisor')" class="py-2 text-xs font-bold rounded-lg border-2 border-indigo-600 bg-indigo-50 text-indigo-700">Supervisor</button>
+        <button id="roleBtnTecnico" onclick="window.app.selectAuthRole('tecnico')" class="py-2 text-xs font-bold rounded-lg border-2 border-slate-200 bg-white text-slate-600">Técnico</button>
+      </div>
+      <div class="flex justify-center space-x-3 mb-4">
+        <div id="pinDot0" class="w-3.5 h-3.5 rounded-full border-2 border-slate-300 bg-white"></div>
+        <div id="pinDot1" class="w-3.5 h-3.5 rounded-full border-2 border-slate-300 bg-white"></div>
+        <div id="pinDot2" class="w-3.5 h-3.5 rounded-full border-2 border-slate-300 bg-white"></div>
+        <div id="pinDot3" class="w-3.5 h-3.5 rounded-full border-2 border-slate-300 bg-white"></div>
+      </div>
+      <div class="grid grid-cols-3 gap-2 max-w-[220px] mx-auto mb-3">
+        <button onclick="window.app.typePin(1)" class="h-12 text-xl font-bold bg-slate-50 rounded-xl border hover:bg-slate-100">1</button>
+        <button onclick="window.app.typePin(2)" class="h-12 text-xl font-bold bg-slate-50 rounded-xl border hover:bg-slate-100">2</button>
+        <button onclick="window.app.typePin(3)" class="h-12 text-xl font-bold bg-slate-50 rounded-xl border hover:bg-slate-100">3</button>
+        <button onclick="window.app.typePin(4)" class="h-12 text-xl font-bold bg-slate-50 rounded-xl border hover:bg-slate-100">4</button>
+        <button onclick="window.app.typePin(5)" class="h-12 text-xl font-bold bg-slate-50 rounded-xl border hover:bg-slate-100">5</button>
+        <button onclick="window.app.typePin(6)" class="h-12 text-xl font-bold bg-slate-50 rounded-xl border hover:bg-slate-100">6</button>
+        <button onclick="window.app.typePin(7)" class="h-12 text-xl font-bold bg-slate-50 rounded-xl border hover:bg-slate-100">7</button>
+        <button onclick="window.app.typePin(8)" class="h-12 text-xl font-bold bg-slate-50 rounded-xl border hover:bg-slate-100">8</button>
+        <button onclick="window.app.typePin(9)" class="h-12 text-xl font-bold bg-slate-50 rounded-xl border hover:bg-slate-100">9</button>
+        <button onclick="window.app.clearPin()" class="h-12 text-xs font-bold bg-slate-100 rounded-xl hover:bg-slate-200">Borrar</button>
+        <button onclick="window.app.typePin(0)" class="h-12 text-xl font-bold bg-slate-50 rounded-xl border hover:bg-slate-100">0</button>
+        <button onclick="window.app.deletePin()" class="h-12 text-base font-bold bg-slate-100 rounded-xl hover:bg-slate-200">⌫</button>
+      </div>
+      <div id="authErrorMsg" class="hidden text-xs text-rose-600 font-bold mt-2">PIN Incorrecto</div>
+    </div>
+  </div>
 
   <!-- Modal Ficha de Proyecto / Nuevo Proyecto -->
   <div id="projectModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
@@ -321,6 +378,7 @@
           </div>
           <div>
             <label class="block font-bold text-slate-700 mb-1">Código PMA</label>
+            <input type="text" id="formProj700 mb-1">Código PMA</label>
             <input type="text" id="formProjPMA" placeholder="Ej. D-3-40, G-S1-45" class="w-full border rounded-lg p-2">
           </div>
         </div>
@@ -378,651 +436,4 @@
           <h3 class="text-base font-black text-slate-900">Nueva Orden de Trabajo (OT)</h3>
           <p id="createOtSubtitle" class="text-xs text-slate-400">Emisión operativa para cuadrilla en terreno</p>
         </div>
-        <button onclick="window.app.closeCreateOtModal()" class="text-slate-400 text-xl font-bold">✕</button>
-      </div>
-      <form id="createOtForm" onsubmit="window.app.handleCreateOT(event)" class="space-y-3 pt-3 overflow-y-auto custom-scroll flex-1 text-xs">
-        <input type="hidden" id="newOtSourceProjectId">
-        <div class="grid grid-cols-2 gap-2">
-          <div>
-            <label class="block font-bold text-slate-600 mb-1">Especialidad</label>
-            <select id="newOtEspecialidad" required class="w-full p-2 bg-slate-50 border rounded-lg">
-              <option value="Infraestructura">Infraestructura</option>
-              <option value="Climatización">Climatización</option>
-              <option value="Electricidad">Electricidad</option>
-              <option value="Equipos Industriales">Equipos Industriales</option>
-              <option value="Equipos Clinicos">Equipos Clínicos</option>
-            </select>
-          </div>
-          <div>
-            <label class="block font-bold text-slate-600 mb-1">Prioridad</label>
-            <select id="newOtPrioridad" required class="w-full p-2 bg-slate-50 border rounded-lg">
-              <option value="Urgente">🚨 Urgente</option>
-              <option value="Alta" selected>🟠 Alta</option>
-              <option value="Media">🟡 Media</option>
-              <option value="Baja">🟢 Baja</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-2">
-          <div>
-            <label class="block font-bold text-slate-600 mb-1">Recinto / Servicio</label>
-            <input type="text" id="newOtRecinto" required class="w-full p-2 bg-slate-50 border rounded-lg">
-          </div>
-          <div>
-            <label class="block font-bold text-slate-600 mb-1">PMA / Ticket</label>
-            <input type="text" id="newOtTicket" class="w-full p-2 bg-slate-50 border rounded-lg">
-          </div>
-        </div>
-
-        <div>
-          <label class="block font-bold text-slate-600 mb-1">Solicitante</label>
-          <input type="text" id="newOtSolicitante" required class="w-full p-2 bg-slate-50 border rounded-lg">
-        </div>
-
-        <div>
-          <label class="block font-bold text-slate-600 mb-1">Descripción del Trabajo Operativo</label>
-          <textarea id="newOtDescripcion" required rows="4" class="w-full p-2 bg-slate-50 border rounded-lg"></textarea>
-        </div>
-
-        <div class="pt-2 flex justify-end space-x-2">
-          <button type="button" onclick="window.app.closeCreateOtModal()" class="px-4 py-2 font-bold bg-slate-100 rounded-lg">Cancelar</button>
-          <button type="submit" class="px-5 py-2 font-black text-white bg-blue-600 rounded-lg">Crear y Despachar OT</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- SDO Cloud Master Engine Script -->
-  <script>
-    const SGM_CONFIG = {
-      supabaseUrl: "https://xtrzyioxbanyjvjeqedw.supabase.co",
-      supabaseAnonKey: "sb_publishable__rmY-7gpN8Ijh7Bn5e9HtA_Bu6Z4Yqy",
-      defaultHospital: "HBQP - Infraestructura & Operaciones",
-      defaultPrefix: "OT-INFRA",
-      defaultPins: { supervisor: "1234", tecnico: "5678" }
-    };
-
-    // 46 Proyectos precargados desde la planilla original
-    const INITIAL_PROJECTS = """ + projects_json + """;
-
-    function escapeHtml(u) {
-      return u ? u.toString().replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;") : '';
-    }
-
-    async function hashPin(pin) {
-      if (!window.crypto?.subtle) return `fb_${pin}`;
-      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pin));
-      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
-    }
-
-    class UnifiedPlatformApp {
-      constructor() {
-        this.currentRole = null;
-        this.enteredPin = '';
-        this.selectedAuthRole = 'supervisor';
-        this.activeModule = 'projects';
-
-        this.projects = [];
-        this.orders = [];
-        this.projectsViewMode = 'kanban';
-        this.projectStatusFilter = 'ALL';
-        this.otFilterStatus = 'TODOS';
-
-        this.currentProjectInModal = null;
-        this.draggedProjectId = null;
-        this.hashes = { supervisor: "", tecnico: "" };
-        this.supabase = null;
-
-        this.initAuth();
-      }
-
-      async initAuth() {
-        this.hashes.supervisor = await hashPin(SGM_CONFIG.defaultPins.supervisor);
-        this.hashes.tecnico = await hashPin(SGM_CONFIG.defaultPins.tecnico);
-
-        this.loadInitialStores();
-        this.initSupabase();
-
-        const role = sessionStorage.getItem('sdo_active_role');
-        if (role) {
-          this.currentRole = role;
-          this.applyRoleRestrictions();
-        } else {
-          this.openAuthModal();
-        }
-      }
-
-      initSupabase() {
-        if (window.supabase && SGM_CONFIG.supabaseUrl.startsWith("https://")) {
-          try {
-            this.supabase = window.supabase.createClient(SGM_CONFIG.supabaseUrl, SGM_CONFIG.supabaseAnonKey);
-            this.supabase.channel('unified_realtime')
-              .on('postgres_changes', { event: '*', schema: 'public', table: 'projects_hbqp' }, () => this.fetchProjects())
-              .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => this.fetchOrders())
-              .subscribe();
-            
-            this.fetchProjects();
-            this.fetchOrders();
-          } catch(e) {}
-        }
-      }
-
-      loadInitialStores() {
-        const storedProjects = localStorage.getItem('hbqp_projects_store_v2');
-        if (storedProjects) {
-          try { this.projects = JSON.parse(storedProjects); } catch(e) { this.projects = INITIAL_PROJECTS; }
-        } else {
-          this.projects = JSON.parse(JSON.stringify(INITIAL_PROJECTS));
-          localStorage.setItem('hbqp_projects_store_v2', JSON.stringify(this.projects));
-        }
-
-        const storedOrders = localStorage.getItem('sdo_orders_cache_v2');
-        if (storedOrders) {
-          try { this.orders = JSON.parse(storedOrders); } catch(e) { this.orders = []; }
-        } else {
-          this.orders = [];
-        }
-      }
-
-      async fetchProjects() {
-        if (!this.supabase) return;
-        const { data } = await this.supabase.from('projects_hbqp').select('*');
-        if (data && data.length > 0) {
-          this.projects = data.map(r => r.data);
-          localStorage.setItem('hbqp_projects_store_v2', JSON.stringify(this.projects));
-          this.renderProjects();
-        }
-      }
-
-      async fetchOrders() {
-        if (!this.supabase) return;
-        const { data } = await this.supabase.from('orders').select('*');
-        if (data && data.length > 0) {
-          this.orders = data.map(r => r.data);
-          localStorage.setItem('sdo_orders_cache_v2', JSON.stringify(this.orders));
-          this.renderOrders();
-        }
-      }
-
-      async syncProject(p) {
-        localStorage.setItem('hbqp_projects_store_v2', JSON.stringify(this.projects));
-        if (this.supabase) {
-          try {
-            await this.supabase.from('projects_hbqp').upsert({
-              id: String(p.id),
-              codigo: p.codigo,
-              data: p,
-              updated_at: new Date().toISOString()
-            });
-          } catch(e) {}
-        }
-      }
-
-      async syncOrder(o) {
-        localStorage.setItem('sdo_orders_cache_v2', JSON.stringify(this.orders));
-        if (this.supabase) {
-          try {
-            await this.supabase.from('orders').upsert({
-              id: o.id,
-              data: o,
-              created_at: o.fechaCreacion
-            });
-          } catch(e) {}
-        }
-      }
-
-      showToast(msg, icon = '✅') {
-        const c = document.getElementById('toastContainer');
-        const t = document.createElement('div');
-        t.className = 'bg-slate-900 text-white px-4 py-2 rounded-xl shadow-2xl text-xs font-bold flex items-center gap-2 border border-slate-700 toast-anim';
-        t.innerHTML = `<span>${icon}</span> <span>${escapeHtml(msg)}</span>`;
-        c.appendChild(t);
-        setTimeout(() => { t.remove(); }, 2600);
-      }
-
-      // --- AUTH & ROLES ---
-      openAuthModal() { document.getElementById('authModal').classList.remove('hidden'); }
-      closeAuthModal() { if (this.currentRole) document.getElementById('authModal').classList.add('hidden'); }
-      selectAuthRole(r) {
-        this.selectedAuthRole = r;
-        const btnSup = document.getElementById('roleBtnSupervisor');
-        const btnTec = document.getElementById('roleBtnTecnico');
-        if (r === 'supervisor') {
-          btnSup.className = "py-2 text-xs font-bold rounded-lg border-2 border-indigo-600 bg-indigo-50 text-indigo-700";
-          btnTec.className = "py-2 text-xs font-bold rounded-lg border-2 border-slate-200 bg-white text-slate-600";
-        } else {
-          btnTec.className = "py-2 text-xs font-bold rounded-lg border-2 border-indigo-600 bg-indigo-50 text-indigo-700";
-          btnSup.className = "py-2 text-xs font-bold rounded-lg border-2 border-slate-200 bg-white text-slate-600";
-        }
-      }
-      typePin(n) {
-        if (this.enteredPin.length < 4) {
-          this.enteredPin += n;
-          this.updatePinDots();
-          if (this.enteredPin.length === 4) setTimeout(() => this.validatePin(), 50);
-        }
-      }
-      clearPin() { this.enteredPin = ''; this.updatePinDots(); }
-      deletePin() { this.enteredPin = this.enteredPin.slice(0, -1); this.updatePinDots(); }
-      updatePinDots() {
-        for (let i = 0; i < 4; i++) {
-          const dot = document.getElementById(`pinDot${i}`);
-          dot.className = i < this.enteredPin.length ? "w-3.5 h-3.5 rounded-full border-2 border-indigo-600 bg-indigo-600" : "w-3.5 h-3.5 rounded-full border-2 border-slate-300 bg-white";
-        }
-      }
-      async validatePin() {
-        const h = await hashPin(this.enteredPin);
-        const expected = this.selectedAuthRole === 'supervisor' ? this.hashes.supervisor : this.hashes.tecnico;
-        if (h === expected) {
-          this.currentRole = this.selectedAuthRole;
-          sessionStorage.setItem('sdo_active_role', this.currentRole);
-          this.applyRoleRestrictions();
-          document.getElementById('authModal').classList.add('hidden');
-          this.clearPin();
-        } else {
-          document.getElementById('authErrorMsg').classList.remove('hidden');
-          this.clearPin();
-        }
-      }
-
-      applyRoleRestrictions() {
-        const badge = document.getElementById('roleBadge');
-        const switcher = document.getElementById('moduleSwitcher');
-        const mob = document.getElementById('mobileModuleOptions');
-        const sup = document.getElementById('supervisorMenuOptions');
-
-        if (this.currentRole === 'supervisor') {
-          badge.textContent = 'SUPERVISOR';
-          badge.className = 'text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-indigo-600 text-white';
-          switcher.classList.remove('hidden');
-          mob.classList.remove('hidden');
-          sup.classList.remove('hidden');
-          this.switchModule('projects');
-        } else {
-          badge.textContent = 'TÉCNICO';
-          badge.className = 'text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-amber-600 text-white';
-          switcher.classList.add('hidden');
-          mob.classList.add('hidden');
-          sup.classList.add('hidden');
-          this.switchModule('orders');
-        }
-      }
-
-      switchModule(m) {
-        if (m === 'projects' && this.currentRole !== 'supervisor') return;
-        this.activeModule = m;
-        const navP = document.getElementById('navBtnProjects');
-        const navO = document.getElementById('navBtnOrders');
-        const viewP = document.getElementById('moduleProjectsView');
-        const viewO = document.getElementById('moduleOrdersView');
-        const btnText = document.getElementById('btnHeaderActionText');
-
-        if (m === 'projects') {
-          navP.className = "px-3.5 py-1.5 rounded-lg bg-indigo-600 text-white shadow transition flex items-center gap-1.5";
-          navO.className = "px-3.5 py-1.5 rounded-lg text-slate-300 hover:text-white transition flex items-center gap-1.5";
-          viewP.classList.remove('hidden');
-          viewO.classList.add('hidden');
-          btnText.textContent = "Nuevo Proyecto";
-          this.renderProjects();
-        } else {
-          navO.className = "px-3.5 py-1.5 rounded-lg bg-blue-600 text-white shadow transition flex items-center gap-1.5";
-          navP.className = "px-3.5 py-1.5 rounded-lg text-slate-300 hover:text-white transition flex items-center gap-1.5";
-          viewO.classList.remove('hidden');
-          viewP.classList.add('hidden');
-          btnText.textContent = "Nueva OT";
-          this.renderOrders();
-        }
-      }
-
-      handleHeaderPrimaryAction() {
-        if (this.activeModule === 'projects') this.openCreateProjectModal();
-        else this.openCreateOtModal();
-      }
-      toggleMenu() { document.getElementById('appMenuDropdown').classList.toggle('hidden'); }
-
-      // --- LOGICA DE PROYECTOS ---
-      normalizeProjectStatus(s) {
-        if (!s) return 'PENDIENTE';
-        const u = s.toUpperCase();
-        if (u.includes('PENDIENTE')) return 'PENDIENTE';
-        if (u.includes('PROPUESTA')) return 'Propuesta enviada';
-        if (u.includes('PROCESO') || u.includes('EJECUC')) return 'EN PROCESO';
-        if (u.includes('TERMINADO') || u.includes('LISTO')) return 'TERMINADO';
-        return 'PENDIENTE';
-      }
-
-      renderProjects() {
-        const c = document.getElementById('projectsContainer');
-        const sum = document.getElementById('moduleStatsSummary');
-        const q = (document.getElementById('searchProjectsInput').value || '').toLowerCase().trim();
-        const tipo = (document.getElementById('filterProjTipologia').value || '').toUpperCase();
-        const piso = document.getElementById('filterProjPiso').value;
-        const prio = (document.getElementById('filterProjPrioridad').value || '').toUpperCase();
-
-        const pCount = this.projects.filter(p => this.normalizeProjectStatus(p.estado) === 'PENDIENTE').length;
-        const propCount = this.projects.filter(p => this.normalizeProjectStatus(p.estado) === 'Propuesta enviada').length;
-        const procCount = this.projects.filter(p => this.normalizeProjectStatus(p.estado) === 'EN PROCESO').length;
-        const doneCount = this.projects.filter(p => this.normalizeProjectStatus(p.estado) === 'TERMINADO').length;
-
-        sum.innerHTML = `
-          <span>Total Proyectos: <strong class="text-white font-bold">${this.projects.length}</strong></span>
-          <span class="text-slate-600">|</span>
-          <span class="cursor-pointer" onclick="window.app.setProjectStatusFilter('PENDIENTE')"><span class="w-2 h-2 rounded-full bg-amber-400 inline-block mr-1"></span>Pendientes: <strong class="text-amber-300 font-bold">${pCount}</strong></span>
-          <span class="cursor-pointer" onclick="window.app.setProjectStatusFilter('Propuesta enviada')"><span class="w-2 h-2 rounded-full bg-blue-400 inline-block mr-1"></span>Propuestas: <strong class="text-blue-300 font-bold">${propCount}</strong></span>
-          <span class="cursor-pointer" onclick="window.app.setProjectStatusFilter('EN PROCESO')"><span class="w-2 h-2 rounded-full bg-indigo-400 inline-block mr-1"></span>En Obras: <strong class="text-indigo-300 font-bold">${procCount}</strong></span>
-          <span class="cursor-pointer" onclick="window.app.setProjectStatusFilter('TERMINADO')"><span class="w-2 h-2 rounded-full bg-emerald-400 inline-block mr-1"></span>Concluidos: <strong class="text-emerald-300 font-bold">${doneCount}</strong></span>
-        `;
-
-        const filtered = this.projects.filter(p => {
-          const norm = this.normalizeProjectStatus(p.estado);
-          const matchQ = !q || p.codigo?.toLowerCase().includes(q) || p.requerimiento?.toLowerCase().includes(q) || p.unidad?.toLowerCase().includes(q) || p.solicitante?.toLowerCase().includes(q) || p.pma?.toLowerCase().includes(q);
-          const matchS = this.projectStatusFilter === 'ALL' || norm === this.projectStatusFilter;
-          const matchT = !tipo || p.tipologia?.toUpperCase().includes(tipo);
-          const matchP = !piso || String(p.piso).includes(piso);
-          const matchPrio = !prio || p.prioridad?.toUpperCase().includes(prio);
-          return matchQ && matchS && matchT && matchP && matchPrio;
-        });
-
-        if (this.projectsViewMode === 'kanban') {
-          const cols = [
-            { key: 'PENDIENTE', title: 'En Evaluación / Pendientes', color: 'bg-amber-500', badge: 'bg-amber-100 text-amber-900' },
-            { key: 'Propuesta enviada', title: 'Propuesta Enviada', color: 'bg-blue-500', badge: 'bg-blue-100 text-blue-900' },
-            { key: 'EN PROCESO', title: 'En Ejecución / Obras', color: 'bg-indigo-500', badge: 'bg-indigo-100 text-indigo-900' },
-            { key: 'TERMINADO', title: 'Concluidos / Entregados', color: 'bg-emerald-500', badge: 'bg-emerald-100 text-emerald-900' }
-          ];
-
-          c.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 items-start">${cols.map(col => `
-            <div class="kanban-col-container shadow-sm">
-              <div class="flex justify-between items-center pb-2 mb-2.5 border-b border-slate-300">
-                <span class="font-bold text-xs flex items-center gap-1.5 uppercase text-slate-800"><span class="w-2.5 h-2.5 rounded-full ${col.color}"></span> ${col.title}</span>
-                <span class="text-xs font-bold px-2 py-0.5 rounded-full ${col.badge}">${filtered.filter(p => this.normalizeProjectStatus(p.estado) === col.key).length}</span>
-              </div>
-              <div class="kanban-cards-wrapper custom-scroll" ondragover="event.preventDefault(); this.classList.add('drag-over');" ondragleave="this.classList.remove('drag-over');" ondrop="window.app.handleProjectDrop(event, '${col.key}')">
-                ${filtered.filter(p => this.normalizeProjectStatus(p.estado) === col.key).map(p => `
-                  <div class="project-card group" draggable="true" ondragstart="window.app.draggedProjectId=${p.id}" onclick="window.app.openEditProjectModal(${p.id})">
-                    <div class="flex justify-between items-center text-xs mb-1.5">
-                      <span class="font-black text-slate-900">${escapeHtml(p.codigo || 'PROY-' + p.id)}</span>
-                      <span class="px-2 py-0.5 rounded text-[10px] font-bold ${p.tipologia === 'REPARACION' ? 'badge-reparacion' : (p.tipologia === 'APOYO TECNICO' ? 'badge-apoyo' : 'badge-proyecto')}">${p.tipologia || 'PROYECTO'}</span>
-                    </div>
-                    <h4 class="text-xs font-bold text-slate-900 mb-1.5 group-hover:text-indigo-600 transition line-clamp-2">${escapeHtml(p.requerimiento || p.descripcion)}</h4>
-                    ${p.unidad ? `<p class="text-[11px] text-slate-600 mb-1 truncate">🏢 ${escapeHtml(p.unidad)}</p>` : ''}
-                    <div class="flex items-center gap-1 flex-wrap mb-2 text-[10px] text-slate-500">
-                      ${p.piso ? `<span class="bg-slate-100 px-1.5 py-0.5 rounded">Piso ${escapeHtml(p.piso)}</span>` : ''}
-                      ${p.pma ? `<span class="bg-cyan-50 text-cyan-800 px-1.5 py-0.5 rounded border border-cyan-200 font-bold">PMA: ${escapeHtml(p.pma)}</span>` : ''}
-                    </div>
-                    ${p.pendiente ? `<div class="p-1.5 bg-amber-50 rounded text-amber-900 text-[10px] font-bold mb-2">⚠️ ${escapeHtml(p.pendiente)}</div>` : ''}
-                    <div class="pt-2 border-t flex items-center justify-between text-[10px] text-slate-400">
-                      <span>${p.fecha_ingreso || ''}</span>
-                      <span class="text-indigo-600 font-bold opacity-0 group-hover:opacity-100 transition">Ver Ficha →</span>
-                    </div>
-                  </div>
-                `).join('')}
-              </div>
-            </div>
-          `).join('')}</div>`;
-        } else if (this.projectsViewMode === 'cards') {
-          c.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">${filtered.map(p => `
-            <div class="bg-white p-4 rounded-xl border shadow-sm cursor-pointer hover:border-slate-300 transition" onclick="window.app.openEditProjectModal(${p.id})">
-              <div class="flex justify-between items-center mb-1">
-                <span class="font-bold text-xs text-indigo-700">${escapeHtml(p.codigo || 'PROY-' + p.id)}</span>
-                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100">${p.estado}</span>
-              </div>
-              <h4 class="font-bold text-sm text-slate-900 mb-1 truncate">${escapeHtml(p.requerimiento || p.descripcion)}</h4>
-              <p class="text-xs text-slate-500 mb-1">🏢 ${escapeHtml(p.unidad || '')} · Piso ${escapeHtml(p.piso || '-')}</p>
-              ${p.pendiente ? `<p class="text-xs font-semibold text-amber-700 truncate">⚠️ ${escapeHtml(p.pendiente)}</p>` : ''}
-            </div>
-          `).join('')}</div>`;
-        } else {
-          c.innerHTML = `
-            <div class="bg-white rounded-xl border overflow-hidden shadow-sm">
-              <table class="w-full text-left text-xs">
-                <thead class="bg-slate-50 text-slate-700 font-bold border-b">
-                  <tr><th class="p-3">Código</th><th class="p-3">Tipología</th><th class="p-3">Requerimiento</th><th class="p-3">Unidad</th><th class="p-3">Piso / Recinto</th><th class="p-3">PMA</th><th class="p-3">Hito Pendiente</th><th class="p-3">Fase</th></tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100">
-                  ${filtered.map(p => `
-                    <tr class="hover:bg-slate-50 cursor-pointer" onclick="window.app.openEditProjectModal(${p.id})">
-                      <td class="p-3 font-bold text-indigo-700">${escapeHtml(p.codigo || 'PROY-' + p.id)}</td>
-                      <td class="p-3">${p.tipologia}</td>
-                      <td class="p-3 font-medium max-w-xs truncate">${escapeHtml(p.requerimiento || p.descripcion)}</td>
-                      <td class="p-3 text-slate-600">${escapeHtml(p.unidad || '-')}</td>
-                      <td class="p-3">Piso ${escapeHtml(p.piso || '-')} · ${escapeHtml(p.ubicacion || '')}</td>
-                      <td class="p-3 font-mono">${escapeHtml(p.pma || '-')}</td>
-                      <td class="p-3 font-bold text-amber-700">${escapeHtml(p.pendiente || '-')}</td>
-                      <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100">${p.estado}</span></td>
-                    </tr>
-                  `).join('')}
-                </tbody>
-              </table>
-            </div>
-          `;
-        }
-      }
-
-      setProjectsViewMode(m) { this.projectsViewMode = m; this.renderProjects(); }
-      setProjectStatusFilter(s) { this.projectStatusFilter = s; this.renderProjects(); }
-      clearProjectFilters() { document.getElementById('searchProjectsInput').value = ''; this.setProjectStatusFilter('ALL'); }
-
-      handleProjectDrop(e, st) {
-        e.preventDefault();
-        e.currentTarget.classList.remove('drag-over');
-        if (!this.draggedProjectId) return;
-        const p = this.projects.find(item => item.id == this.draggedProjectId);
-        if (p && this.normalizeProjectStatus(p.estado) !== st) {
-          p.estado = st;
-          p.fecha_actualizacion = new Date().toISOString().split('T')[0];
-          this.syncProject(p);
-          this.renderProjects();
-          this.showToast(`Proyecto ${p.codigo} movido a ${st}`);
-        }
-        this.draggedProjectId = null;
-      }
-
-      openCreateProjectModal() {
-        document.getElementById('projectForm').reset();
-        document.getElementById('formProjectId').value = '';
-        const nextId = this.projects.length > 0 ? Math.max(...this.projects.map(p => Number(p.id) || 0)) + 1 : 1;
-        document.getElementById('formProjCodigo').value = `PROY-${String(nextId).padStart(3, '0')}`;
-        document.getElementById('modalProjectTitle').innerText = 'Nuevo Proyecto de Infraestructura';
-        document.getElementById('btnDeleteProject').classList.add('hidden');
-        document.getElementById('btnConvertToOt').classList.add('hidden');
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('formProjFechaIngreso').value = today;
-        document.getElementById('formProjFechaActualizacion').value = today;
-        document.getElementById('projectModal').classList.remove('hidden');
-      }
-
-      openEditProjectModal(id) {
-        const p = this.projects.find(item => item.id == id);
-        if (!p) return;
-        this.currentProjectInModal = p;
-
-        document.getElementById('formProjectId').value = p.id;
-        document.getElementById('formProjCodigo').value = p.codigo || `PROY-${p.id}`;
-        document.getElementById('formProjTicket').value = p.ticket || '';
-        document.getElementById('formProjTipologia').value = p.tipologia || 'PROYECTO';
-        document.getElementById('formProjPrioridad').value = p.prioridad || 'MEDIA';
-        document.getElementById('formProjRequerimiento').value = p.requerimiento || p.descripcion || '';
-        document.getElementById('formProjUnidad').value = p.unidad || '';
-        document.getElementById('formProjSolicitante').value = p.solicitante || '';
-        document.getElementById('formProjPiso').value = p.piso || '';
-        document.getElementById('formProjUbicacion').value = p.ubicacion || '';
-        document.getElementById('formProjPMA').value = p.pma || '';
-        document.getElementById('formProjEstado').value = p.estado || 'PENDIENTE';
-        document.getElementById('formProjFechaIngreso').value = p.fecha_ingreso || '';
-        document.getElementById('formProjFechaActualizacion').value = p.fecha_actualizacion || '';
-        document.getElementById('formProjPendiente').value = p.pendiente || '';
-        document.getElementById('formProjDescripcion').value = p.descripcion || '';
-
-        document.getElementById('modalProjectTitle').innerText = `Ficha Técnica: ${p.codigo || 'PROY-' + p.id}`;
-        document.getElementById('btnDeleteProject').classList.remove('hidden');
-        document.getElementById('btnConvertToOt').classList.remove('hidden');
-        document.getElementById('projectModal').classList.remove('hidden');
-      }
-
-      closeProjectModal() { document.getElementById('projectModal').classList.add('hidden'); }
-
-      saveProject(e) {
-        e.preventDefault();
-        const id = document.getElementById('formProjectId').value;
-        const today = new Date().toISOString().split('T')[0];
-
-        const projectData = {
-          codigo: document.getElementById('formProjCodigo').value.trim(),
-          ticket: document.getElementById('formProjTicket').value.trim(),
-          tipologia: document.getElementById('formProjTipologia').value,
-          prioridad: document.getElementById('formProjPrioridad').value,
-          requerimiento: document.getElementById('formProjRequerimiento').value.trim(),
-          unidad: document.getElementById('formProjUnidad').value.trim(),
-          solicitante: document.getElementById('formProjSolicitante').value.trim(),
-          piso: document.getElementById('formProjPiso').value.trim(),
-          ubicacion: document.getElementById('formProjUbicacion').value.trim(),
-          pma: document.getElementById('formProjPMA').value.trim(),
-          estado: document.getElementById('formProjEstado').value,
-          fecha_ingreso: document.getElementById('formProjFechaIngreso').value || today,
-          fecha_actualizacion: today,
-          pendiente: document.getElementById('formProjPendiente').value.trim(),
-          descripcion: document.getElementById('formProjDescripcion').value.trim()
-        };
-
-        if (id) {
-          const idx = this.projects.findIndex(p => p.id == id);
-          if (idx !== -1) {
-            this.projects[idx] = { ...this.projects[idx], ...projectData };
-            this.syncProject(this.projects[idx]);
-            this.showToast(`Proyecto ${projectData.codigo} actualizado`);
-          }
-        } else {
-          const newId = this.projects.length > 0 ? Math.max(...this.projects.map(p => Number(p.id) || 0)) + 1 : 1;
-          const newProj = { id: newId, ...projectData };
-          this.projects.unshift(newProj);
-          this.syncProject(newProj);
-          this.showToast(`Nuevo proyecto ${projectData.codigo} creado`);
-        }
-
-        this.closeProjectModal();
-        this.renderProjects();
-      }
-
-      deleteProject() {
-        const id = document.getElementById('formProjectId').value;
-        if (!id) return;
-        if (confirm('¿Eliminar este proyecto?')) {
-          this.projects = this.projects.filter(p => p.id != id);
-          if (this.supabase) this.supabase.from('projects_hbqp').delete().eq('id', String(id));
-          localStorage.setItem('hbqp_projects_store_v2', JSON.stringify(this.projects));
-          this.closeProjectModal();
-          this.renderProjects();
-          this.showToast('Proyecto eliminado');
-        }
-      }
-
-      // --- DERIVAR PROYECTO A OT ---
-      convertCurrentProjectToOT() {
-        if (!this.currentProjectInModal) return;
-        const p = this.currentProjectInModal;
-        this.closeProjectModal();
-
-        document.getElementById('createOtForm').reset();
-        document.getElementById('newOtSourceProjectId').value = p.id;
-        document.getElementById('createOtSubtitle').innerText = `Derivando desde Proyecto: ${p.codigo}`;
-        document.getElementById('newOtRecinto').value = `Piso ${p.piso || '-'} - ${p.ubicacion || p.unidad}`;
-        document.getElementById('newOtTicket').value = p.pma || p.ticket || p.codigo;
-        document.getElementById('newOtSolicitante').value = p.solicitante || p.unidad || 'Subdirección de Operaciones';
-        document.getElementById('newOtDescripcion').value = `[${p.codigo}] ${p.requerimiento}\n\n${p.descripcion || ''}`;
-        document.getElementById('createOtModal').classList.remove('hidden');
-      }
-
-      // --- LOGICA DE ORDENES DE TRABAJO ---
-      renderOrders() {
-        const c = document.getElementById('ordersContainer');
-        const sum = document.getElementById('moduleStatsSummary');
-        const q = (document.getElementById('searchOtInput').value || '').toLowerCase();
-        const filtered = this.orders.filter(o => !q || o.folio?.toLowerCase().includes(q) || o.recinto?.toLowerCase().includes(q));
-
-        if (filtered.length === 0) {
-          c.innerHTML = `<div class="bg-white p-12 rounded-2xl border text-center text-slate-400"><p class="text-sm font-semibold">No hay Órdenes de Trabajo</p></div>`;
-          return;
-        }
-
-        c.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">${filtered.map(o => `
-          <div class="bg-white p-4 rounded-xl border shadow-sm cursor-pointer hover:border-slate-300" onclick="window.app.openOperativeView('${o.id}')">
-            <div class="flex justify-between text-xs mb-1 font-bold">
-              <span>${o.folio}</span>
-              <span class="px-2 py-0.5 rounded bg-slate-100">${o.estado}</span>
-            </div>
-            <h4 class="font-bold text-sm text-slate-900 mb-1 truncate">${escapeHtml(o.recinto)}</h4>
-            <p class="text-xs text-slate-600 line-clamp-2">${escapeHtml(o.descripcion)}</p>
-          </div>
-        `).join('')}</div>`;
-      }
-
-      openCreateOtModal() { document.getElementById('createOtForm').reset(); document.getElementById('createOtModal').classList.remove('hidden'); }
-      closeCreateOtModal() { document.getElementById('createOtModal').classList.add('hidden'); }
-
-      handleCreateOT(e) {
-        e.preventDefault();
-        const folio = `OT-INFRA-${String(this.orders.length + 1).padStart(3, '0')}-2026`;
-        const newOt = {
-          id: `ot_${Date.now()}`,
-          folio: folio,
-          especialidad: document.getElementById('newOtEspecialidad').value,
-          prioridad: document.getElementById('newOtPrioridad').value,
-          recinto: document.getElementById('newOtRecinto').value,
-          ticket: document.getElementById('newOtTicket').value,
-          solicitante: document.getElementById('newOtSolicitante').value,
-          descripcion: document.getElementById('newOtDescripcion').value,
-          estado: 'Pendiente',
-          fechaCreacion: new Date().toISOString()
-        };
-
-        this.orders.unshift(newOt);
-        localStorage.setItem('sdo_orders_cache_v2', JSON.stringify(this.orders));
-        if (this.supabase) this.supabase.from('orders').upsert({ id: newOt.id, data: newOt });
-
-        const srcId = document.getElementById('newOtSourceProjectId').value;
-        if (srcId) {
-          const p = this.projects.find(item => item.id == srcId);
-          if (p) {
-            p.estado = 'EN PROCESO';
-            p.pendiente = `Derivado a OT: ${folio}`;
-            this.syncProject(p);
-          }
-        }
-
-        this.closeCreateOtModal();
-        this.showToast(`OT ${folio} emitida con éxito`);
-        this.switchModule('orders');
-      }
-
-      exportActiveDataCSV() {
-        const headers = ["Código", "N° Ticket", "Tipología", "Unidad Solicitante", "Solicitante", "Piso", "Recinto", "PMA", "Requerimiento", "Estado", "Hito Pendiente", "Prioridad"];
-        const rows = this.projects.map(p => [
-          p.codigo,
-          `"${(p.ticket || '').replace(/"/g, '""')}"`,
-          p.tipologia || '',
-          `"${(p.unidad || '').replace(/"/g, '""')}"`,
-          `"${(p.solicitante || '').replace(/"/g, '""')}"`,
-          p.piso || '',
-          `"${(p.ubicacion || '').replace(/"/g, '""')}"`,
-          p.pma || '',
-          `"${(p.requerimiento || p.descripcion || '').replace(/"/g, '""')}"`,
-          p.estado || '',
-          `"${(p.pendiente || '').replace(/"/g, '""')}"`,
-          p.prioridad || ''
-        ]);
-        const csv = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
-        const a = document.createElement("a");
-        a.href = encodeURI(csv);
-        a.download = `Proyectos_HBQP_${new Date().toISOString().split('T')[0]}.csv`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      }
-    }
-
-    window.addEventListener('DOMContentLoaded', () => { window.app = new UnifiedPlatformApp(); });
-  </script>
-</body>
-</html>
+        <button onclick="window.app.closeCreateOtModal()" class="text-slate-400 text
