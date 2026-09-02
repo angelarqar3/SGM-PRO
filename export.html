@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Centro de Exportación y Reportes - SDO Cloud HBQP</title>
+  <title>Centro de Exportación, Estadísticas & Reportes - SDO Cloud HBQP</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -19,10 +19,12 @@
       color: #0f172a;
       font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
-    .custom-scroll::-webkit-scrollbar { height: 4px; width: 4px; }
+    .custom-scroll::-webkit-scrollbar { height: 5px; width: 5px; }
     .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-    @keyframes slideUp { 0% { opacity: 0; transform: translateY(16px); } 100% { opacity: 1; transform: translateY(0); } }
-    .animate-slide-up { animation: slideUp 0.25s ease-out forwards; }
+    .custom-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    @keyframes slideUp { 0% { opacity: 0; transform: translateY(10px); } 100% { opacity: 1; transform: translateY(0); } }
+    .animate-slide-up { animation: slideUp 0.22s ease-out forwards; }
+    .bar-transition { transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
   </style>
 </head>
 <body class="min-h-screen flex flex-col pb-12">
@@ -31,9 +33,9 @@
 
   <!-- Header Superior -->
   <header class="bg-slate-900 text-white sticky top-0 z-30 shadow-md border-b border-slate-800">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+    <div class="max-w-7xl mx-auto px-3 sm:px-4 py-2.5 flex items-center justify-between gap-3">
       <div class="flex items-center space-x-3">
-        <a href="index.html" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center gap-2 text-xs font-bold transition shadow-sm" title="Regresar a SDO Cloud">
+        <a href="index.html" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center gap-2 text-xs font-bold transition shadow-sm" title="Regresar al panel operativo">
           <i class="fa-solid fa-arrow-left"></i> <span class="hidden sm:inline">Volver a SDO Cloud</span>
         </a>
         <div>
@@ -46,165 +48,464 @@
       </div>
 
       <div class="flex items-center space-x-2">
+        <button onclick="window.exporter.forceSyncRemote()" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold border border-slate-700 flex items-center gap-1.5 transition" title="Recargar datos desde Supabase">
+          <i class="fa-solid fa-rotate"></i> <span class="hidden md:inline">Actualizar</span>
+        </button>
         <span id="syncStatusBadge" class="text-[10px] font-bold px-2 py-1 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/40 flex items-center gap-1.5">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> <span class="hidden sm:inline">Base de Datos Conectada</span><span class="sm:hidden">Conectado</span>
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> <span class="hidden sm:inline">Supabase Conectado</span><span class="sm:hidden">En línea</span>
         </span>
+      </div>
+    </div>
+
+    <!-- Navegación por Secciones Principales -->
+    <div class="bg-slate-950 px-3 sm:px-4 py-1.5 border-t border-slate-800/80">
+      <div class="max-w-7xl mx-auto flex items-center justify-between gap-2 overflow-x-auto custom-scroll whitespace-nowrap">
+        <div class="flex items-center space-x-1 sm:space-x-2 text-xs font-bold">
+          <button id="tabBtnStats" onclick="window.exporter.switchSection('stats')" 
+                  class="px-3 py-1.5 rounded-lg bg-indigo-600 text-white shadow-sm flex items-center gap-1.5 transition">
+            <i class="fa-solid fa-chart-pie"></i> <span>Estadísticas & KPIs</span>
+          </button>
+          <button id="tabBtnAdvance" onclick="window.exporter.switchSection('advance')" 
+                  class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white flex items-center gap-1.5 transition">
+            <i class="fa-solid fa-arrow-trend-up"></i> <span>Reporte de Avances (PDF)</span>
+          </button>
+          <button id="tabBtnExport" onclick="window.exporter.switchSection('export')" 
+                  class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white flex items-center gap-1.5 transition">
+            <i class="fa-solid fa-file-arrow-down"></i> <span>Descarga & Exportación</span>
+          </button>
+        </div>
+
+        <div class="text-[11px] text-slate-400 font-medium hidden md:block">
+          <i class="fa-solid fa-hospital text-indigo-400 mr-1"></i> <span id="headerSubLabel">Datos en tiempo real</span>
+        </div>
       </div>
     </div>
   </header>
 
   <!-- Contenedor Principal -->
   <main class="max-w-7xl w-full mx-auto px-3 sm:px-4 py-4 flex-1 space-y-4">
-    
-    <!-- Paso 1: Selección de Módulo a Exportar -->
-    <section class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
-      <div class="flex items-center justify-between">
-        <span class="text-xs font-black uppercase text-slate-400 tracking-wider">1. Seleccionar Datos a Exportar</span>
-        <span id="badgeCurrentCount" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100">0 registros</span>
-      </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-        <button type="button" onclick="window.exporter.setTargetModule('orders')" id="btnTargetOrders" 
-                class="p-3.5 rounded-xl border-2 border-blue-600 bg-blue-50 text-blue-900 font-bold text-left transition flex items-center justify-between shadow-sm">
-          <div class="flex items-center gap-3">
-            <span class="w-10 h-10 rounded-lg bg-blue-600 text-white flex items-center justify-center text-lg shadow-sm">🔧</span>
+    <!-- Selector de Fuente de Datos (OTs vs Proyectos) -->
+    <section class="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+        <span class="text-xs font-black uppercase text-slate-500 tracking-wider flex items-center gap-1.5">
+          <i class="fa-solid fa-layer-group text-indigo-600"></i> Fuente de Información:
+        </span>
+        <div class="flex items-center space-x-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-bold w-full sm:w-auto">
+          <button type="button" onclick="window.exporter.setTargetModule('orders')" id="btnTargetOrders" 
+                  class="flex-1 sm:flex-none px-3.5 py-1.5 rounded-lg bg-white text-blue-700 shadow-sm transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-wrench text-blue-600"></i> <span>Órdenes de Trabajo (OTs)</span>
+          </button>
+          <button type="button" onclick="window.exporter.setTargetModule('projects')" id="btnTargetProjects" 
+                  class="flex-1 sm:flex-none px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-diagram-project text-indigo-600"></i> <span>Catálogo de Proyectos</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================
+         SECCIÓN 1: ESTADÍSTICAS Y KPIS CONFIGURABLES Y SIMPLES
+         ========================================================== -->
+    <section id="sectionStats" class="space-y-4 animate-slide-up">
+      
+      <!-- Barra de Configuración Simple de KPIs -->
+      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
+          <div class="flex items-center gap-2">
+            <span class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-700 flex items-center justify-center text-sm shadow-sm">
+              <i class="fa-solid fa-sliders"></i>
+            </span>
             <div>
-              <p class="font-black text-sm">Órdenes de Trabajo (OTs)</p>
-              <p class="text-[11px] text-blue-700 font-medium">Historial operativo de cuadrilla</p>
+              <h3 class="font-black text-xs sm:text-sm text-slate-900">Configuración Rápida de KPIs</h3>
+              <p class="text-[11px] text-slate-500">Ajusta el periodo, agrupa por dimensión y establece metas operativas</p>
             </div>
           </div>
-          <i class="fa-solid fa-check text-blue-600 text-lg"></i>
-        </button>
+          
+          <div class="flex items-center gap-1.5 self-end sm:self-auto">
+            <button type="button" onclick="window.exporter.toggleKpiSettingsModal()" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center gap-1.5 transition">
+              <i class="fa-solid fa-bullseye text-indigo-600"></i> <span>Ajustar Metas</span>
+            </button>
+            <button type="button" onclick="window.exporter.exportKpiSummaryPDF()" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-black text-white font-bold text-xs flex items-center gap-1.5 shadow-sm transition">
+              <i class="fa-solid fa-file-pdf text-rose-400"></i> <span>Exportar KPIs (PDF)</span>
+            </button>
+          </div>
+        </div>
 
-        <button type="button" onclick="window.exporter.setTargetModule('projects')" id="btnTargetProjects" 
-                class="p-3.5 rounded-xl border-2 border-slate-200 bg-white text-slate-700 font-bold text-left transition hover:border-slate-300 flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <span class="w-10 h-10 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center text-lg">📋</span>
-            <div>
-              <p class="font-black text-sm">Catálogo de Proyectos</p>
-              <p class="text-[11px] text-slate-500 font-medium">Iniciativas e infraestructura HBQP</p>
+        <!-- Opciones de Configuración -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+          <!-- Periodo -->
+          <div class="space-y-1.5">
+            <label class="font-bold text-slate-700 block">Periodo Temporal:</label>
+            <div class="flex items-center gap-1 flex-wrap">
+              <button type="button" onclick="window.exporter.setKpiPreset(7)" class="kpi-preset-btn px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[11px] transition" data-preset="7">7d</button>
+              <button type="button" onclick="window.exporter.setKpiPreset(30)" class="kpi-preset-btn px-2.5 py-1 rounded-lg bg-indigo-600 text-white font-bold text-[11px] transition" data-preset="30">30d</button>
+              <button type="button" onclick="window.exporter.setKpiPreset('month')" class="kpi-preset-btn px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[11px] transition" data-preset="month">Este Mes</button>
+              <button type="button" onclick="window.exporter.setKpiPreset('all')" class="kpi-preset-btn px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[11px] transition" data-preset="all">Histórico</button>
+              <button type="button" onclick="window.exporter.toggleCustomDates()" class="px-2 py-1 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50 text-[11px] font-bold transition">📅 Fechas</button>
+            </div>
+            <!-- Rango de Fechas Personalizadas -->
+            <div id="kpiCustomDatesContainer" class="hidden grid grid-cols-2 gap-2 pt-1">
+              <input type="date" id="kpiDateFrom" onchange="window.exporter.onCustomDateChange()" class="p-1.5 bg-slate-50 border rounded text-[11px] font-semibold">
+              <input type="date" id="kpiDateTo" onchange="window.exporter.onCustomDateChange()" class="p-1.5 bg-slate-50 border rounded text-[11px] font-semibold">
             </div>
           </div>
-          <i class="fa-solid fa-check text-transparent text-lg"></i>
-        </button>
 
-        <button type="button" onclick="window.exporter.setTargetModule('consolidated')" id="btnTargetConsolidated" 
-                class="p-3.5 rounded-xl border-2 border-slate-200 bg-white text-slate-700 font-bold text-left transition hover:border-slate-300 flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <span class="w-10 h-10 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center text-lg">📑</span>
-            <div>
-              <p class="font-black text-sm">Consolidado Integral</p>
-              <p class="text-[11px] text-slate-500 font-medium">Reporte conjunto Proyectos + OTs</p>
+          <!-- Dimensión de Agrupación -->
+          <div class="space-y-1.5">
+            <label class="font-bold text-slate-700 block">Agrupar Gráficos y Matriz por:</label>
+            <select id="kpiGroupByDimension" onchange="window.exporter.onDimensionChange()" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="state" selected>Estado / Fase</option>
+              <option value="category">Especialidad / Tipología</option>
+              <option value="assignee">Técnico / Unidad Solicitante</option>
+              <option value="priority">Nivel de Prioridad</option>
+              <option value="floor">Piso / Ubicación</option>
+            </select>
+          </div>
+
+          <!-- Filtro de Segmentación -->
+          <div class="space-y-1.5">
+            <label class="font-bold text-slate-700 block" id="lblKpiSegmentFilter">Filtrar por Área / Especialidad:</label>
+            <select id="kpiSegmentFilter" onchange="window.exporter.onSegmentChange()" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="ALL">Todas las Áreas y Especialidades</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tarjetas de KPIs Simples y de Alto Valor -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <!-- KPI 1: Volumen -->
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden">
+          <div class="flex items-center justify-between text-xs font-bold text-slate-500 uppercase">
+            <span>Volumen Total</span>
+            <span class="p-1.5 rounded-lg bg-slate-100 text-slate-700"><i class="fa-solid fa-folder-open"></i></span>
+          </div>
+          <p id="kpiTotalCount" class="text-2xl sm:text-3xl font-black text-slate-900 mt-2">0</p>
+          <div class="flex items-center justify-between text-[11px] text-slate-500 font-medium mt-1">
+            <span id="kpiNewCountText">Nuevos: 0</span>
+            <span id="kpiActiveCountText" class="text-amber-700 font-bold">Activos: 0</span>
+          </div>
+        </div>
+
+        <!-- KPI 2: Tasa de Cierre vs Meta -->
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden">
+          <div class="flex items-center justify-between text-xs font-bold text-slate-500 uppercase">
+            <span>Tasa de Cierre</span>
+            <span id="badgeTargetStatus" class="px-1.5 py-0.5 rounded text-[10px] font-black bg-emerald-100 text-emerald-800">Meta: 80%</span>
+          </div>
+          <div class="flex items-baseline gap-2 mt-2">
+            <p id="kpiCloseRate" class="text-2xl sm:text-3xl font-black text-emerald-600">0%</p>
+            <span id="kpiVsTargetText" class="text-xs font-bold text-emerald-600">Cumplida</span>
+          </div>
+          <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden mt-2 relative">
+            <div id="kpiProgressBar" class="h-full bg-emerald-500 bar-transition" style="width: 0%"></div>
+            <div id="kpiTargetMarker" class="absolute top-0 bottom-0 w-0.5 bg-slate-900 opacity-60" style="left: 80%" title="Meta configurada"></div>
+          </div>
+        </div>
+
+        <!-- KPI 3: Tiempo Promedio de Atención -->
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden">
+          <div class="flex items-center justify-between text-xs font-bold text-slate-500 uppercase">
+            <span>Tiempo Promedio</span>
+            <span id="badgeTimeTarget" class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-800">Meta: 48h</span>
+          </div>
+          <p id="kpiAvgTime" class="text-2xl sm:text-3xl font-black text-indigo-600 mt-2">0h</p>
+          <p id="kpiAvgSubtitle" class="text-[11px] text-slate-500 font-medium mt-1">Por orden/proyecto</p>
+        </div>
+
+        <!-- KPI 4: Casos Críticos / Bloqueos -->
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden">
+          <div class="flex items-center justify-between text-xs font-bold text-slate-500 uppercase">
+            <span id="lblKpiUrgent">Casos Críticos</span>
+            <span class="p-1.5 rounded-lg bg-rose-50 text-rose-700"><i class="fa-solid fa-triangle-exclamation"></i></span>
+          </div>
+          <p id="kpiCriticalCount" class="text-2xl sm:text-3xl font-black text-rose-600 mt-2">0</p>
+          <p id="kpiCriticalSubtitle" class="text-[11px] text-slate-500 font-medium mt-1">Urgentes / Con Hito Pendiente</p>
+        </div>
+      </div>
+
+      <!-- Desglose Gráfico Reactivo y Matriz Resumen -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        <!-- Gráfico de Barras Proporcionales (7 Cols) -->
+        <div class="lg:col-span-7 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+          <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+            <h3 class="text-xs font-black text-slate-800 uppercase tracking-wide flex items-center gap-2">
+              <i class="fa-solid fa-chart-column text-indigo-600"></i>
+              <span id="dynamicChartTitle">Desglose por Dimensión</span>
+            </h3>
+            <span class="text-[11px] text-slate-400 font-semibold" id="dynamicChartCount">Total Registros</span>
+          </div>
+          
+          <div id="dynamicBarsContainer" class="space-y-3 text-xs pt-1">
+            <!-- Barras generadas en JS -->
+          </div>
+        </div>
+
+        <!-- Matriz Resumen Ejecutiva (5 Cols) -->
+        <div class="lg:col-span-5 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between pb-2 border-b border-slate-100 mb-2">
+              <h3 class="text-xs font-black text-slate-800 uppercase tracking-wide flex items-center gap-2">
+                <i class="fa-solid fa-table-list text-blue-600"></i> Resumen de Indicadores
+              </h3>
+              <button onclick="window.exporter.copyKpiTableToClipboard()" class="text-[11px] text-indigo-600 hover:text-indigo-800 font-bold flex items-center gap-1">
+                <i class="fa-solid fa-copy"></i> Copiar
+              </button>
+            </div>
+            
+            <div class="overflow-x-auto custom-scroll max-h-72">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 text-slate-600 font-bold border-b text-[11px]">
+                  <tr>
+                    <th class="p-2">Categoría</th>
+                    <th class="p-2 text-center">Cant.</th>
+                    <th class="p-2 text-right">% del Total</th>
+                  </tr>
+                </thead>
+                <tbody id="dynamicMatrixBody" class="divide-y divide-slate-100">
+                  <!-- Filas generadas en JS -->
+                </tbody>
+              </table>
             </div>
           </div>
-          <i class="fa-solid fa-check text-transparent text-lg"></i>
-        </button>
-      </div>
-    </section>
 
-    <!-- Paso 2: Filtros de Exportación -->
-    <section class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
-      <div class="flex items-center justify-between">
-        <span class="text-xs font-black uppercase text-slate-400 tracking-wider">2. Filtros y Criterios</span>
-        <button type="button" onclick="window.exporter.resetFilters()" class="text-xs text-rose-600 hover:text-rose-700 font-bold flex items-center gap-1">
-          <i class="fa-solid fa-rotate-left"></i> Limpiar Filtros
-        </button>
-      </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
-        <div>
-          <label class="block font-bold text-slate-700 mb-1">Fecha Desde:</label>
-          <input type="date" id="filterDateFrom" onchange="window.exporter.applyFilters()" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg font-medium">
-        </div>
-        <div>
-          <label class="block font-bold text-slate-700 mb-1">Fecha Hasta:</label>
-          <input type="date" id="filterDateTo" onchange="window.exporter.applyFilters()" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg font-medium">
-        </div>
-        <div>
-          <label class="block font-bold text-slate-700 mb-1" id="lblFilterState">Estado / Fase:</label>
-          <select id="filterState" onchange="window.exporter.applyFilters()" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg font-medium"></select>
-        </div>
-        <div>
-          <label class="block font-bold text-slate-700 mb-1" id="lblFilterCategory">Especialidad / Tipología:</label>
-          <select id="filterCategory" onchange="window.exporter.applyFilters()" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg font-medium"></select>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 border-t border-slate-100 text-xs">
-        <div>
-          <label class="block font-bold text-slate-700 mb-1">Búsqueda Textual:</label>
-          <div class="relative">
-            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-            <input type="text" id="filterKeyword" oninput="window.exporter.applyFilters()" placeholder="Buscar por palabra clave, folio, código, recinto, PMA..." 
-                   class="w-full pl-8 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg font-medium">
+          <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+            <span class="text-slate-500 font-medium">¿Deseas descargar el listado completo?</span>
+            <button onclick="window.exporter.switchSection('export')" class="font-bold text-indigo-600 hover:underline flex items-center gap-1">
+              Ir a Descarga <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </button>
           </div>
         </div>
-        <div>
-          <label class="block font-bold text-slate-700 mb-1" id="lblFilterAssignee">Técnico Asignado / Solicitante:</label>
-          <select id="filterAssignee" onchange="window.exporter.applyFilters()" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg font-medium"></select>
+      </div>
+    </section>
+
+    <!-- ==========================================================
+         SECCIÓN 2: REPORTE EJECUTIVO DE AVANCES (PDF)
+         ========================================================== -->
+    <section id="sectionAdvance" class="hidden space-y-4 animate-slide-up">
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+          <div>
+            <h2 class="text-base font-black text-slate-900 flex items-center gap-2">
+              <i class="fa-solid fa-arrow-trend-up text-indigo-600"></i> Reporte Ejecutivo de Avances
+            </h2>
+            <p class="text-xs text-slate-500">Analiza el rendimiento del equipo e infraestructura entre dos fechas y genera el informe gerencial</p>
+          </div>
+          
+          <div class="flex items-center gap-1.5 flex-wrap text-xs">
+            <button onclick="window.exporter.setAdvanceDatePreset(7)" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition">7 días</button>
+            <button onclick="window.exporter.setAdvanceDatePreset(30)" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition">30 días</button>
+            <button onclick="window.exporter.setAdvanceDatePreset(90)" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition">Este Trimestre</button>
+            <button onclick="window.exporter.setAdvanceDatePreset('all')" class="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 font-bold transition">Histórico Total</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-50 p-3.5 rounded-xl border border-slate-200 text-xs">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Fecha Desde:</label>
+            <input type="date" id="advDateFrom" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-bold text-slate-800">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Fecha Hasta:</label>
+            <input type="date" id="advDateTo" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-bold text-slate-800">
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-3">
+          <button onclick="window.exporter.generateAdvanceStats()" class="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-xl text-xs shadow-md transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-calculator"></i> <span>Calcular Métricas de Avance</span>
+          </button>
+          <button onclick="window.exporter.exportAdvanceReportPDF()" id="btnDownloadAdvancePDF" class="py-2.5 px-5 bg-slate-900 hover:bg-black text-white font-black rounded-xl text-xs shadow-md transition flex items-center justify-center gap-2 disabled:opacity-50">
+            <i class="fa-solid fa-file-pdf text-rose-400"></i> <span>Descargar Informe Gerencial (PDF)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Resultados del Reporte de Avance -->
+      <div id="advanceStatsResult" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+          <div class="bg-blue-50 border border-blue-200 p-3 rounded-xl">
+            <span class="block text-[10px] uppercase font-bold text-blue-800">Total en Periodo</span>
+            <span id="statAdvTotal" class="text-2xl font-black text-blue-900">0</span>
+          </div>
+          <div class="bg-emerald-50 border border-emerald-200 p-3 rounded-xl">
+            <span class="block text-[10px] uppercase font-bold text-emerald-800">Finalizados en Periodo</span>
+            <span id="statAdvCompleted" class="text-2xl font-black text-emerald-900">0</span>
+          </div>
+          <div class="bg-indigo-50 border border-indigo-200 p-3 rounded-xl">
+            <span class="block text-[10px] uppercase font-bold text-indigo-800">Promedio Atención</span>
+            <span id="statAdvAvgHours" class="text-2xl font-black text-indigo-900">0h</span>
+          </div>
+          <div class="bg-amber-50 border border-amber-200 p-3 rounded-xl">
+            <span class="block text-[10px] uppercase font-bold text-amber-800">Actualmente Activos</span>
+            <span id="statAdvPending" class="text-2xl font-black text-amber-900">0</span>
+          </div>
+        </div>
+
+        <div class="border border-slate-200 rounded-xl overflow-hidden">
+          <div class="overflow-x-auto custom-scroll">
+            <table class="w-full text-left text-xs min-w-[650px]">
+              <thead class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+                <tr>
+                  <th class="p-2.5">Código / Folio</th>
+                  <th class="p-2.5">Recinto / Requerimiento</th>
+                  <th class="p-2.5">Estado</th>
+                  <th class="p-2.5 text-right">Tiempo Registrado</th>
+                </tr>
+              </thead>
+              <tbody id="advanceReportTableBody" class="divide-y divide-slate-100 bg-white"></tbody>
+            </table>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- Paso 3: Botones de Exportación Directa -->
-    <section class="bg-gradient-to-r from-slate-900 to-indigo-950 p-5 rounded-2xl shadow-xl text-white space-y-4">
-      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
-        <div>
-          <h2 class="font-black text-base">3. Generar y Descargar Archivo</h2>
-          <p class="text-xs text-slate-400">Selecciona el formato deseado para procesar los datos filtrados</p>
+    <!-- ==========================================================
+         SECCIÓN 3: DESCARGA & EXPORTACIÓN MULTI-FORMATO
+         ========================================================== -->
+    <section id="sectionExport" class="hidden space-y-4 animate-slide-up">
+      <!-- Filtros -->
+      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-black uppercase text-slate-400 tracking-wider">Filtros de Exportación</span>
+          <button type="button" onclick="window.exporter.resetExportFilters()" class="text-xs text-rose-600 font-bold flex items-center gap-1">
+            <i class="fa-solid fa-rotate-left"></i> Limpiar Filtros
+          </button>
         </div>
-        <div class="flex items-center gap-2 text-xs bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700">
-          <span class="text-slate-400">Total a exportar:</span>
-          <strong id="statExportCount" class="text-emerald-400 font-black text-sm">0</strong>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Fecha Desde:</label>
+            <input type="date" id="filterDateFrom" onchange="window.exporter.applyExportFilters()" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg font-medium">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Fecha Hasta:</label>
+            <input type="date" id="filterDateTo" onchange="window.exporter.applyExportFilters()" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg font-medium">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1" id="lblFilterState">Estado / Fase:</label>
+            <select id="filterState" onchange="window.exporter.applyExportFilters()" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg font-medium"></select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1" id="lblFilterCategory">Especialidad / Tipología:</label>
+            <select id="filterCategory" onchange="window.exporter.applyExportFilters()" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg font-medium"></select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 border-t border-slate-100 text-xs">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Búsqueda Textual:</label>
+            <div class="relative">
+              <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+              <input type="text" id="filterKeyword" oninput="window.exporter.applyExportFilters()" placeholder="Buscar por palabra clave, folio, código, recinto, PMA..." 
+                     class="w-full pl-8 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg font-medium">
+            </div>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1" id="lblFilterAssignee">Técnico / Unidad:</label>
+            <select id="filterAssignee" onchange="window.exporter.applyExportFilters()" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg font-medium"></select>
+          </div>
         </div>
       </div>
 
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-        <button type="button" onclick="window.exporter.exportToExcelXlsx()" 
-                class="p-3 bg-emerald-600 hover:bg-emerald-500 active:scale-95 rounded-xl font-bold transition shadow-md flex flex-col items-center justify-center gap-2 text-center">
-          <i class="fa-solid fa-file-excel text-2xl text-white"></i>
-          <span>Descargar Excel (.xlsx)</span>
-          <span class="text-[10px] text-emerald-200 font-normal">Formato nativo con formato</span>
-        </button>
+      <!-- Panel de Descarga -->
+      <div class="bg-gradient-to-r from-slate-900 to-indigo-950 p-5 rounded-2xl shadow-xl text-white space-y-4">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
+          <div>
+            <h2 class="font-black text-base">Descarga de Archivos</h2>
+            <p class="text-xs text-slate-400">Exporta los datos filtrados en tu formato de preferencia</p>
+          </div>
+          <div class="flex items-center gap-2 text-xs bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700">
+            <span class="text-slate-400">Filas seleccionadas:</span>
+            <strong id="statExportCount" class="text-emerald-400 font-black text-sm">0</strong>
+          </div>
+        </div>
 
-        <button type="button" onclick="window.exporter.exportToCSV()" 
-                class="p-3 bg-teal-700 hover:bg-teal-600 active:scale-95 rounded-xl font-bold transition shadow-md flex flex-col items-center justify-center gap-2 text-center">
-          <i class="fa-solid fa-file-csv text-2xl text-white"></i>
-          <span>Descargar CSV (.csv)</span>
-          <span class="text-[10px] text-teal-200 font-normal">Compatible UTF-8 BOM</span>
-        </button>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+          <button type="button" onclick="window.exporter.exportToExcelXlsx()" 
+                  class="p-3 bg-emerald-600 hover:bg-emerald-500 active:scale-95 rounded-xl font-bold transition shadow-md flex flex-col items-center justify-center gap-2 text-center">
+            <i class="fa-solid fa-file-excel text-2xl text-white"></i>
+            <span>Descargar Excel (.xlsx)</span>
+            <span class="text-[10px] text-emerald-200 font-normal">Libro nativo con formato</span>
+          </button>
 
-        <button type="button" onclick="window.exporter.exportToPDF()" 
-                class="p-3 bg-rose-700 hover:bg-rose-600 active:scale-95 rounded-xl font-bold transition shadow-md flex flex-col items-center justify-center gap-2 text-center">
-          <i class="fa-solid fa-file-pdf text-2xl text-white"></i>
-          <span>Informe Ejecutivo (.pdf)</span>
-          <span class="text-[10px] text-rose-200 font-normal">Documento gerencial HBQP</span>
-        </button>
+          <button type="button" onclick="window.exporter.exportToCSV()" 
+                  class="p-3 bg-teal-700 hover:bg-teal-600 active:scale-95 rounded-xl font-bold transition shadow-md flex flex-col items-center justify-center gap-2 text-center">
+            <i class="fa-solid fa-file-csv text-2xl text-white"></i>
+            <span>Descargar CSV (.csv)</span>
+            <span class="text-[10px] text-teal-200 font-normal">Compatible UTF-8 BOM</span>
+          </button>
 
-        <button type="button" onclick="window.exporter.copyTableToClipboard()" 
-                class="p-3 bg-slate-800 hover:bg-slate-700 active:scale-95 rounded-xl font-bold transition shadow-md flex flex-col items-center justify-center gap-2 text-center border border-slate-700">
-          <i class="fa-solid fa-copy text-2xl text-indigo-300"></i>
-          <span>Copiar al Portapapeles</span>
-          <span class="text-[10px] text-slate-400 font-normal">Pegar directo en planilla</span>
-        </button>
+          <button type="button" onclick="window.exporter.exportToPDF()" 
+                  class="p-3 bg-rose-700 hover:bg-rose-600 active:scale-95 rounded-xl font-bold transition shadow-md flex flex-col items-center justify-center gap-2 text-center">
+            <i class="fa-solid fa-file-pdf text-2xl text-white"></i>
+            <span>Informe General (.pdf)</span>
+            <span class="text-[10px] text-rose-200 font-normal">Listado formal HBQP</span>
+          </button>
+
+          <button type="button" onclick="window.exporter.copyTableToClipboard()" 
+                  class="p-3 bg-slate-800 hover:bg-slate-700 active:scale-95 rounded-xl font-bold transition shadow-md flex flex-col items-center justify-center gap-2 text-center border border-slate-700">
+            <i class="fa-solid fa-copy text-2xl text-indigo-300"></i>
+            <span>Copiar al Portapapeles</span>
+            <span class="text-[10px] text-slate-400 font-normal">Pegar directo con Ctrl+V</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Previsualización de Datos -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden space-y-2">
+        <div class="p-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between text-xs">
+          <div class="flex items-center gap-2">
+            <span class="font-black text-slate-800">Vista Previa de Filas</span>
+            <span class="text-slate-500 font-normal hidden sm:inline">(Se descargarán exactamente estas filas)</span>
+          </div>
+          <span class="text-[11px] text-slate-400 font-medium">Desliza horizontalmente si es necesario</span>
+        </div>
+        <div class="overflow-x-auto custom-scroll w-full p-2">
+          <div id="previewTableContainer"></div>
+        </div>
       </div>
     </section>
 
-    <!-- Paso 4: Previsualización de Datos -->
-    <section class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden space-y-2">
-      <div class="p-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between text-xs">
-        <div class="flex items-center gap-2">
-          <span class="font-black text-slate-800">Vista Previa de Datos</span>
-          <span class="text-slate-500 font-normal hidden sm:inline">(Se exportarán exactamente las filas mostradas abajo)</span>
-        </div>
-        <span class="text-[11px] text-slate-400">Desliza horizontalmente si es necesario</span>
-      </div>
-
-      <div class="overflow-x-auto custom-scroll w-full p-2">
-        <div id="previewTableContainer"></div>
-      </div>
-    </section>
   </main>
+
+  <!-- Modal Ajuste de Metas y Objetivos KPI -->
+  <div id="modalKpiSettings" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border border-slate-200 space-y-4">
+      <div class="flex items-center justify-between border-b pb-2">
+        <h3 class="font-black text-sm text-slate-900 flex items-center gap-2">
+          <i class="fa-solid fa-bullseye text-indigo-600"></i> Configurar Metas KPI
+        </h3>
+        <button onclick="window.exporter.toggleKpiSettingsModal()" class="text-slate-400 hover:text-slate-700">✕</button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Meta de Tasa de Cierre (%):</label>
+          <div class="flex items-center gap-2">
+            <input type="number" id="inputTargetCloseRate" min="1" max="100" class="w-full p-2 border rounded-lg font-bold text-indigo-700" value="80">
+            <span class="font-bold text-slate-500">%</span>
+          </div>
+          <p class="text-[10px] text-slate-400 mt-0.5">Porcentaje mínimo de resolución deseado para el periodo evaluado.</p>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Meta de Tiempo Promedio Máximo (horas):</label>
+          <div class="flex items-center gap-2">
+            <input type="number" id="inputTargetHours" min="1" max="500" class="w-full p-2 border rounded-lg font-bold text-indigo-700" value="48">
+            <span class="font-bold text-slate-500">hrs</span>
+          </div>
+          <p class="text-[10px] text-slate-400 mt-0.5">Tiempo medio de resolución máximo esperado.</p>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2 border-t">
+        <button type="button" onclick="window.exporter.toggleKpiSettingsModal()" class="px-3 py-1.5 bg-slate-100 rounded-lg font-bold text-slate-600 text-xs">Cancelar</button>
+        <button type="button" onclick="window.exporter.saveKpiSettings()" class="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-bold text-xs shadow-sm">Guardar Metas</button>
+      </div>
+    </div>
+  </div>
 
   <script>
     const SGM_CONFIG = {
@@ -217,104 +518,645 @@
       return unsafe.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
 
-    class StandaloneExportCenter {
+    class StandaloneReportCenter {
       constructor() {
+        this.currentSection = 'stats';
         this.targetModule = 'orders';
         this.orders = [];
         this.projects = [];
-        this.filteredData = [];
+        this.filteredExportData = [];
+        this.advanceFilteredData = [];
         this.supabase = null;
 
-        this.initData();
+        // Metas configurables con persistencia
+        this.kpiConfig = {
+          targetCloseRate: 80,
+          targetHours: 48,
+          preset: '30',
+          dimension: 'state',
+          segment: 'ALL',
+          dateFrom: '',
+          dateTo: ''
+        };
+
+        this.init();
       }
 
-      async initData() {
-        // 1. Cargar desde LocalStorage como respaldo inmediato
+      async init() {
+        this.loadKpiSettings();
+
+        // Cargar almacenamiento local
         try {
-          const cachedOrders = localStorage.getItem('sdo_orders_cache_v6');
-          if (cachedOrders) this.orders = JSON.parse(cachedOrders);
-          
-          const cachedProjects = localStorage.getItem('hbqp_projects_store_v6');
-          if (cachedProjects) this.projects = JSON.parse(cachedProjects);
+          const o = localStorage.getItem('sdo_orders_cache_v6');
+          if (o) this.orders = JSON.parse(o);
+          const p = localStorage.getItem('hbqp_projects_store_v6');
+          if (p) this.projects = JSON.parse(p);
         } catch(e) {}
 
-        // 2. Conectar a Supabase si está disponible
+        // Conectar a Supabase
         try {
           if (window.supabase) {
             this.supabase = window.supabase.createClient(SGM_CONFIG.supabaseUrl, SGM_CONFIG.supabaseAnonKey);
             await this.fetchRemoteData();
           }
-        } catch(e) {
-          console.warn("Modo local de exportador.");
-        }
+        } catch(e) {}
 
+        this.setAdvanceDatePreset(30);
         this.updateFilterDropdowns();
-        this.applyFilters();
+        this.updateKpiSegmentDropdown();
+        this.refreshCurrentView();
+      }
+
+      loadKpiSettings() {
+        try {
+          const saved = localStorage.getItem('hbqp_kpi_user_config');
+          if (saved) {
+            this.kpiConfig = { ...this.kpiConfig, ...JSON.parse(saved) };
+          }
+        } catch(e) {}
+
+        const inRate = document.getElementById('inputTargetCloseRate');
+        const inHours = document.getElementById('inputTargetHours');
+        const inDim = document.getElementById('kpiGroupByDimension');
+
+        if (inRate) inRate.value = this.kpiConfig.targetCloseRate;
+        if (inHours) inHours.value = this.kpiConfig.targetHours;
+        if (inDim) inDim.value = this.kpiConfig.dimension;
+      }
+
+      saveKpiSettings() {
+        const rate = parseInt(document.getElementById('inputTargetCloseRate').value, 10);
+        const hours = parseInt(document.getElementById('inputTargetHours').value, 10);
+
+        if (!isNaN(rate)) this.kpiConfig.targetCloseRate = Math.min(100, Math.max(1, rate));
+        if (!isNaN(hours)) this.kpiConfig.targetHours = Math.max(1, hours);
+
+        localStorage.setItem('hbqp_kpi_user_config', JSON.stringify(this.kpiConfig));
+        this.toggleKpiSettingsModal();
+        this.renderStatsView();
+        this.showToast('Metas de KPIs guardadas', '🎯');
+      }
+
+      toggleKpiSettingsModal() {
+        document.getElementById('modalKpiSettings')?.classList.toggle('hidden');
       }
 
       async fetchRemoteData() {
         if (!this.supabase) return;
         try {
           const { data: ords } = await this.supabase.from('orders').select('*').order('created_at', { ascending: false });
-          if (ords && ords.length > 0) {
-            this.orders = ords.map(r => r.data);
-          }
+          if (ords && ords.length > 0) this.orders = ords.map(r => r.data);
 
           const { data: projs } = await this.supabase.from('projects_hbqp').select('*');
-          if (projs && projs.length > 0) {
-            this.projects = projs.map(r => r.data);
-          }
-        } catch(e) {
-          console.warn("Fallo lectura remota en exportador:", e);
+          if (projs && projs.length > 0) this.projects = projs.map(r => r.data);
+        } catch(e) {}
+      }
+
+      async forceSyncRemote() {
+        this.showToast('Recargando datos desde Supabase...', '🔄');
+        await this.fetchRemoteData();
+        this.updateFilterDropdowns();
+        this.updateKpiSegmentDropdown();
+        this.refreshCurrentView();
+        this.showToast('Datos actualizados en tiempo real', '✅');
+      }
+
+      switchSection(sec) {
+        this.currentSection = sec;
+        
+        const btnStats = document.getElementById('tabBtnStats');
+        const btnAdv = document.getElementById('tabBtnAdvance');
+        const btnExp = document.getElementById('tabBtnExport');
+
+        const secStats = document.getElementById('sectionStats');
+        const secAdv = document.getElementById('sectionAdvance');
+        const secExp = document.getElementById('sectionExport');
+
+        [btnStats, btnAdv, btnExp].forEach(b => {
+          b.className = "px-3 py-1.5 rounded-lg text-slate-400 hover:text-white flex items-center gap-1.5 transition";
+        });
+
+        secStats.classList.add('hidden');
+        secAdv.classList.add('hidden');
+        secExp.classList.add('hidden');
+
+        if (sec === 'stats') {
+          btnStats.className = "px-3 py-1.5 rounded-lg bg-indigo-600 text-white shadow-sm flex items-center gap-1.5 transition";
+          secStats.classList.remove('hidden');
+          this.renderStatsView();
+        } else if (sec === 'advance') {
+          btnAdv.className = "px-3 py-1.5 rounded-lg bg-indigo-600 text-white shadow-sm flex items-center gap-1.5 transition";
+          secAdv.classList.remove('hidden');
+          this.generateAdvanceStats();
+        } else {
+          btnExp.className = "px-3 py-1.5 rounded-lg bg-indigo-600 text-white shadow-sm flex items-center gap-1.5 transition";
+          secExp.classList.remove('hidden');
+          this.applyExportFilters();
         }
       }
 
       setTargetModule(m) {
         this.targetModule = m;
-        
         const btnO = document.getElementById('btnTargetOrders');
         const btnP = document.getElementById('btnTargetProjects');
-        const btnC = document.getElementById('btnTargetConsolidated');
-
-        [btnO, btnP, btnC].forEach(b => {
-          b.className = "p-3.5 rounded-xl border-2 border-slate-200 bg-white text-slate-700 font-bold text-left transition hover:border-slate-300 flex items-center justify-between";
-          b.querySelector('i').className = "fa-solid fa-check text-transparent text-lg";
-        });
 
         if (m === 'orders') {
-          btnO.className = "p-3.5 rounded-xl border-2 border-blue-600 bg-blue-50 text-blue-900 font-bold text-left transition flex items-center justify-between shadow-sm";
-          btnO.querySelector('i').className = "fa-solid fa-check text-blue-600 text-lg";
-        } else if (m === 'projects') {
-          btnP.className = "p-3.5 rounded-xl border-2 border-indigo-600 bg-indigo-50 text-indigo-900 font-bold text-left transition flex items-center justify-between shadow-sm";
-          btnP.querySelector('i').className = "fa-solid fa-check text-indigo-600 text-lg";
+          btnO.className = "flex-1 sm:flex-none px-3.5 py-1.5 rounded-lg bg-white text-blue-700 shadow-sm transition flex items-center justify-center gap-1.5";
+          btnP.className = "flex-1 sm:flex-none px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition flex items-center justify-center gap-1.5";
         } else {
-          btnC.className = "p-3.5 rounded-xl border-2 border-purple-600 bg-purple-50 text-purple-900 font-bold text-left transition flex items-center justify-between shadow-sm";
-          btnC.querySelector('i').className = "fa-solid fa-check text-purple-600 text-lg";
+          btnP.className = "flex-1 sm:flex-none px-3.5 py-1.5 rounded-lg bg-white text-indigo-700 shadow-sm transition flex items-center justify-center gap-1.5";
+          btnO.className = "flex-1 sm:flex-none px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition flex items-center justify-center gap-1.5";
         }
 
         this.updateFilterDropdowns();
-        this.applyFilters();
+        this.updateKpiSegmentDropdown();
+        this.refreshCurrentView();
       }
 
+      refreshCurrentView() {
+        if (this.currentSection === 'stats') this.renderStatsView();
+        else if (this.currentSection === 'advance') this.generateAdvanceStats();
+        else this.applyExportFilters();
+      }
+
+      // ==========================================================
+      // SECCIÓN 1: ESTADÍSTICAS Y KPIS CONFIGURABLES
+      // ==========================================================
+      setKpiPreset(preset) {
+        this.kpiConfig.preset = preset;
+        document.querySelectorAll('.kpi-preset-btn').forEach(b => {
+          b.className = b.dataset.preset == String(preset) 
+            ? "kpi-preset-btn px-2.5 py-1 rounded-lg bg-indigo-600 text-white font-bold text-[11px] transition"
+            : "kpi-preset-btn px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[11px] transition";
+        });
+
+        document.getElementById('kpiCustomDatesContainer')?.classList.add('hidden');
+
+        const now = new Date();
+        const toStr = now.toISOString().split('T')[0];
+        let fromStr = '';
+
+        if (preset === 7) {
+          fromStr = new Date(Date.now() - 7 * 86400000).toISOString().split('T')[0];
+        } else if (preset === 30) {
+          fromStr = new Date(Date.now() - 30 * 86400000).toISOString().split('T')[0];
+        } else if (preset === 'month') {
+          fromStr = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+        } else {
+          fromStr = '2025-01-01';
+        }
+
+        this.kpiConfig.dateFrom = fromStr;
+        this.kpiConfig.dateTo = toStr;
+        document.getElementById('kpiDateFrom').value = fromStr;
+        document.getElementById('kpiDateTo').value = toStr;
+
+        this.renderStatsView();
+      }
+
+      toggleCustomDates() {
+        const c = document.getElementById('kpiCustomDatesContainer');
+        c?.classList.toggle('hidden');
+      }
+
+      onCustomDateChange() {
+        this.kpiConfig.dateFrom = document.getElementById('kpiDateFrom').value;
+        this.kpiConfig.dateTo = document.getElementById('kpiDateTo').value;
+        this.kpiConfig.preset = 'custom';
+        document.querySelectorAll('.kpi-preset-btn').forEach(b => {
+          b.className = "kpi-preset-btn px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[11px] transition";
+        });
+        this.renderStatsView();
+      }
+
+      onDimensionChange() {
+        this.kpiConfig.dimension = document.getElementById('kpiGroupByDimension').value;
+        this.renderStatsView();
+      }
+
+      onSegmentChange() {
+        this.kpiConfig.segment = document.getElementById('kpiSegmentFilter').value;
+        this.renderStatsView();
+      }
+
+      updateKpiSegmentDropdown() {
+        const isOrders = this.targetModule === 'orders';
+        const sel = document.getElementById('kpiSegmentFilter');
+        const lbl = document.getElementById('lblKpiSegmentFilter');
+        if (!sel) return;
+
+        if (isOrders) {
+          lbl.textContent = 'Filtrar por Especialidad / Área:';
+          const specs = ['Infraestructura', 'Climatización', 'Electricidad', 'Equipos Industriales', 'Equipos Clinicos'];
+          sel.innerHTML = '<option value="ALL">Todas las Especialidades</option>' + specs.map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('');
+        } else {
+          lbl.textContent = 'Filtrar por Tipología:';
+          const tipos = ['PROYECTO', 'REPARACION', 'APOYO TECNICO'];
+          sel.innerHTML = '<option value="ALL">Todas las Tipologías</option>' + tipos.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('');
+        }
+      }
+
+      getKpiFilteredDataset() {
+        const isOrders = this.targetModule === 'orders';
+        const dataset = isOrders ? this.orders : this.projects;
+
+        const from = this.kpiConfig.dateFrom ? new Date(this.kpiConfig.dateFrom) : new Date(0);
+        const to = this.kpiConfig.dateTo ? new Date(this.kpiConfig.dateTo + 'T23:59:59') : new Date();
+
+        return dataset.filter(item => {
+          const refDate = isOrders 
+            ? new Date(item.fechaCreacion || Date.now()) 
+            : (item.fecha_ingreso ? new Date(item.fecha_ingreso) : new Date(0));
+
+          const matchDate = refDate >= from && refDate <= to;
+          
+          let matchSeg = true;
+          if (this.kpiConfig.segment !== 'ALL') {
+            if (isOrders) matchSeg = item.especialidad === this.kpiConfig.segment;
+            else matchSeg = item.tipologia === this.kpiConfig.segment;
+          }
+
+          return matchDate && matchSeg;
+        });
+      }
+
+      renderStatsView() {
+        const isOrders = this.targetModule === 'orders';
+        const filtered = this.getKpiFilteredDataset();
+        const total = filtered.length;
+
+        // KPI 1: Volumen y Activos
+        let completed = 0;
+        let active = 0;
+        let critical = 0;
+        let totalHours = 0;
+
+        if (isOrders) {
+          completed = filtered.filter(o => o.estado === 'Terminada').length;
+          active = total - completed;
+          critical = filtered.filter(o => o.prioridad === 'Urgente' && o.estado !== 'Terminada').length;
+
+          filtered.forEach(o => {
+            const start = new Date(o.fechaCreacion || Date.now());
+            const end = o.fechaTermino ? new Date(o.fechaTermino) : new Date();
+            totalHours += Math.max(0, (end - start) / 3600000);
+          });
+        } else {
+          completed = filtered.filter(p => (p.estado || '').toUpperCase().includes('TERMINADO')).length;
+          active = total - completed;
+          critical = filtered.filter(p => p.pendiente && p.pendiente.trim() !== '').length;
+        }
+
+        document.getElementById('kpiTotalCount').textContent = total;
+        document.getElementById('kpiNewCountText').textContent = `Finalizados: ${completed}`;
+        document.getElementById('kpiActiveCountText').textContent = `Activos: ${active}`;
+
+        // KPI 2: Tasa de Cierre vs Meta
+        const rate = total > 0 ? Math.round((completed / total) * 100) : 0;
+        const targetRate = this.kpiConfig.targetCloseRate;
+        document.getElementById('kpiCloseRate').textContent = `${rate}%`;
+        document.getElementById('kpiProgressBar').style.width = `${rate}%`;
+        document.getElementById('badgeTargetStatus').textContent = `Meta: ${targetRate}%`;
+        document.getElementById('kpiTargetMarker').style.left = `${targetRate}%`;
+
+        const isTargetMet = rate >= targetRate;
+        const txtTarget = document.getElementById('kpiVsTargetText');
+        if (isTargetMet) {
+          txtTarget.textContent = `Cumplida (+${rate - targetRate}%)`;
+          txtTarget.className = "text-xs font-bold text-emerald-600";
+          document.getElementById('badgeTargetStatus').className = "px-1.5 py-0.5 rounded text-[10px] font-black bg-emerald-100 text-emerald-800";
+        } else {
+          txtTarget.textContent = `Bajo meta (-${targetRate - rate}%)`;
+          txtTarget.className = "text-xs font-bold text-amber-600";
+          document.getElementById('badgeTargetStatus').className = "px-1.5 py-0.5 rounded text-[10px] font-black bg-amber-100 text-amber-800";
+        }
+
+        // KPI 3: Tiempo Promedio vs Meta
+        const avgHours = total > 0 ? Math.round(totalHours / total) : 0;
+        const targetHours = this.kpiConfig.targetHours;
+        document.getElementById('badgeTimeTarget').textContent = `Meta: <${targetHours}h`;
+
+        if (isOrders) {
+          const tText = avgHours >= 24 ? `${Math.round(avgHours/24)}d ${avgHours%24}h` : `${avgHours}h`;
+          document.getElementById('kpiAvgTime').textContent = tText;
+          document.getElementById('kpiAvgSubtitle').textContent = avgHours <= targetHours ? 'Dentro de la meta esperada' : 'Excede meta esperada';
+        } else {
+          document.getElementById('kpiAvgTime').textContent = `${completed}/${total}`;
+          document.getElementById('kpiAvgSubtitle').textContent = 'Proyectos concluidos';
+        }
+
+        // KPI 4: Casos Críticos
+        document.getElementById('kpiCriticalCount').textContent = critical;
+        document.getElementById('lblKpiUrgent').textContent = isOrders ? 'OTs Urgentes Activas' : 'Hitos Bloqueantes';
+        document.getElementById('kpiCriticalSubtitle').textContent = isOrders ? 'Alta criticidad en curso' : 'Proyectos detenidos con hito pendiente';
+
+        // Renderizar Desglose Dinámico según la dimensión seleccionada
+        this.renderDynamicDimensionAnalysis(filtered);
+      }
+
+      renderDynamicDimensionAnalysis(filtered) {
+        const isOrders = this.targetModule === 'orders';
+        const dim = this.kpiConfig.dimension;
+        const total = filtered.length;
+
+        const groups = {};
+        const titleMap = {
+          'state': isOrders ? 'Desglose por Estado de OTs' : 'Desglose por Fase del Proyecto',
+          'category': isOrders ? 'Desglose por Especialidad Técnica' : 'Desglose por Tipología',
+          'assignee': isOrders ? 'Desglose por Técnico Asignado' : 'Desglose por Unidad Solicitante',
+          'priority': 'Desglose por Nivel de Prioridad',
+          'floor': 'Desglose por Piso / Emplazamiento'
+        };
+
+        document.getElementById('dynamicChartTitle').textContent = titleMap[dim] || 'Desglose de Indicadores';
+        document.getElementById('dynamicChartCount').textContent = `${total} registros`;
+
+        filtered.forEach(item => {
+          let key = 'Sin clasificar';
+
+          if (dim === 'state') {
+            key = item.estado || 'Sin Estado';
+          } else if (dim === 'category') {
+            key = isOrders ? (item.especialidad || 'Sin Especialidad') : (item.tipologia || 'PROYECTO');
+          } else if (dim === 'assignee') {
+            key = isOrders ? (item.encargado || 'Sin Asignar') : (item.unidad || 'General');
+          } else if (dim === 'priority') {
+            key = item.prioridad || 'Media';
+          } else if (dim === 'floor') {
+            key = item.piso ? `Piso ${item.piso}` : 'General';
+          }
+
+          groups[key] = (groups[key] || 0) + 1;
+        });
+
+        // Colores para las barras
+        const colorPalette = [
+          'bg-indigo-600', 'bg-blue-600', 'bg-amber-500', 'bg-emerald-600', 
+          'bg-purple-600', 'bg-rose-600', 'bg-cyan-600', 'bg-teal-600'
+        ];
+
+        const sorted = Object.entries(groups).sort((a, b) => b[1] - a[1]);
+
+        // Barras
+        const barsContainer = document.getElementById('dynamicBarsContainer');
+        if (sorted.length === 0) {
+          barsContainer.innerHTML = `<div class="p-6 text-center text-slate-400 text-xs italic">No hay registros para este criterio.</div>`;
+        } else {
+          barsContainer.innerHTML = sorted.map(([label, count], idx) => {
+            const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+            const barColor = colorPalette[idx % colorPalette.length];
+            return `
+              <div class="space-y-1">
+                <div class="flex justify-between items-center text-xs font-bold text-slate-700">
+                  <span class="truncate max-w-[220px] sm:max-w-xs">${escapeHtml(label)}</span>
+                  <span class="text-slate-900">${count} <span class="text-[11px] text-slate-400 font-normal">(${pct}%)</span></span>
+                </div>
+                <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                  <div class="h-full ${barColor} bar-transition" style="width: ${pct}%"></div>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+
+        // Matriz Resumen
+        const matrixBody = document.getElementById('dynamicMatrixBody');
+        matrixBody.innerHTML = sorted.map(([label, count]) => {
+          const pct = total > 0 ? ((count / total) * 100).toFixed(1) : '0.0';
+          return `
+            <tr class="hover:bg-slate-50 text-xs">
+              <td class="p-2 font-medium text-slate-800 truncate max-w-[140px]">${escapeHtml(label)}</td>
+              <td class="p-2 text-center font-bold text-slate-900">${count}</td>
+              <td class="p-2 text-right font-black text-indigo-700">${pct}%</td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      copyKpiTableToClipboard() {
+        const matrixBody = document.getElementById('dynamicMatrixBody');
+        if (!matrixBody) return;
+        const rows = matrixBody.querySelectorAll('tr');
+        if (rows.length === 0) {
+          this.showToast('No hay datos para copiar', '⚠️');
+          return;
+        }
+
+        let tsv = 'Categoría\tCantidad\tPorcentaje\n';
+        rows.forEach(r => {
+          const cols = Array.from(r.querySelectorAll('td')).map(td => td.textContent.trim());
+          tsv += cols.join('\t') + '\n';
+        });
+
+        navigator.clipboard.writeText(tsv).then(() => {
+          this.showToast('Matriz de KPIs copiada al portapapeles', '📋');
+        });
+      }
+
+      exportKpiSummaryPDF() {
+        if (!window.jspdf) return;
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        const isOrders = this.targetModule === 'orders';
+        const filtered = this.getKpiFilteredDataset();
+
+        doc.setFontSize(14);
+        doc.setTextColor(15, 23, 42);
+        doc.text('HOSPITAL BIPROVINCIAL QUILLOTA PETORCA (HBQP)', 14, 15);
+        doc.setFontSize(11);
+        doc.setTextColor(79, 70, 229);
+        doc.text(`RESUMEN EJECUTIVO DE KPIS - ${isOrders ? 'ÓRDENES DE TRABAJO' : 'PROYECTOS'}`, 14, 21);
+        doc.setFontSize(8);
+        doc.setTextColor(100, 116, 139);
+        doc.text(`Periodo: ${this.kpiConfig.dateFrom || 'Inicio'} al ${this.kpiConfig.dateTo || 'Hoy'} | Meta Cierre: ${this.kpiConfig.targetCloseRate}%`, 14, 26);
+
+        // Tabla con datos de la matriz
+        const rows = Array.from(document.querySelectorAll('#dynamicMatrixBody tr')).map(tr => {
+          return Array.from(tr.querySelectorAll('td')).map(td => td.textContent.trim());
+        });
+
+        doc.autoTable({
+          head: [["Dimensión / Categoría", "Cantidad", "% del Total"]],
+          body: rows,
+          startY: 32,
+          theme: 'grid',
+          styles: { fontSize: 9 },
+          headStyles: { fillColor: [15, 23, 42], textColor: [255, 255, 255] }
+        });
+
+        doc.save(`KPI_Summary_HBQP_${this.targetModule}_${Date.now()}.pdf`);
+        this.showToast('Resumen de KPIs descargado en PDF', '📄');
+      }
+
+      // ==========================================================
+      // SECCIÓN 2: REPORTE DE AVANCES
+      // ==========================================================
+      setAdvanceDatePreset(days) {
+        const to = new Date();
+        document.getElementById('advDateTo').value = to.toISOString().split('T')[0];
+
+        if (days === 'all') {
+          document.getElementById('advDateFrom').value = '2025-01-01';
+        } else {
+          const from = new Date(Date.now() - Number(days) * 86400000);
+          document.getElementById('advDateFrom').value = from.toISOString().split('T')[0];
+        }
+
+        if (this.currentSection === 'advance') this.generateAdvanceStats();
+      }
+
+      generateAdvanceStats() {
+        const fromStr = document.getElementById('advDateFrom').value;
+        const toStr = document.getElementById('advDateTo').value;
+        const isOrders = this.targetModule === 'orders';
+
+        const from = fromStr ? new Date(fromStr) : new Date(0);
+        const to = toStr ? new Date(toStr + 'T23:59:59') : new Date();
+
+        if (isOrders) {
+          this.advanceFilteredData = this.orders.filter(o => {
+            const d = new Date(o.fechaCreacion || Date.now());
+            return d >= from && d <= to;
+          });
+        } else {
+          this.advanceFilteredData = this.projects.filter(p => {
+            const d = p.fecha_ingreso ? new Date(p.fecha_ingreso) : new Date(0);
+            return d >= from && d <= to;
+          });
+        }
+
+        const total = this.advanceFilteredData.length;
+        let completed = 0;
+        let totalHrs = 0;
+
+        if (isOrders) {
+          completed = this.advanceFilteredData.filter(o => o.estado === 'Terminada').length;
+          this.advanceFilteredData.forEach(o => {
+            if (o.estado !== 'Pendiente' && o.fechaEjecucion) {
+              const start = new Date(o.fechaEjecucion);
+              const end = o.fechaTermino ? new Date(o.fechaTermino) : new Date();
+              totalHrs += Math.max(0, (end - start) / 3600000);
+            }
+          });
+        } else {
+          completed = this.advanceFilteredData.filter(p => (p.estado || '').toUpperCase().includes('TERMINADO')).length;
+        }
+
+        const pending = total - completed;
+        const avgHours = total > 0 ? (totalHrs / total).toFixed(1) : 0;
+
+        document.getElementById('statAdvTotal').textContent = total;
+        document.getElementById('statAdvCompleted').textContent = completed;
+        document.getElementById('statAdvAvgHours').textContent = isOrders ? `${avgHours}h` : `${completed}/${total}`;
+        document.getElementById('statAdvPending').textContent = pending;
+
+        const tbody = document.getElementById('advanceReportTableBody');
+        tbody.innerHTML = this.advanceFilteredData.map(item => {
+          let code = isOrders ? item.folio : (item.codigo || 'PROY-' + item.id);
+          let title = isOrders ? item.recinto : (item.requerimiento || item.descripcion);
+          let state = item.estado;
+          let timeText = '-';
+
+          if (isOrders) {
+            const start = new Date(item.fechaCreacion || Date.now());
+            const end = item.fechaTermino ? new Date(item.fechaTermino) : new Date();
+            const hrs = Math.max(0, (end - start) / 3600000);
+            const days = Math.floor(hrs / 24);
+            timeText = days > 0 ? `${days}d ${Math.floor(hrs%24)}h` : `${Math.floor(hrs)}h`;
+          } else {
+            timeText = item.fecha_ingreso || '-';
+          }
+
+          return `
+            <tr class="hover:bg-slate-50">
+              <td class="p-2.5 font-bold ${isOrders ? 'text-blue-700' : 'text-indigo-700'} whitespace-nowrap">${escapeHtml(code)}</td>
+              <td class="p-2.5 max-w-xs sm:max-w-md truncate font-medium">${escapeHtml(title)}</td>
+              <td class="p-2.5 whitespace-nowrap"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100">${escapeHtml(state)}</span></td>
+              <td class="p-2.5 text-right font-semibold text-slate-700 whitespace-nowrap">${timeText}</td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      exportAdvanceReportPDF() {
+        if (!window.jspdf || this.advanceFilteredData.length === 0) {
+          this.showToast('No hay datos en el periodo para exportar', '⚠️');
+          return;
+        }
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('landscape');
+        const isOrders = this.targetModule === 'orders';
+        const fromVal = document.getElementById('advDateFrom').value;
+        const toVal = document.getElementById('advDateTo').value;
+
+        // Membrete Oficial
+        doc.setFontSize(14);
+        doc.setTextColor(15, 23, 42);
+        doc.text('HOSPITAL BIPROVINCIAL QUILLOTA PETORCA (HBQP)', 14, 15);
+        doc.setFontSize(11);
+        doc.setTextColor(79, 70, 229);
+        doc.text(`INFORME GERENCIAL DE AVANCE - ${isOrders ? 'ÓRDENES DE TRABAJO (OTs)' : 'CATÁLOGO DE PROYECTOS'}`, 14, 21);
+        doc.setFontSize(8);
+        doc.setTextColor(100, 116, 139);
+        doc.text(`Periodo Analizado: ${fromVal || 'Inicio'} al ${toVal || 'Actualidad'} | Total evaluado: ${this.advanceFilteredData.length} registros`, 14, 26);
+
+        let head = [];
+        let body = [];
+
+        if (isOrders) {
+          head = [["Folio", "Recinto", "Especialidad", "Prioridad", "Técnico Asignado", "Estado", "Tiempo de Atención"]];
+          body = this.advanceFilteredData.map(o => {
+            const start = new Date(o.fechaCreacion || Date.now());
+            const end = o.fechaTermino ? new Date(o.fechaTermino) : new Date();
+            const hrs = Math.max(0, (end - start) / 3600000);
+            const days = Math.floor(hrs / 24);
+            const tText = days > 0 ? `${days}d ${Math.floor(hrs%24)}h` : `${Math.floor(hrs)}h`;
+            return [o.folio, o.recinto, o.especialidad, o.prioridad, o.encargado || 'No asignado', o.estado, tText];
+          });
+        } else {
+          head = [["Código", "Tipología", "Requerimiento / Asunto", "Unidad Solicitante", "Piso", "PMA", "Fase"]];
+          body = this.advanceFilteredData.map(p => [
+            p.codigo || 'PROY-' + p.id, p.tipologia || 'PROYECTO', (p.requerimiento || p.descripcion || '').substring(0, 50),
+            p.unidad || '-', p.piso || '-', p.pma || '-', p.estado
+          ]);
+        }
+
+        doc.autoTable({
+          head: head,
+          body: body,
+          startY: 30,
+          theme: 'striped',
+          styles: { fontSize: 8, cellPadding: 2.5 },
+          headStyles: { fillColor: [15, 23, 42], textColor: [255, 255, 255] }
+        });
+
+        doc.save(`Informe_Avance_HBQP_${this.targetModule}_${Date.now()}.pdf`);
+        this.showToast('Informe de avance descargado en PDF', '📄');
+      }
+
+      // ==========================================================
+      // SECCIÓN 3: EXPORTACIÓN MULTI-FORMATO
+      // ==========================================================
       updateFilterDropdowns() {
+        const isOrders = this.targetModule === 'orders';
         const selState = document.getElementById('filterState');
         const selCategory = document.getElementById('filterCategory');
         const selAssignee = document.getElementById('filterAssignee');
-        const lblState = document.getElementById('lblFilterState');
-        const lblCategory = document.getElementById('lblFilterCategory');
-        const lblAssignee = document.getElementById('lblFilterAssignee');
 
-        if (this.targetModule === 'orders') {
-          lblState.textContent = "Estado de la OT:";
+        if (!selState) return;
+
+        if (isOrders) {
+          document.getElementById('lblFilterState').textContent = 'Estado de la OT:';
           selState.innerHTML = `
             <option value="ALL">Todos los Estados</option>
             <option value="Pendiente">Pendiente (En Curso)</option>
             <option value="En Ejecución">En Ejecución</option>
-            <option value="Solicitud Cierre">Solicitud Cierre (En Revisión)</option>
-            <option value="Terminada">Terminada (Cerrada)</option>
+            <option value="Solicitud Cierre">Solicitud Cierre</option>
+            <option value="Terminada">Terminada</option>
           `;
-
-          lblCategory.textContent = "Especialidad Técnica:";
+          document.getElementById('lblFilterCategory').textContent = 'Especialidad:';
           selCategory.innerHTML = `
             <option value="ALL">Todas las Especialidades</option>
             <option value="Infraestructura">Infraestructura</option>
@@ -323,13 +1165,11 @@
             <option value="Equipos Industriales">Equipos Industriales</option>
             <option value="Equipos Clinicos">Equipos Clínicos</option>
           `;
-
-          lblAssignee.textContent = "Técnico Asignado:";
+          document.getElementById('lblFilterAssignee').textContent = 'Técnico Asignado:';
           const techs = Array.from(new Set(this.orders.map(o => o.encargado).filter(Boolean)));
           selAssignee.innerHTML = `<option value="ALL">Todos los Técnicos</option>` + techs.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('');
-
-        } else if (this.targetModule === 'projects') {
-          lblState.textContent = "Fase del Proyecto:";
+        } else {
+          document.getElementById('lblFilterState').textContent = 'Fase del Proyecto:';
           selState.innerHTML = `
             <option value="ALL">Todas las Fases</option>
             <option value="PENDIENTE">En Evaluación / Pendiente</option>
@@ -337,41 +1177,30 @@
             <option value="EN PROCESO">En Obras / Ejecución</option>
             <option value="TERMINADO">Concluido / Entregado</option>
           `;
-
-          lblCategory.textContent = "Tipología del Proyecto:";
+          document.getElementById('lblFilterCategory').textContent = 'Tipología:';
           selCategory.innerHTML = `
             <option value="ALL">Todas las Tipologías</option>
             <option value="PROYECTO">Proyecto</option>
             <option value="REPARACION">Reparación</option>
             <option value="APOYO TECNICO">Apoyo Técnico</option>
           `;
-
-          lblAssignee.textContent = "Unidad Solicitante:";
+          document.getElementById('lblFilterAssignee').textContent = 'Unidad Solicitante:';
           const units = Array.from(new Set(this.projects.map(p => p.unidad).filter(Boolean)));
           selAssignee.innerHTML = `<option value="ALL">Todas las Unidades</option>` + units.map(u => `<option value="${escapeHtml(u)}">${escapeHtml(u)}</option>`).join('');
-
-        } else {
-          // Consolidado
-          lblState.textContent = "Filtro General Estado:";
-          selState.innerHTML = `<option value="ALL">Todos los Registros</option>`;
-          lblCategory.textContent = "Tipo de Registro:";
-          selCategory.innerHTML = `<option value="ALL">Proyectos y OTs</option>`;
-          lblAssignee.textContent = "Filtro General:";
-          selAssignee.innerHTML = `<option value="ALL">Sin Filtro Adicional</option>`;
         }
       }
 
-      resetFilters() {
+      resetExportFilters() {
         document.getElementById('filterDateFrom').value = '';
         document.getElementById('filterDateTo').value = '';
         document.getElementById('filterKeyword').value = '';
         document.getElementById('filterState').value = 'ALL';
         document.getElementById('filterCategory').value = 'ALL';
         document.getElementById('filterAssignee').value = 'ALL';
-        this.applyFilters();
+        this.applyExportFilters();
       }
 
-      applyFilters() {
+      applyExportFilters() {
         const fromVal = document.getElementById('filterDateFrom').value;
         const toVal = document.getElementById('filterDateTo').value;
         const stateVal = document.getElementById('filterState').value;
@@ -383,7 +1212,7 @@
         const toDate = toVal ? new Date(toVal + 'T23:59:59') : null;
 
         if (this.targetModule === 'orders') {
-          this.filteredData = this.orders.filter(o => {
+          this.filteredExportData = this.orders.filter(o => {
             const dateRef = new Date(o.fechaCreacion || Date.now());
             const matchFrom = !fromDate || dateRef >= fromDate;
             const matchTo = !toDate || dateRef <= toDate;
@@ -393,8 +1222,8 @@
             const matchQ = !q || o.folio?.toLowerCase().includes(q) || o.recinto?.toLowerCase().includes(q) || o.ticket?.toLowerCase().includes(q) || o.solicitante?.toLowerCase().includes(q) || o.descripcion?.toLowerCase().includes(q);
             return matchFrom && matchTo && matchState && matchCat && matchAss && matchQ;
           });
-        } else if (this.targetModule === 'projects') {
-          this.filteredData = this.projects.filter(p => {
+        } else {
+          this.filteredExportData = this.projects.filter(p => {
             const dateRef = p.fecha_ingreso ? new Date(p.fecha_ingreso) : null;
             const matchFrom = !fromDate || (dateRef && dateRef >= fromDate);
             const matchTo = !toDate || (dateRef && dateRef <= toDate);
@@ -404,18 +1233,9 @@
             const matchQ = !q || p.codigo?.toLowerCase().includes(q) || p.requerimiento?.toLowerCase().includes(q) || p.pma?.toLowerCase().includes(q) || p.unidad?.toLowerCase().includes(q);
             return matchFrom && matchTo && matchState && matchCat && matchAss && matchQ;
           });
-        } else {
-          // Consolidado
-          const ords = this.orders.map(o => ({ _type: 'OT', ...o }));
-          const projs = this.projects.map(p => ({ _type: 'PROYECTO', ...p }));
-          this.filteredData = [...projs, ...ords].filter(item => {
-            if (!q) return true;
-            return JSON.stringify(item).toLowerCase().includes(q);
-          });
         }
 
-        document.getElementById('badgeCurrentCount').textContent = `${this.filteredData.length} registros`;
-        document.getElementById('statExportCount').textContent = this.filteredData.length;
+        document.getElementById('statExportCount').textContent = this.filteredExportData.length;
         this.renderPreviewTable();
       }
 
@@ -423,88 +1243,66 @@
         const c = document.getElementById('previewTableContainer');
         if (!c) return;
 
-        if (this.filteredData.length === 0) {
-          c.innerHTML = `<div class="p-8 text-center text-slate-400 font-medium text-xs">No hay datos que coincidan con los filtros aplicados.</div>`;
+        if (this.filteredExportData.length === 0) {
+          c.innerHTML = `<div class="p-8 text-center text-slate-400 font-medium text-xs">No hay registros que coincidan con los filtros.</div>`;
           return;
         }
 
         if (this.targetModule === 'orders') {
           c.innerHTML = `
-            <table class="w-full text-left text-xs min-w-[750px]">
+            <table class="w-full text-left text-xs min-w-[720px]">
               <thead class="bg-slate-100 text-slate-700 font-bold border-b whitespace-nowrap">
                 <tr>
                   <th class="p-2.5">Folio</th>
                   <th class="p-2.5">Recinto</th>
+                  <th class="p-2.5">Servicio</th>
                   <th class="p-2.5">Especialidad</th>
                   <th class="p-2.5">Prioridad</th>
                   <th class="p-2.5">Técnico</th>
                   <th class="p-2.5">Estado</th>
-                  <th class="p-2.5">Fecha Creación</th>
                   <th class="p-2.5">Descripción</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-100">
-                ${this.filteredData.slice(0, 50).map(o => `
+                ${this.filteredExportData.slice(0, 50).map(o => `
                   <tr class="hover:bg-slate-50">
                     <td class="p-2.5 font-bold text-blue-700 whitespace-nowrap">${escapeHtml(o.folio)}</td>
                     <td class="p-2.5 whitespace-nowrap font-medium">${escapeHtml(o.recinto)}</td>
+                    <td class="p-2.5 whitespace-nowrap text-slate-600">${escapeHtml(o.servicio || '-')}</td>
                     <td class="p-2.5 whitespace-nowrap">${escapeHtml(o.especialidad)}</td>
                     <td class="p-2.5 whitespace-nowrap">${escapeHtml(o.prioridad)}</td>
                     <td class="p-2.5 whitespace-nowrap text-slate-600">${escapeHtml(o.encargado || 'No asignado')}</td>
                     <td class="p-2.5 whitespace-nowrap"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100">${escapeHtml(o.estado)}</span></td>
-                    <td class="p-2.5 whitespace-nowrap text-slate-500">${o.fechaCreacion ? new Date(o.fechaCreacion).toLocaleDateString() : '-'}</td>
                     <td class="p-2.5 max-w-xs truncate text-slate-600">${escapeHtml(o.descripcion)}</td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
-            ${this.filteredData.length > 50 ? `<p class="p-2 text-center text-slate-400 text-[11px]">Mostrando primeras 50 filas en vista previa (se exportarán las ${this.filteredData.length} filas)</p>` : ''}
-          `;
-        } else if (this.targetModule === 'projects') {
-          c.innerHTML = `
-            <table class="w-full text-left text-xs min-w-[750px]">
-              <thead class="bg-slate-100 text-slate-700 font-bold border-b whitespace-nowrap">
-                <tr>
-                  <th class="p-2.5">Código</th>
-                  <th class="p-2.5">Tipología</th>
-                  <th class="p-2.5">Requerimiento</th>
-                  <th class="p-2.5">Unidad</th>
-                  <th class="p-2.5">Piso/Ubicación</th>
-                  <th class="p-2.5">PMA</th>
-                  <th class="p-2.5">Estado</th>
-                  <th class="p-2.5">Hito Pendiente</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-slate-100">
-                ${this.filteredData.slice(0, 50).map(p => `
-                  <tr class="hover:bg-slate-50">
-                    <td class="p-2.5 font-bold text-indigo-700 whitespace-nowrap">${escapeHtml(p.codigo || 'PROY-' + p.id)}</td>
-                    <td class="p-2.5 whitespace-nowrap">${escapeHtml(p.tipologia || '')}</td>
-                    <td class="p-2.5 max-w-xs truncate font-medium">${escapeHtml(p.requerimiento || p.descripcion)}</td>
-                    <td class="p-2.5 whitespace-nowrap text-slate-600">${escapeHtml(p.unidad || '-')}</td>
-                    <td class="p-2.5 whitespace-nowrap">Piso ${escapeHtml(p.piso || '-')} ${p.ubicacion ? '· ' + escapeHtml(p.ubicacion) : ''}</td>
-                    <td class="p-2.5 font-mono whitespace-nowrap">${escapeHtml(p.pma || '-')}</td>
-                    <td class="p-2.5 whitespace-nowrap"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100">${escapeHtml(p.estado)}</span></td>
-                    <td class="p-2.5 max-w-xs truncate text-amber-700 font-bold">${escapeHtml(p.pendiente || '-')}</td>
                   </tr>
                 `).join('')}
               </tbody>
             </table>
           `;
         } else {
-          // Consolidado
           c.innerHTML = `
-            <table class="w-full text-left text-xs min-w-[750px]">
+            <table class="w-full text-left text-xs min-w-[720px]">
               <thead class="bg-slate-100 text-slate-700 font-bold border-b whitespace-nowrap">
-                <tr><th class="p-2.5">Módulo</th><th class="p-2.5">ID / Folio</th><th class="p-2.5">Título / Requerimiento</th><th class="p-2.5">Estado</th></tr>
+                <tr>
+                  <th class="p-2.5">Código</th>
+                  <th class="p-2.5">Tipología</th>
+                  <th class="p-2.5">Requerimiento</th>
+                  <th class="p-2.5">Unidad</th>
+                  <th class="p-2.5">Piso / Recinto</th>
+                  <th class="p-2.5">Estado</th>
+                  <th class="p-2.5">Hito Pendiente</th>
+                </tr>
               </thead>
               <tbody class="divide-y divide-slate-100">
-                ${this.filteredData.slice(0, 50).map(item => `
+                ${this.filteredExportData.slice(0, 50).map(p => `
                   <tr class="hover:bg-slate-50">
-                    <td class="p-2.5 font-bold"><span class="px-2 py-0.5 rounded text-[10px] ${item._type === 'OT' ? 'bg-blue-100 text-blue-800' : 'bg-indigo-100 text-indigo-800'}">${item._type}</span></td>
-                    <td class="p-2.5 font-bold">${escapeHtml(item.folio || item.codigo)}</td>
-                    <td class="p-2.5 max-w-md truncate">${escapeHtml(item.recinto || item.requerimiento || item.descripcion)}</td>
-                    <td class="p-2.5">${escapeHtml(item.estado)}</td>
+                    <td class="p-2.5 font-bold text-indigo-700 whitespace-nowrap">${escapeHtml(p.codigo || 'PROY-' + p.id)}</td>
+                    <td class="p-2.5 whitespace-nowrap">${escapeHtml(p.tipologia || '')}</td>
+                    <td class="p-2.5 max-w-xs truncate font-medium">${escapeHtml(p.requerimiento || p.descripcion)}</td>
+                    <td class="p-2.5 whitespace-nowrap text-slate-600">${escapeHtml(p.unidad || '-')}</td>
+                    <td class="p-2.5 whitespace-nowrap">Piso ${escapeHtml(p.piso || '-')}</td>
+                    <td class="p-2.5 whitespace-nowrap"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100">${escapeHtml(p.estado)}</span></td>
+                    <td class="p-2.5 max-w-xs truncate text-amber-700 font-bold">${escapeHtml(p.pendiente || '-')}</td>
                   </tr>
                 `).join('')}
               </tbody>
@@ -513,20 +1311,21 @@
         }
       }
 
-      // EXPORTACIÓN A EXCEL NATIVO (.xlsx)
       exportToExcelXlsx() {
-        if (!window.XLSX || this.filteredData.length === 0) {
+        if (!window.XLSX || this.filteredExportData.length === 0) {
           this.showToast('No hay datos para exportar', '⚠️');
           return;
         }
 
+        const isOrders = this.targetModule === 'orders';
         let sheetData = [];
         let filename = `HBQP_${this.targetModule}_${new Date().toISOString().split('T')[0]}.xlsx`;
 
-        if (this.targetModule === 'orders') {
-          sheetData = this.filteredData.map(o => ({
+        if (isOrders) {
+          sheetData = this.filteredExportData.map(o => ({
             "Folio": o.folio,
             "Recinto": o.recinto,
+            "Servicio": o.servicio || '',
             "PMA": o.ticket || 'N/A',
             "Especialidad": o.especialidad,
             "Prioridad": o.prioridad,
@@ -539,8 +1338,8 @@
             "Instrucciones Jefatura": o.instrucciones || '',
             "Diagnóstico / Solución": o.diagnostico || ''
           }));
-        } else if (this.targetModule === 'projects') {
-          sheetData = this.filteredData.map(p => ({
+        } else {
+          sheetData = this.filteredExportData.map(p => ({
             "Código": p.codigo,
             "N° Ticket": p.ticket || '',
             "Tipología": p.tipologia || 'PROYECTO',
@@ -553,17 +1352,8 @@
             "Código PMA": p.pma || '',
             "Estado / Fase": p.estado,
             "Fecha Ingreso": p.fecha_ingreso || '',
-            "Última Actualización": p.fecha_actualizacion || '',
             "Hito Pendiente": p.pendiente || '',
             "Especificaciones": p.descripcion || ''
-          }));
-        } else {
-          sheetData = this.filteredData.map(item => ({
-            "Tipo": item._type,
-            "Identificador": item.folio || item.codigo,
-            "Detalle": item.recinto || item.requerimiento || item.descripcion,
-            "Estado": item.estado,
-            "Prioridad": item.prioridad || ''
           }));
         }
 
@@ -572,34 +1362,35 @@
         XLSX.utils.book_append_sheet(wb, ws, "Datos_HBQP");
         XLSX.writeFile(wb, filename);
 
-        this.showToast('Archivo Excel descargado con éxito', '📊');
+        this.showToast('Archivo Excel (.xlsx) descargado', '📊');
       }
 
-      // EXPORTACIÓN A CSV UTF-8 CON BOM
       exportToCSV() {
-        if (this.filteredData.length === 0) {
+        if (this.filteredExportData.length === 0) {
           this.showToast('No hay datos para exportar', '⚠️');
           return;
         }
 
-        let headers = [];
-        let rows = [];
-
+        const isOrders = this.targetModule === 'orders';
         const escapeCSV = (str) => {
           if (str === null || str === undefined) return '""';
           return `"${String(str).replace(/"/g, '""')}"`;
         };
 
-        if (this.targetModule === 'orders') {
-          headers = ['Folio', 'Recinto', 'PMA', 'Especialidad', 'Prioridad', 'Solicitante', 'Técnico Asignado', 'Estado', 'Fecha Creación', 'Fecha Término', 'Descripción', 'Instrucciones', 'Diagnóstico'];
-          rows = this.filteredData.map(o => [
-            o.folio, o.recinto, o.ticket || 'N/A', o.especialidad, o.prioridad, o.solicitante, o.encargado || 'No asignado',
+        let headers = [];
+        let rows = [];
+
+        if (isOrders) {
+          headers = ['Folio', 'Recinto', 'Servicio', 'PMA', 'Especialidad', 'Prioridad', 'Solicitante', 'Técnico Asignado', 'Estado', 'Fecha Creación', 'Fecha Inicio Ejecución', 'Fecha Término', 'Descripción', 'Instrucciones', 'Diagnóstico'];
+          rows = this.filteredExportData.map(o => [
+            o.folio, o.recinto, o.servicio || '', o.ticket || 'N/A', o.especialidad, o.prioridad, o.solicitante, o.encargado || 'No asignado',
+            o.estado, o.fechaCreacion ? new Date(o.fechaCreacion).toLocaleString() : '', o.fechaEjecucion ? new Date(o.fechaEjecucion).toLocaleString() : '', o.fechaTermino ? new Date(o.fechaTermino).toLocaleString() : '',
             o.estado, o.fechaCreacion ? new Date(o.fechaCreacion).toLocaleString() : '', o.fechaTermino ? new Date(o.fechaTermino).toLocaleString() : '',
             o.descripcion, o.instrucciones, o.diagnostico
           ].map(escapeCSV).join(';'));
         } else {
           headers = ['Código', 'Ticket', 'Tipología', 'Prioridad', 'Requerimiento', 'Unidad Solicitante', 'Piso', 'Recinto', 'PMA', 'Estado', 'Hito Pendiente'];
-          rows = this.filteredData.map(p => [
+          rows = this.filteredExportData.map(p => [
             p.codigo, p.ticket || '', p.tipologia || '', p.prioridad || '', p.requerimiento || p.descripcion,
             p.unidad || '', p.piso || '', p.ubicacion || '', p.pma || '', p.estado, p.pendiente || ''
           ].map(escapeCSV).join(';'));
@@ -618,39 +1409,38 @@
         this.showToast('Archivo CSV descargado', '📊');
       }
 
-      // EXPORTACIÓN A PDF EJECUTIVO CON MEMBRETE
       exportToPDF() {
-        if (!window.jspdf || this.filteredData.length === 0) {
+        if (!window.jspdf || this.filteredExportData.length === 0) {
           this.showToast('No hay datos para exportar a PDF', '⚠️');
           return;
         }
 
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('landscape');
+        const isOrders = this.targetModule === 'orders';
 
-        // Membrete
         doc.setFontSize(14);
         doc.setTextColor(15, 23, 42);
-        doc.text(`HOSPITAL BIPROVINCIAL QUILLOTA PETORCA (HBQP)`, 14, 15);
+        doc.text('HOSPITAL BIPROVINCIAL QUILLOTA PETORCA (HBQP)', 14, 15);
         doc.setFontSize(11);
         doc.setTextColor(79, 70, 229);
-        doc.text(`INFORME OFICIAL - ${this.targetModule === 'orders' ? 'ÓRDENES DE TRABAJO (OTs)' : 'CATÁLOGO DE PROYECTOS'}`, 14, 21);
+        doc.text(`REPORTE DE REGISTROS - ${isOrders ? 'ÓRDENES DE TRABAJO' : 'PROYECTOS'}`, 14, 21);
         doc.setFontSize(8);
         doc.setTextColor(100, 116, 139);
-        doc.text(`Generado el: ${new Date().toLocaleString()} | Registros filtrados: ${this.filteredData.length}`, 14, 26);
+        doc.text(`Generado: ${new Date().toLocaleString()} | Total: ${this.filteredExportData.length} registros`, 14, 26);
 
         let head = [];
         let body = [];
 
-        if (this.targetModule === 'orders') {
-          head = [["Folio", "Recinto", "Especialidad", "Prioridad", "Técnico", "Estado", "Fecha"]];
-          body = this.filteredData.map(o => [
+        if (isOrders) {
+          head = [["Folio", "Recinto", "Especialidad", "Prioridad", "Técnico", "Estado", "Fecha Creación"]];
+          body = this.filteredExportData.map(o => [
             o.folio, o.recinto, o.especialidad, o.prioridad, o.encargado || 'No asignado', o.estado,
             o.fechaCreacion ? new Date(o.fechaCreacion).toLocaleDateString() : ''
           ]);
         } else {
           head = [["Código", "Tipología", "Requerimiento", "Unidad Solicitante", "Piso", "PMA", "Fase"]];
-          body = this.filteredData.map(p => [
+          body = this.filteredExportData.map(p => [
             p.codigo || 'PROY-' + p.id, p.tipologia || 'PROYECTO', (p.requerimiento || p.descripcion || '').substring(0, 50),
             p.unidad || '-', p.piso || '-', p.pma || '-', p.estado
           ]);
@@ -661,30 +1451,30 @@
           body: body,
           startY: 30,
           theme: 'striped',
-          styles: { fontSize: 8, cellPadding: 2 },
+          styles: { fontSize: 8, cellPadding: 2.5 },
           headStyles: { fillColor: [15, 23, 42], textColor: [255, 255, 255] }
         });
 
-        doc.save(`Informe_HBQP_${this.targetModule}_${Date.now()}.pdf`);
-        this.showToast('Informe PDF generado', '📄');
+        doc.save(`Registros_HBQP_${this.targetModule}_${Date.now()}.pdf`);
+        this.showToast('Documento PDF generado', '📄');
       }
 
-      // COPIAR AL PORTAPAPELES (TAB-SEPARATED PARA EXCEL)
       copyTableToClipboard() {
-        if (this.filteredData.length === 0) {
+        if (this.filteredExportData.length === 0) {
           this.showToast('No hay datos para copiar', '⚠️');
           return;
         }
 
+        const isOrders = this.targetModule === 'orders';
         let headers = [];
         let rows = [];
 
-        if (this.targetModule === 'orders') {
+        if (isOrders) {
           headers = ['Folio', 'Recinto', 'Especialidad', 'Prioridad', 'Técnico', 'Estado', 'Descripción'];
-          rows = this.filteredData.map(o => [o.folio, o.recinto, o.especialidad, o.prioridad, o.encargado || '', o.estado, o.descripcion].join('\t'));
+          rows = this.filteredExportData.map(o => [o.folio, o.recinto, o.especialidad, o.prioridad, o.encargado || '', o.estado, o.descripcion].join('\t'));
         } else {
           headers = ['Código', 'Tipología', 'Requerimiento', 'Unidad', 'Piso', 'PMA', 'Estado', 'Hito Pendiente'];
-          rows = this.filteredData.map(p => [p.codigo, p.tipologia, p.requerimiento, p.unidad, p.piso, p.pma, p.estado, p.pendiente].join('\t'));
+          rows = this.filteredExportData.map(p => [p.codigo, p.tipologia, p.requerimiento, p.unidad, p.piso, p.pma, p.estado, p.pendiente].join('\t'));
         }
 
         const tsv = headers.join('\t') + '\n' + rows.join('\n');
@@ -707,7 +1497,7 @@
     }
 
     window.addEventListener('DOMContentLoaded', () => {
-      window.exporter = new StandaloneExportCenter();
+      window.exporter = new StandaloneReportCenter();
     });
   </script>
 </body>
