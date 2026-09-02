@@ -504,23 +504,27 @@
         </div>
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label for="newOtRecinto" class="block text-xs font-bold text-slate-600 mb-1">Recinto / Servicio</label>
-            <input type="text" id="newOtRecinto" required placeholder="Ej: Pabellón 3" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium">
+            <label for="newOtRecinto" class="block text-xs font-bold text-slate-600 mb-1">Recinto</label>
+            <input type="text" id="newOtRecinto" required placeholder="Ej: Box 3, Terraza..." class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium">
           </div>
           <div>
-            <label for="newOtTicket" class="block text-xs font-bold text-slate-600 mb-1">PMA</label>
-            <input type="text" id="newOtTicket" placeholder="Ej: PMA-8941" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium">
+            <label for="newOtServicio" class="block text-xs font-bold text-slate-600 mb-1">Servicio / Unidad</label>
+            <input type="text" id="newOtServicio" placeholder="Ej: Medicina Física, Urgencia..." class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium">
           </div>
         </div>
         <div class="grid grid-cols-2 gap-2">
           <div>
+            <label for="newOtTicket" class="block text-xs font-bold text-slate-600 mb-1">PMA</label>
+            <input type="text" id="newOtTicket" placeholder="Ej: PMA-8941" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium">
+          </div>
+          <div>
             <label for="newOtSolicitante" class="block text-xs font-bold text-slate-600 mb-1">Solicitante</label>
             <input type="text" id="newOtSolicitante" required placeholder="Nombre o cargo" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium">
           </div>
-          <div>
-            <label for="newOtEncargado" class="block text-xs font-bold text-slate-600 mb-1">Técnico Asignado</label>
-            <select id="newOtEncargado" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium dynamic-tech-select"></select>
-          </div>
+        </div>
+        <div>
+          <label for="newOtEncargado" class="block text-xs font-bold text-slate-600 mb-1">Técnico Asignado</label>
+          <select id="newOtEncargado" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium dynamic-tech-select"></select>
         </div>
         <div>
           <label for="newOtDescripcion" class="block text-xs font-bold text-slate-600 mb-1">Descripción del Trabajo</label>
@@ -637,14 +641,18 @@
               </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 uov-editable">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 uov-editable">
               <div>
-                <label class="block text-xs font-bold text-slate-600 mb-1">Recinto / Servicio</label>
-                <input type="text" id="uovRecinto" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium">
+                <label class="block text-xs font-bold text-slate-600 mb-1">Recinto</label>
+                <input type="text" id="uovRecinto" placeholder="Ej: Box 3, Terraza, Bodega..." class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Servicio / Unidad</label>
+                <input type="text" id="uovServicio" placeholder="Ej: Medicina Física, Urgencia..." class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium">
               </div>
               <div>
                 <label class="block text-xs font-bold text-slate-600 mb-1">PMA recinto</label>
-                <input type="text" id="uovTicket" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium">
+                <input type="text" id="uovTicket" placeholder="Ej: D-3-40" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium">
               </div>
             </div>
 
@@ -1944,12 +1952,14 @@
 
         const inSrc = document.getElementById('newOtSourceProjectId');
         const inRec = document.getElementById('newOtRecinto');
+        const inServ = document.getElementById('newOtServicio');
         const inTick = document.getElementById('newOtTicket');
         const inSol = document.getElementById('newOtSolicitante');
         const inDesc = document.getElementById('newOtDescripcion');
 
         if (inSrc) inSrc.value = p.id;
-        if (inRec) inRec.value = 'Piso ' + (p.piso || '-') + ' - ' + (p.ubicacion || p.unidad);
+        if (inRec) inRec.value = p.ubicacion || (p.piso ? `Piso ${p.piso}` : '');
+        if (inServ) inServ.value = p.unidad || '';
         if (inTick) inTick.value = p.pma || p.ticket || p.codigo;
         if (inSol) inSol.value = p.solicitante || p.unidad || 'Subdirección de Operaciones';
         if (inDesc) inDesc.value = '[' + p.codigo + '] ' + p.requerimiento + '\n\n' + (p.descripcion || '');
@@ -2008,20 +2018,27 @@
       }
 
       calculateElapsedTimeInfo(order) {
-        const created = new Date(order.fechaCreacion || Date.now());
-        const endRef = order.fechaTermino ? new Date(order.fechaTermino) : new Date();
-        const elapsedMs = Math.max(0, endRef - created);
+        if (!order || order.estado === 'Pendiente' || !order.fechaEjecucion) {
+          return { elapsedString: "0h", textClass: "text-slate-400 font-medium", isPending: true };
+        }
+
+        const startRef = new Date(order.fechaEjecucion);
+        const endRef = (order.estado === 'Terminada' || order.estado === 'Solicitud Cierre') && order.fechaTermino 
+          ? new Date(order.fechaTermino) 
+          : new Date();
+
+        const elapsedMs = Math.max(0, endRef - startRef);
         const elapsedHours = elapsedMs / 3600000;
         const elapsedDays = Math.floor(elapsedHours / 24);
         const remHours = Math.floor(elapsedHours % 24);
 
         const elapsedString = elapsedDays > 0 ? `${elapsedDays}d ${remHours}h` : `${remHours}h`;
         
-        let colorClass = "text-slate-700";
+        let colorClass = "text-slate-700 font-bold";
         if (elapsedDays >= 5) colorClass = "text-rose-700 font-bold";
         else if (elapsedDays >= 2) colorClass = "text-amber-700 font-bold";
 
-        return { elapsedString, textClass: colorClass };
+        return { elapsedString, textClass: colorClass, isPending: false };
       }
 
       updateTimeElapsedElements() { this.renderOrdersList(); }
@@ -2118,7 +2135,7 @@
                 <span class="font-black text-xs flex items-center">${escapeHtml(o.folio)} ${unreadBadge}</span>
                 <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${bg}">${escapeHtml(o.estado)}</span>
               </div>
-              <h4 class="font-bold text-sm truncate">${escapeHtml(o.recinto)}</h4>
+              <h4 class="font-bold text-sm truncate text-slate-900">${escapeHtml(o.recinto || '')}${o.servicio ? ' · <span class="text-slate-500 font-semibold">' + escapeHtml(o.servicio) + '</span>' : ''}</h4>
               <p class="text-[11px] text-slate-500 font-medium truncate mb-1">PMA: ${escapeHtml(o.ticket)} • Prioridad: ${emojis[o.prioridad]||''} ${escapeHtml(o.prioridad)}</p>
               <p class="text-[11px] text-slate-600 leading-tight line-clamp-2">${escapeHtml(o.descripcion)}</p>
               <div class="mt-2 bg-slate-50 p-2 rounded-lg border border-slate-100">
@@ -2144,7 +2161,7 @@
         return `
           <tr class="hover:bg-slate-50 cursor-pointer" onclick="window.app.openOperativeView('${o.id}')">
             <td class="p-3 font-black text-indigo-900 whitespace-nowrap sticky left-0 bg-white shadow-[1px_0_0_#e2e8f0]">${escapeHtml(o.folio)} ${unreadBadge}</td>
-            <td class="p-3"><span class="font-bold block">${escapeHtml(o.recinto)}</span><span class="text-[10px] text-slate-400">PMA: ${escapeHtml(o.ticket)}</span></td>
+            <td class="p-3"><span class="font-bold block text-slate-900">${escapeHtml(o.recinto || '')}</span><span class="text-[11px] text-slate-500 font-medium">${escapeHtml(o.servicio || '')}</span><span class="text-[10px] text-slate-400 block">PMA: ${escapeHtml(o.ticket)}</span></td>
             <td class="p-3">
                <div class="mb-0.5"><span class="text-[10px] font-bold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">${emojis[o.prioridad]||''} ${escapeHtml(o.prioridad)}</span></div>
                <div class="text-[11px] text-slate-600 truncate max-w-[150px] sm:max-w-[200px] lg:max-w-[280px]" title="${escapeHtml(o.descripcion)}">${escapeHtml(o.descripcion)}</div>
@@ -2213,6 +2230,7 @@
           especialidad: document.getElementById('newOtEspecialidad').value,
           prioridad: document.getElementById('newOtPrioridad').value,
           recinto: document.getElementById('newOtRecinto').value.trim(),
+          servicio: (document.getElementById('newOtServicio')?.value || '').trim(),
           ticket: document.getElementById('newOtTicket').value.trim() || 'N/A',
           solicitante: document.getElementById('newOtSolicitante').value.trim(),
           encargado: document.getElementById('newOtEncargado').value,
@@ -2220,6 +2238,7 @@
           instrucciones: document.getElementById('newOtInstrucciones').value.trim(),
           estado: 'Pendiente', 
           fechaCreacion: nowIso, 
+          fechaEjecucion: null, // En modo pendiente no contabiliza tiempo
           fechaUltimoEstado: nowIso,
           fechaTermino: null, 
           solicitudes_terreno: []
@@ -2267,7 +2286,7 @@
 
         document.getElementById('uovId').value = o.id;
         document.getElementById('uovFolio').textContent = o.folio;
-        document.getElementById('uovRecintoHeader').textContent = o.recinto;
+        document.getElementById('uovRecintoHeader').textContent = (o.recinto || '') + (o.servicio ? ' · ' + o.servicio : '');
         document.getElementById('uovStatusBadge').textContent = o.estado;
         document.getElementById('uovStatusBadgeMobile').textContent = o.estado;
         
@@ -2276,13 +2295,16 @@
         
         document.getElementById('uovEspecialidad').value = o.especialidad;
         document.getElementById('uovPrioridad').value = o.prioridad;
-        document.getElementById('uovRecinto').value = o.recinto;
+        document.getElementById('uovRecinto').value = o.recinto || '';
+        if (document.getElementById('uovServicio')) document.getElementById('uovServicio').value = o.servicio || '';
         document.getElementById('uovTicket').value = o.ticket || '';
         document.getElementById('uovSolicitante').value = o.solicitante;
         document.getElementById('uovEncargado').value = o.encargado || '';
         document.getElementById('uovDescripcion').value = o.descripcion;
         document.getElementById('uovInstrucciones').value = o.instrucciones || '';
-        document.getElementById('uovFechaInicio').value = this.formatDateLocal(o.fechaCreacion);
+        
+        const dateToShow = o.fechaEjecucion || (o.estado === 'Pendiente' ? new Date().toISOString() : o.fechaCreacion);
+        document.getElementById('uovFechaInicio').value = this.formatDateLocal(dateToShow);
         
         const disableSec1 = !isSupervisor || isClosed || isReview;
         document.querySelectorAll('.uov-editable').forEach(el => {
@@ -2308,7 +2330,7 @@
         
         document.getElementById('uovEstado').value = o.estado;
         const timeInfo = this.calculateElapsedTimeInfo(o);
-        document.getElementById('uovElapsedText').textContent = timeInfo.elapsedString + " corridas";
+        document.getElementById('uovElapsedText').textContent = timeInfo.isPending ? '0h (Pendiente de inicio)' : timeInfo.elapsedString + " corridas";
         const dateRef = o.fechaUltimoEstado || o.fechaCreacion;
         document.getElementById('uovLastModText').textContent = new Date(dateRef).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' });
 
@@ -2425,30 +2447,59 @@
             o.especialidad = document.getElementById('uovEspecialidad').value;
             o.prioridad = document.getElementById('uovPrioridad').value;
             o.recinto = document.getElementById('uovRecinto').value.trim();
+            if (document.getElementById('uovServicio')) {
+              o.servicio = document.getElementById('uovServicio').value.trim();
+            }
             o.ticket = document.getElementById('uovTicket').value.trim();
             o.solicitante = document.getElementById('uovSolicitante').value.trim();
             o.encargado = document.getElementById('uovEncargado').value;
             o.descripcion = document.getElementById('uovDescripcion').value.trim();
             o.instrucciones = document.getElementById('uovInstrucciones').value.trim();
-            
-            const newDate = document.getElementById('uovFechaInicio').value;
-            if (newDate) {
-              const newIso = new Date(newDate).toISOString();
-              if (o.fechaCreacion !== newIso) {
-                this.logActivity(o, `Fecha de inicio modificada a: ${new Date(newDate).toLocaleString()}`);
-                o.fechaCreacion = newIso;
+          }
+          
+          const oldState = o.estado;
+          const newState = document.getElementById('uovEstado').value;
+          const inputFecha = document.getElementById('uovFechaInicio').value;
+
+          // Regla de estados y tiempos:
+          // 1. Si está o vuelve a 'Pendiente': NO se contabiliza tiempo, se resetea a cero!
+          if (newState === 'Pendiente') {
+            if (oldState !== 'Pendiente') {
+              this.logActivity(o, 'OT devuelta a estado Pendiente: tiempo de ejecución reiniciado a 0h');
+            }
+            o.fechaEjecucion = null;
+            o.fechaTermino = null;
+          } 
+          // 2. Si pasa a 'En Ejecución': inicia el tiempo desde la fecha indicada!
+          else if (newState === 'En Ejecución') {
+            if (oldState !== 'En Ejecución' || !o.fechaEjecucion) {
+              const startIso = inputFecha ? new Date(inputFecha).toISOString() : new Date().toISOString();
+              o.fechaEjecucion = startIso;
+              o.fechaTermino = null;
+              this.logActivity(o, `Inicio de ejecución registrado: ${new Date(startIso).toLocaleString()}`);
+            } else if (inputFecha) {
+              const editIso = new Date(inputFecha).toISOString();
+              if (o.fechaEjecucion !== editIso) {
+                o.fechaEjecucion = editIso;
+                this.logActivity(o, `Fecha de inicio de ejecución ajustada a: ${new Date(editIso).toLocaleString()}`);
               }
             }
           }
-          
-          const newState = document.getElementById('uovEstado').value;
-          if (o.estado !== newState) {
+          // 3. Solicitud de Cierre o Terminada
+          else if (newState === 'Solicitud Cierre' || newState === 'Terminada') {
+            if (!o.fechaEjecucion) {
+              o.fechaEjecucion = inputFecha ? new Date(inputFecha).toISOString() : (o.fechaCreacion || new Date().toISOString());
+            }
+            if (!o.fechaTermino) {
+              o.fechaTermino = new Date().toISOString();
+            }
+          }
+
+          if (oldState !== newState) {
             this.logActivity(o, `Estado actualizado a: ${newState}`);
-            o.fechaUltimoEstado = new Date().toISOString();
-            if (newState === 'Terminada' && !o.fechaTermino) o.fechaTermino = new Date().toISOString();
-            if (newState !== 'Terminada' && newState !== 'Solicitud Cierre') o.fechaTermino = null; 
           }
           o.estado = newState;
+          o.fechaUltimoEstado = new Date().toISOString();
           
           this.showToast('Cambios Guardados', '💾');
           this.syncOrderToCloud(o);
@@ -2462,14 +2513,17 @@
           if (isTechRequestClose) {
             o.estado = 'Solicitud Cierre';
             o.fechaUltimoEstado = new Date().toISOString();
+            if (!o.fechaEjecucion) o.fechaEjecucion = o.fechaCreacion || new Date().toISOString();
             if (!o.fechaTermino) o.fechaTermino = new Date().toISOString();
             this.logActivity(o, 'El técnico solicitó el cierre de la OT');
             this.showToast('Cierre solicitado a Jefatura', '⚡');
           } else {
             if (o.estado === 'Pendiente') {
               o.estado = 'En Ejecución';
+              // Al iniciar ejecución el técnico, comienza el cronómetro desde este momento
+              o.fechaEjecucion = new Date().toISOString();
               o.fechaUltimoEstado = new Date().toISOString();
-              this.logActivity(o, 'El técnico inició la ejecución (Pendiente -> En Ejecución)');
+              this.logActivity(o, 'El técnico inició la ejecución de trabajos (tiempo iniciado)');
             }
             this.showToast('Progreso guardado', '💾');
           }
