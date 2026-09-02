@@ -317,7 +317,7 @@
   <!-- Modal Auth (PIN Pad) -->
   <div id="authModal" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-xs rounded-2xl p-5 shadow-2xl border border-slate-200 text-center relative">
-      <button onclick="window.app.closeAuthModal()" class="absolute top-3 right-3 text-slate-400 hover:text-slate-700" aria-label="Cerrar">✕</button>
+      <button id="btnAuthModalClose" onclick="window.app.closeAuthModal()" class="absolute top-3 right-3 text-slate-400 hover:text-slate-700" aria-label="Cerrar">✕</button>
       <div id="authLogoContainer" class="w-12 h-12 mx-auto rounded-xl bg-slate-100 flex items-center justify-center mb-2 overflow-hidden border border-slate-200"><span class="text-2xl" aria-hidden="true">🏥</span></div>
       <h3 class="font-black text-lg text-slate-900">Acceso SDO Cloud</h3>
       <p class="text-xs text-slate-500 mb-4">Seleccione su rol e ingrese su PIN</p>
@@ -954,10 +954,11 @@
 
     class UnifiedPlatformApp {
       constructor() {
-        this.currentRole = 'supervisor';
+        this.currentRole = null;
         this.enteredPin = '';
         this.selectedAuthRole = 'supervisor';
         this.activeModule = 'projects';
+        this.pendingDeepLinkOtId = null;
 
         this.projects = [];
         this.orders = [];
@@ -998,11 +999,27 @@
 
         setInterval(() => this.updateTimeElapsedElements(), 60000);
 
+        // Capturar deep-link (?ot=ID o #ot=ID) desde link directo o WhatsApp
+        const params = new URLSearchParams(window.location.search);
+        let otId = params.get('ot');
+        if (!otId && window.location.hash.startsWith('#ot=')) {
+          otId = window.location.hash.replace('#ot=', '');
+        }
+        if (otId) {
+          this.pendingDeepLinkOtId = otId;
+        }
+
         const cachedRole = sessionStorage.getItem('sdo_active_role');
         if (cachedRole) {
           this.currentRole = cachedRole;
+          this.applyRoleRestrictions();
+          if (this.pendingDeepLinkOtId) {
+            this.checkDeepLink();
+          }
+        } else {
+          // Sin autenticación: Forzar ingreso de PIN obligatorio
+          this.openAuthModal();
         }
-        this.applyRoleRestrictions();
       }
 
       initScrollSpy() {
@@ -1213,7 +1230,6 @@
         this.updateKpis();
         this.renderOrdersList();
         this.renderProjects();
-        this.checkDeepLink();
       }
 
       updateUIWithConfig() {
@@ -1241,13 +1257,16 @@
       }
 
       checkDeepLink() {
-        const params = new URLSearchParams(window.location.search);
-        const otId = params.get('ot');
-        if (otId) {
+        if (!this.currentRole) return;
+        const targetId = this.pendingDeepLinkOtId;
+        if (targetId) {
           setTimeout(() => {
-            const target = this.orders.find(o => o.id === otId || o.folio === otId);
-            if (target && this.currentRole) this.openOperativeView(target.id);
-          }, 600);
+            const target = this.orders.find(o => o.id === targetId || o.folio === targetId);
+            if (target) {
+              this.openOperativeView(target.id);
+            }
+            this.pendingDeepLinkOtId = null;
+          }, 300);
         }
       }
 
@@ -1315,10 +1334,20 @@
       openAuthModal() {
         this.enteredPin = '';
         this.updatePinDots();
+        const closeBtn = document.getElementById('btnAuthModalClose');
+        if (closeBtn) {
+          closeBtn.classList.toggle('hidden', !this.currentRole);
+        }
         document.getElementById('authErrorMsg')?.classList.add('hidden');
         document.getElementById('authModal')?.classList.remove('hidden');
       }
-      closeAuthModal() { if (this.currentRole) document.getElementById('authModal')?.classList.add('hidden'); }
+      closeAuthModal() {
+        if (this.currentRole) {
+          document.getElementById('authModal')?.classList.add('hidden');
+        } else {
+          this.showToast('Debe ingresar su PIN para acceder', '🔒');
+        }
+      }
 
       selectAuthRole(role) {
         this.selectedAuthRole = role;
@@ -1359,6 +1388,11 @@
           this.applyRoleRestrictions();
           this.closeAuthModal();
           this.clearPin();
+          
+          // Si el usuario ingresó por link de WhatsApp o directo, abrir la OT inmediatamente tras validar PIN
+          if (this.pendingDeepLinkOtId) {
+            this.checkDeepLink();
+          }
         } else {
           document.getElementById('authErrorMsg')?.classList.remove('hidden');
           this.clearPin();
