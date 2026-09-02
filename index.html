@@ -3,322 +3,405 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-  <title>SDO Cloud HBQP - Proyectos & Órdenes de Trabajo</title>
+  <title>SDO Cloud - Sistema de Operaciones</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
-    * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
-    html, body { touch-action: manipulation; -webkit-text-size-adjust: 100%; }
-    input, textarea, select { font-size: 14px !important; touch-action: manipulation; }
-    .custom-scroll::-webkit-scrollbar { height: 4px; width: 4px; }
-    .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-    .custom-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-    @keyframes slideUpFade { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
-    .toast-anim { animation: slideUpFade 0.3s ease forwards; }
+    * {
+      -webkit-tap-highlight-color: transparent;
+      box-sizing: border-box;
+    }
+    html, body {
+      touch-action: manipulation;
+      -webkit-text-size-adjust: 100%;
+    }
+    input, textarea, select {
+      font-size: 16px !important;
+      touch-action: manipulation;
+    }
+    .custom-scroll::-webkit-scrollbar {
+      height: 4px;
+      width: 4px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    @keyframes slideUpFade {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .toast-anim {
+      animation: slideUpFade 0.3s ease forwards;
+    }
     @keyframes pulse-ring {
       0% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.7); }
       70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(225, 29, 72, 0); }
       100% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(225, 29, 72, 0); }
     }
-    .badge-pulse { animation: pulse-ring 2s infinite; }
-
-    :root {
-      --sdo-bg: #f8fafc; --sdo-surface: #ffffff; --sdo-surface-soft: #f1f5f9;
-      --sdo-ink: #0f172a; --sdo-muted: #64748b; --sdo-line: #e2e8f0;
-      --sdo-navy: #0f172a; --sdo-accent: #4f46e5; --sdo-blue: #2563eb;
-      --sdo-green: #059669; --sdo-amber: #d97706; --sdo-rose: #e11d48;
+    .badge-pulse {
+      animation: pulse-ring 2s infinite;
     }
+
+    /* ==========================================================
+       SDO CLOUD — UI MINIMAL 2026
+       ========================================================== */
+    :root {
+      --sdo-bg: #f5f7fb;
+      --sdo-surface: #ffffff;
+      --sdo-surface-soft: #f8fafc;
+      --sdo-ink: #0f172a;
+      --sdo-muted: #64748b;
+      --sdo-line: #e2e8f0;
+      --sdo-line-soft: #edf1f6;
+      --sdo-navy: #111827;
+      --sdo-navy-2: #172033;
+      --sdo-accent: #4f46e5;
+      --sdo-accent-soft: #eef2ff;
+      --sdo-blue: #2563eb;
+      --sdo-green: #059669;
+      --sdo-amber: #d97706;
+      --sdo-rose: #e11d48;
+      --sdo-radius: 16px;
+      --sdo-radius-sm: 11px;
+      --sdo-shadow: 0 1px 2px rgba(15,23,42,.035), 0 8px 24px rgba(15,23,42,.045);
+      --sdo-shadow-hover: 0 2px 4px rgba(15,23,42,.04), 0 14px 34px rgba(15,23,42,.075);
+    }
+
+    html { background: var(--sdo-bg); scroll-behavior: smooth; }
 
     body {
-      background: radial-gradient(circle at 85% -10%, rgba(79,70,229,.045), transparent 24rem), var(--sdo-bg) !important;
+      background:
+        radial-gradient(circle at 85% -10%, rgba(79,70,229,.055), transparent 28rem),
+        var(--sdo-bg) !important;
       color: var(--sdo-ink) !important;
       font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+      letter-spacing: -0.005em;
     }
 
-    /* Mobile-first Header */
-    .app-header {
-      background: rgba(15, 23, 42, 0.98) !important;
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border-bottom: 1px solid rgba(255,255,255,0.08);
+    /* Header */
+    body > header {
+      background: rgba(15, 23, 42, .97) !important;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      box-shadow: 0 4px 18px rgba(15,23,42,.12) !important;
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
     }
 
-    /* Kanban Columns */
-    .kanban-col-container {
-      min-height: calc(100vh - 300px);
-      background: #f1f5f9;
-      border: 1px solid #e2e8f0;
-      border-radius: 14px;
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
+    body > header > div {
+      max-width: 1180px !important;
+      min-height: 68px;
+      padding-top: 10px !important;
+      padding-bottom: 10px !important;
     }
-    .kanban-cards-wrapper {
-      min-height: 200px;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      padding: 3px;
-      border-radius: 10px;
-      transition: background-color 0.2s ease, border-color 0.2s ease;
-    }
-    .kanban-cards-wrapper.drag-over {
-      background-color: rgba(224, 242, 254, 0.85) !important;
-      border: 2px dashed #0284c7 !important;
-    }
-    .project-card {
-      background: #ffffff;
-      border: 1px solid var(--sdo-line);
-      border-radius: 12px;
-      padding: 13px;
-      box-shadow: 0 1px 3px rgba(15,23,42,.04);
-      cursor: grab;
-      transition: transform 0.16s ease, box-shadow 0.16s ease;
-    }
-    .project-card:hover { transform: translateY(-2px); border-color: #cbd5e1; box-shadow: 0 8px 20px rgba(15,23,42,.07); }
-    .project-card.dragging { opacity: 0.35; transform: scale(0.96); }
 
-    .badge-proyecto { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
-    .badge-reparacion { background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
-    .badge-apoyo { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+    #headerLogoContainer {
+      width: 42px !important;
+      height: 42px !important;
+      border-radius: 12px !important;
+      background: linear-gradient(145deg, rgba(99,102,241,.22), rgba(30,41,59,.85)) !important;
+      border-color: rgba(148,163,184,.18) !important;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+    }
 
+    #roleBadge {
+      background: #4f46e5 !important;
+      border-radius: 999px !important;
+      padding: 3px 8px !important;
+      font-size: 9px !important;
+      letter-spacing: .07em !important;
+      box-shadow: none !important;
+    }
+
+    #headerHospitalName {
+      color: #94a3b8 !important;
+      margin-top: 1px;
+    }
+
+    body > header button[aria-label="Abrir Menú"] {
+      min-height: 38px;
+      border-radius: 11px !important;
+      background: rgba(255,255,255,.07) !important;
+      border-color: rgba(255,255,255,.12) !important;
+      color: #f8fafc !important;
+      padding-left: 12px !important;
+      padding-right: 12px !important;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+    }
+
+    body > header button[aria-label="Abrir Menú"]:hover { background: rgba(255,255,255,.12) !important; }
+
+    #appMenuDropdown {
+      border: 1px solid var(--sdo-line) !important;
+      border-radius: 14px !important;
+      box-shadow: 0 18px 45px rgba(15,23,42,.16) !important;
+      padding: 7px !important;
+      margin-top: 5px;
+    }
+
+    #appMenuDropdown button {
+      border-radius: 9px;
+      min-height: 39px;
+      transition: background .16s ease, color .16s ease;
+    }
+
+    /* Main */
+    body > main {
+      max-width: 1180px !important;
+      padding-top: 22px !important;
+      padding-bottom: 40px !important;
+    }
+
+    /* KPIs */
+    body > main > section:first-of-type { gap: 12px !important; margin-bottom: 14px !important; }
+
+    body > main > section:first-of-type > div {
+      position: relative;
+      min-height: 96px;
+      padding: 16px 17px !important;
+      border: 1px solid var(--sdo-line-soft) !important;
+      border-radius: var(--sdo-radius) !important;
+      background: rgba(255,255,255,.96) !important;
+      box-shadow: var(--sdo-shadow) !important;
+      overflow: hidden;
+      transform: translateZ(0);
+      transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+    }
+
+    body > main > section:first-of-type > div:hover {
+      transform: translateY(-1px);
+      border-color: #d9dfeb !important;
+      box-shadow: var(--sdo-shadow-hover) !important;
+    }
+
+    body > main > section:first-of-type > div::after {
+      content: ""; position: absolute; left: 17px; bottom: 0; width: 34px; height: 3px; border-radius: 3px 3px 0 0; background: #cbd5e1;
+    }
+
+    body > main > section:first-of-type > div:nth-child(1)::after { background: var(--sdo-amber); }
+    body > main > section:first-of-type > div:nth-child(2)::after { background: var(--sdo-blue); }
+    body > main > section:first-of-type > div:nth-child(3)::after { background: var(--sdo-accent); }
+    body > main > section:first-of-type > div:nth-child(4)::after { background: var(--sdo-green); }
+
+    body > main > section:first-of-type span.uppercase { font-size: 10px !important; letter-spacing: .075em !important; color: #64748b !important; }
+    body > main > section:first-of-type p[id^="kpi"] { margin-top: 8px !important; font-size: 27px !important; line-height: 1 !important; font-weight: 800 !important; letter-spacing: -.035em; }
+
+    /* Barra de búsqueda y filtros */
+    body > main > section:nth-of-type(2) {
+      margin-bottom: 18px !important;
+      padding: 10px !important;
+      border: 1px solid var(--sdo-line-soft) !important;
+      border-radius: var(--sdo-radius) !important;
+      background: rgba(255,255,255,.93) !important;
+      box-shadow: var(--sdo-shadow) !important;
+    }
+
+    #searchInput {
+      height: 43px; padding-left: 38px !important; background: #f8fafc !important; border: 1px solid #e5eaf1 !important; border-radius: 11px !important; color: var(--sdo-ink) !important; font-size: 14px !important; box-shadow: inset 0 1px 1px rgba(15,23,42,.015); transition: background .18s ease, border-color .18s ease, box-shadow .18s ease;
+    }
+    #searchInput::placeholder { color: #94a3b8; }
+    #searchInput:focus { background: #fff !important; border-color: #a5b4fc !important; box-shadow: 0 0 0 3px rgba(79,70,229,.10) !important; outline: none !important; }
+
+    #viewCardsBtn, #viewTableBtn { min-height: 34px; border-radius: 8px !important; transition: all .16s ease !important; }
+    #viewCardsBtn.bg-white, #viewTableBtn.bg-white { color: var(--sdo-accent) !important; box-shadow: 0 1px 3px rgba(15,23,42,.08) !important; }
+
+    .status-filter-btn { min-height: 30px; padding: 6px 12px !important; border-radius: 999px !important; font-size: 11px !important; font-weight: 650 !important; border: 1px solid transparent; transition: all .16s ease !important; }
+    .status-filter-btn.bg-slate-800 { background: var(--sdo-navy) !important; color: white !important; box-shadow: 0 3px 10px rgba(15,23,42,.11); }
+    .status-filter-btn.bg-slate-100 { background: #f6f8fb !important; color: #64748b !important; border-color: #edf1f5 !important; }
+    .status-filter-btn.bg-slate-100:hover { background: #eef2f7 !important; color: #334155 !important; }
+
+    /* Tarjetas OT */
+    #ordersContainer > .grid { gap: 14px !important; }
+    #ordersContainer > .grid > div {
+      position: relative; min-height: 190px; padding: 17px !important; border: 1px solid var(--sdo-line-soft) !important; border-radius: var(--sdo-radius) !important; background: rgba(255,255,255,.98) !important; box-shadow: var(--sdo-shadow) !important; transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; cursor: pointer;
+    }
+    #ordersContainer > .grid > div:hover { transform: translateY(-2px); border-color: #dbe1eb !important; box-shadow: var(--sdo-shadow-hover) !important; }
+    #ordersContainer h4 { margin-top: 9px !important; color: #0f172a !important; font-size: 15px !important; line-height: 1.25 !important; letter-spacing: -.015em; }
+    #ordersContainer .text-slate-500 { color: #64748b !important; }
+    #ordersContainer > .grid > div > div:first-child > div:nth-child(3) { margin-top: 14px !important; padding: 10px 11px !important; border: 1px solid #edf1f5 !important; border-radius: 10px !important; background: #f8fafc !important; }
+    #ordersContainer .h-1\.5 { height: 5px !important; background: #e8edf3 !important; }
+    #ordersContainer .pt-2.border-t { border-color: #edf1f5 !important; padding-top: 11px !important; }
+    
+    #ordersContainer button { min-height: 36px; border-radius: 9px !important; }
+    #ordersContainer button.bg-slate-800 { background: var(--sdo-navy) !important; box-shadow: 0 4px 10px rgba(15,23,42,.08); }
+    #ordersContainer button.bg-blue-50 { background: #f5f7ff !important; border-color: #dfe4ff !important; color: #4338ca !important; }
+
+    /* Badges */
+    #ordersContainer .bg-amber-100 { background: #fff7e8 !important; color: #a85b00 !important; }
+    #ordersContainer .bg-blue-100 { background: #eef5ff !important; color: #1d4ed8 !important; }
+    #ordersContainer .bg-indigo-100 { background: #f0efff !important; color: #4338ca !important; }
+    #ordersContainer .bg-emerald-100 { background: #ebf8f2 !important; color: #047857 !important; }
+
+    /* Tabla */
+    #ordersContainer > div.bg-white.rounded-xl { border: 1px solid var(--sdo-line-soft) !important; border-radius: var(--sdo-radius) !important; box-shadow: var(--sdo-shadow) !important; }
+    #ordersContainer table thead { background: #f8fafc !important; color: #475569 !important; border-color: #edf1f5 !important; }
+    #ordersContainer table th { padding: 12px 14px !important; font-size: 10px !important; text-transform: uppercase; letter-spacing: .06em; }
+    #ordersContainer table td { padding: 13px 14px !important; border-color: #f0f3f7 !important; }
+    #ordersContainer table tbody tr { background: white; transition: background .14s ease; cursor: pointer; }
+    #ordersContainer table tbody tr:hover { background: #fafbfe !important; }
+
+    /* Formularios */
+    input:not(#searchInput), textarea, select { border-color: #dfe5ed !important; background: #f8fafc !important; border-radius: 10px !important; color: #0f172a !important; box-shadow: inset 0 1px 1px rgba(15,23,42,.015); }
+    input:not(#searchInput):focus, textarea:focus, select:focus { outline: none !important; border-color: #a5b4fc !important; background: white !important; box-shadow: 0 0 0 3px rgba(79,70,229,.09) !important; }
+
+    /* Modales */
+    #authModal, #createModal, #settingsModal, #advanceReportModal, #customConfirmModal { background: rgba(15,23,42,.56) !important; backdrop-filter: blur(7px) !important; -webkit-backdrop-filter: blur(7px) !important; }
+    #authModal > div, #createModal > div, #settingsModal > div, #advanceReportModal > div, #customConfirmModal > div { border: 1px solid rgba(226,232,240,.9) !important; border-radius: 18px !important; box-shadow: 0 24px 70px rgba(15,23,42,.18) !important; }
+
+    /* Ficha operativa unificada */
     #unifiedOperativeView { background: var(--sdo-bg) !important; }
-    .uov-section-card { background: #ffffff; border: 1px solid var(--sdo-line); border-radius: 16px; padding: 1.25rem; box-shadow: 0 1px 3px rgba(15,23,42,.04); }
-    .uov-nav-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: 11px; color: #64748b; font-weight: 600; transition: background 0.2s, color 0.2s; }
-    .uov-nav-link:hover, .uov-nav-link.active { background: #eef2ff; color: #4f46e5; }
-    .uov-bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-top: 1px solid #e2e8f0; padding: 1rem; z-index: 45; }
-    .uov-action-btn { min-height: 42px; border-radius: 11px; font-weight: 700; padding: 0 1.25rem; }
+    .uov-section-card { background: #ffffff; border: 1px solid var(--sdo-line-soft); border-radius: var(--sdo-radius); padding: 1.5rem; box-shadow: var(--sdo-shadow); }
+    .uov-nav-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: var(--sdo-radius-sm); color: var(--sdo-muted); font-weight: 600; transition: background 0.2s, color 0.2s; }
+    .uov-nav-link:hover, .uov-nav-link.active { background: var(--sdo-accent-soft); color: var(--sdo-accent); }
+    .uov-bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-top: 1px solid var(--sdo-line); padding: 1rem; z-index: 45; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); }
+    .uov-action-btn { min-height: 44px; border-radius: var(--sdo-radius-sm); font-weight: 700; padding: 0 1.5rem; transition: transform 0.15s; }
+    .uov-action-btn:active { transform: scale(0.98); }
+    .uov-btn-danger { background: #fff; border: 1px solid #fecdd3; color: var(--sdo-rose); }
+    .uov-btn-danger:hover { background: #fff1f2; }
+    .uov-btn-primary { background: var(--sdo-accent); color: white; border: none; }
+    .uov-btn-primary:hover { background: #4338ca; }
+
+    button.bg-blue-600, button.bg-indigo-600 { background: var(--sdo-accent) !important; box-shadow: none !important; }
+    button.bg-blue-600:hover, button.bg-indigo-600:hover { background: #4338ca !important; }
+    button.bg-slate-800, button.bg-slate-900 { background: var(--sdo-navy) !important; }
+
+    button, [onclick] { -webkit-tap-highlight-color: transparent; }
+
+    @media (max-width: 639px) {
+      body > header > div { min-height: 62px; }
+      body > main { padding-top: 14px !important; }
+      body > main > section:first-of-type { gap: 8px !important; }
+      body > main > section:first-of-type > div { min-height: 86px; padding: 13px !important; }
+      body > main > section:first-of-type > div::after { left: 13px; }
+      body > main > section:first-of-type p[id^="kpi"] { font-size: 24px !important; }
+      body > main > section:nth-of-type(2) { padding: 9px !important; }
+      #ordersContainer > .grid > div { min-height: auto; padding: 15px !important; }
+      #ordersContainer h4 { font-size: 14px !important; }
+      
+      .uov-nav { display: none; }
+      .uov-content { margin-left: 0 !important; width: 100% !important; padding-bottom: 80px; }
+    }
+    @media (min-width: 1024px) {
+      #ordersContainer > .grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; max-width: 790px; }
+    }
   </style>
 </head>
-<body class="min-h-screen flex flex-col font-sans pb-10">
-  <div id="toastContainer" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[70] flex flex-col gap-2 pointer-events-none max-w-[90vw]"></div>
+<body class="bg-slate-100 text-slate-900 min-h-screen flex flex-col font-sans pb-12">
 
-  <!-- Header Principal Optimizado para Móvil y Desktop -->
-  <header class="app-header text-white sticky top-0 z-30 shadow-md">
-    <div class="max-w-7xl mx-auto px-3 sm:px-4 py-2 flex items-center justify-between gap-2">
-      
-      <!-- Logo + Identidad + Status -->
-      <div class="flex items-center space-x-2.5 cursor-pointer min-w-0" onclick="window.app.renderActiveModule()">
-        <div id="headerLogoContainer" class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center shrink-0">
-          <span class="text-lg sm:text-xl" aria-hidden="true">🏥</span>
+  <div id="toastContainer" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-[60] flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- Header -->
+  <header class="bg-slate-900 text-white sticky top-0 z-30 shadow-md">
+    <div class="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between">
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="window.app.renderDashboard()">
+        <div id="headerLogoContainer" class="w-10 h-10 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center overflow-hidden shrink-0">
+          <span class="text-xl">🏥</span>
         </div>
-        <div class="min-w-0">
-          <div class="flex items-center space-x-1.5">
-            <span class="font-black text-sm sm:text-base tracking-tight text-white truncate">SDO Cloud</span>
-            <span id="roleBadge" class="text-[9px] sm:text-[10px] uppercase font-black tracking-wider px-1.5 py-0.5 rounded bg-indigo-600 text-white shrink-0">Supervisor</span>
-            <span id="supabaseStatusBadge" onclick="window.app.forceSyncAll()" class="cursor-pointer text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/40 flex items-center gap-1 shrink-0" title="Click para forzar sincronización">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> <span class="hidden sm:inline">Supabase En Línea</span>
-            </span>
+        <div>
+          <div class="flex items-center space-x-2">
+            <span class="font-bold text-base tracking-wide text-white">SDO Cloud</span>
+            <span id="roleBadge" class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-blue-600 text-white">Supervisor</span>
           </div>
-          <p id="headerHospitalName" class="text-[11px] text-slate-400 truncate max-w-[140px] sm:max-w-xs">HBQP - Infraestructura & Operaciones</p>
+          <p id="headerHospitalName" class="text-xs text-slate-400 truncate max-w-[160px] sm:max-w-xs">Hospital Regional</p>
         </div>
       </div>
 
-      <!-- Selector de Módulos (Adaptativo: compacto en móvil, amplio en desktop) -->
-      <nav id="moduleSwitcher" class="flex items-center bg-slate-800/90 p-0.5 sm:p-1 rounded-xl border border-slate-700 text-[11px] sm:text-xs font-bold">
-        <button id="navBtnProjects" onclick="window.app.switchModule('projects')" class="px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg bg-indigo-600 text-white shadow transition flex items-center gap-1">
-          <i class="fa-solid fa-diagram-project"></i> <span class="hidden xs:inline">Proyectos</span>
-        </button>
-        <button id="navBtnOrders" onclick="window.app.switchModule('orders')" class="px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-slate-300 hover:text-white transition flex items-center gap-1">
-          <i class="fa-solid fa-wrench"></i> <span class="hidden xs:inline">OTs</span>
-        </button>
-      </nav>
-
-      <!-- Botón de Acción Principal + Menú -->
-      <div class="flex items-center space-x-1.5 sm:space-x-2 relative shrink-0">
-        <button id="btnHeaderAction" onclick="window.app.handleHeaderPrimaryAction()" class="px-2.5 sm:px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white text-xs font-bold transition flex items-center gap-1 shadow-sm">
-          <span id="btnHeaderActionIcon">➕</span> <span id="btnHeaderActionText" class="hidden xs:inline sm:inline">Nuevo Proyecto</span>
+      <div class="flex items-center space-x-2 relative">
+        <button onclick="window.app.toggleMenu()" aria-label="Abrir Menú" class="p-2 rounded-lg bg-slate-800 text-slate-200 hover:bg-slate-700 active:scale-95 border border-slate-700 flex items-center space-x-1">
+          <span class="text-base" aria-hidden="true">☰</span>
+          <span class="text-xs font-semibold hidden sm:inline">Menú</span>
         </button>
 
-        <button onclick="window.app.toggleMenu()" aria-label="Abrir Menú" class="p-1.5 sm:p-2 rounded-lg bg-slate-800 text-slate-200 hover:bg-slate-700 active:scale-95 border border-slate-700 flex items-center space-x-1">
-          <span class="text-base leading-none" aria-hidden="true">☰</span>
-        </button>
-
-        <!-- Dropdown Menú -->
-        <div id="appMenuDropdown" class="hidden absolute right-0 top-11 w-64 bg-white rounded-xl shadow-2xl border border-slate-200 text-slate-800 z-50 overflow-hidden py-1 text-xs sm:text-sm">
-          <div id="mobileModuleOptions" class="md:hidden px-3 py-2 border-b bg-slate-50 space-y-1">
-            <span class="text-[10px] font-bold text-slate-400 uppercase block">Módulos</span>
-            <button onclick="window.app.switchModule('projects'); window.app.toggleMenu();" class="w-full text-left px-2 py-1.5 rounded text-xs font-bold text-indigo-700 hover:bg-indigo-50 flex items-center gap-2">
-              <i class="fa-solid fa-diagram-project"></i> Módulo Proyectos
-            </button>
-            <button onclick="window.app.switchModule('orders'); window.app.toggleMenu();" class="w-full text-left px-2 py-1.5 rounded text-xs font-bold text-slate-700 hover:bg-slate-100 flex items-center gap-2">
-              <i class="fa-solid fa-wrench"></i> Módulo OTs
-            </button>
-          </div>
-
+        <div id="appMenuDropdown" class="hidden absolute right-0 top-12 w-56 bg-white rounded-xl shadow-2xl border border-slate-200 text-slate-800 z-50 overflow-hidden py-1">
+          <button onclick="window.app.renderDashboard(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left text-sm font-medium hover:bg-slate-50 flex items-center space-x-2">
+            <span aria-hidden="true">📊</span> <span>Panel General</span>
+          </button>
+          
           <div id="supervisorMenuOptions">
-            <button onclick="window.app.openCreateProjectModal(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left font-medium hover:bg-slate-50 flex items-center space-x-2 text-indigo-600">
-              <i class="fa-solid fa-plus text-indigo-500"></i> <span>Nuevo Proyecto</span>
+            <button onclick="window.app.openCreateModal(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left text-sm font-medium hover:bg-slate-50 flex items-center space-x-2 text-blue-600">
+              <span aria-hidden="true">➕</span> <span>Nueva OT</span>
             </button>
-            <button onclick="window.app.openCreateOtModal(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left font-medium hover:bg-slate-50 flex items-center space-x-2 text-blue-600">
-              <i class="fa-solid fa-wrench text-blue-500"></i> <span>Nueva Orden de Trabajo (OT)</span>
+            <button onclick="window.app.openAdvanceReportModal(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left text-sm font-medium hover:bg-slate-50 flex items-center space-x-2">
+              <span aria-hidden="true">📈</span> <span>Reporte de Avance</span>
             </button>
-            <button onclick="window.app.openAdvanceReportModal(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left font-medium hover:bg-slate-50 flex items-center space-x-2">
-              <span aria-hidden="true">📈</span> <span>Reporte de Avance OTs (PDF)</span>
-            </button>
-            <button onclick="window.app.exportToExcel(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left font-medium hover:bg-slate-50 flex items-center space-x-2 text-emerald-700">
-              <span aria-hidden="true">📊</span> <span>Descargar BD OTs (Excel)</span>
-            </button>
-            <button onclick="window.app.exportProjectsCSV(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left font-medium hover:bg-slate-50 flex items-center space-x-2 text-emerald-700">
-              <i class="fa-solid fa-file-csv text-emerald-600"></i> <span>Exportar Proyectos (CSV)</span>
-            </button>
-            <button onclick="window.app.forceSyncAll(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left font-medium hover:bg-slate-50 flex items-center space-x-2 text-cyan-700">
-              <i class="fa-solid fa-rotate text-cyan-600"></i> <span>Forzar Sincronización Nube</span>
-            </button>
-            <button onclick="window.app.openSettingsModal(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left font-medium hover:bg-slate-50 flex items-center space-x-2">
-              <span aria-hidden="true">⚙️</span> <span>Configuración & PINs</span>
+            <button onclick="window.app.openSettingsModal(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left text-sm font-medium hover:bg-slate-50 flex items-center space-x-2">
+              <span aria-hidden="true">⚙️</span> <span>Configuración</span>
             </button>
           </div>
 
           <hr class="my-1 border-slate-100">
-          <button onclick="window.app.openAuthModal(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left font-medium hover:bg-slate-50 flex items-center space-x-2 text-amber-700">
+          <button onclick="window.app.openAuthModal(); window.app.toggleMenu();" class="w-full px-4 py-2.5 text-left text-sm font-medium hover:bg-slate-50 flex items-center space-x-2 text-amber-700">
             <span aria-hidden="true">🔄</span> <span>Cambiar Rol / PIN</span>
           </button>
         </div>
       </div>
     </div>
-
-    <!-- Barra de Contexto Contextual y KPIs (Scrollable en móvil) -->
-    <div class="bg-slate-950/90 border-t border-slate-800 px-3 sm:px-4 py-1.5 text-xs text-slate-300">
-      <div class="max-w-7xl mx-auto flex items-center justify-between gap-2 overflow-x-auto custom-scroll whitespace-nowrap">
-        <div id="moduleStatsSummary" class="flex items-center gap-3 font-medium text-[11px] sm:text-xs"></div>
-        <div class="text-[10px] text-slate-400 hidden lg:block shrink-0">
-          <i class="fa-solid fa-shield-halved text-indigo-400 mr-1"></i> <span id="moduleAccessLabel">Sincronización Supabase Activa</span>
-        </div>
-      </div>
-    </div>
   </header>
 
-
-
-  <!-- ==========================================================
-       VISTA 1: MÓDULO DE PROYECTOS (SUPERVISOR)
-       ========================================================== -->
-  <section id="moduleProjectsView" class="max-w-7xl w-full mx-auto px-3 sm:px-4 py-3 sm:py-4 flex-1">
-    <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm mb-4 space-y-2.5">
-      <div class="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center justify-between">
-        <div class="relative flex-1">
-          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-          <input type="text" id="searchProjectsInput" oninput="window.app.renderProjects()" placeholder="Buscar proyectos por requerimiento, unidad, recinto, PMA..." 
-                 class="w-full pl-8 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-        </div>
-
-        <div class="flex items-center space-x-1 bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs font-bold self-end sm:self-auto">
-          <button id="btnProjViewKanban" onclick="window.app.setProjectsViewMode('kanban')" class="px-2.5 sm:px-3 py-1.5 rounded-md bg-white text-indigo-600 shadow-sm">
-            <i class="fa-solid fa-table-columns mr-1"></i> Kanban
-          </button>
-          <button id="btnProjViewCards" onclick="window.app.setProjectsViewMode('cards')" class="px-2.5 sm:px-3 py-1.5 rounded-md text-slate-600">
-            <i class="fa-solid fa-grip mr-1"></i> Cuadrícula
-          </button>
-          <button id="btnProjViewTable" onclick="window.app.setProjectsViewMode('table')" class="px-2.5 sm:px-3 py-1.5 rounded-md text-slate-600">
-            <i class="fa-solid fa-table-list mr-1"></i> Matriz
-          </button>
-        </div>
-      </div>
-
-      <div class="flex items-center justify-between flex-wrap gap-2 pt-1 border-t border-slate-100 text-xs">
-        <div class="flex items-center flex-wrap gap-1.5 sm:gap-2">
-          <select id="filterProjTipologia" onchange="window.app.renderProjects()" class="bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-[11px] sm:text-xs">
-            <option value="">Todas las Tipologías</option>
-            <option value="PROYECTO">Proyecto</option>
-            <option value="REPARACION">Reparación</option>
-            <option value="APOYO TECNICO">Apoyo Técnico</option>
-          </select>
-          <select id="filterProjPiso" onchange="window.app.renderProjects()" class="bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-[11px] sm:text-xs">
-            <option value="">Todos los Pisos</option>
-            <option value="-1">Piso -1 (Subsuelo)</option>
-            <option value="1">Piso 1</option>
-            <option value="2">Piso 2</option>
-            <option value="3">Piso 3</option>
-            <option value="4">Piso 4</option>
-            <option value="5">Piso 5</option>
-            <option value="6">Piso 6</option>
-            <option value="7">Piso 7</option>
-          </select>
-          <button onclick="window.app.clearProjectFilters()" class="text-slate-400 hover:text-slate-700 px-2 py-1 bg-slate-100 rounded text-[11px] font-semibold">✕</button>
-        </div>
-
-        <div class="flex items-center space-x-1.5 overflow-x-auto custom-scroll pb-1">
-          <button onclick="window.app.setProjectStatusFilter('ALL')" class="proj-status-btn px-2.5 sm:px-3 py-1 text-[11px] font-bold rounded-full bg-slate-800 text-white whitespace-nowrap" data-status="ALL">Todos</button>
-          <button onclick="window.app.setProjectStatusFilter('PENDIENTE')" class="proj-status-btn px-2.5 sm:px-3 py-1 text-[11px] font-bold rounded-full bg-slate-100 text-slate-600 whitespace-nowrap" data-status="PENDIENTE">En Evaluación</button>
-          <button onclick="window.app.setProjectStatusFilter('Propuesta enviada')" class="proj-status-btn px-2.5 sm:px-3 py-1 text-[11px] font-bold rounded-full bg-slate-100 text-slate-600 whitespace-nowrap" data-status="Propuesta enviada">Propuestas</button>
-          <button onclick="window.app.setProjectStatusFilter('EN PROCESO')" class="proj-status-btn px-2.5 sm:px-3 py-1 text-[11px] font-bold rounded-full bg-slate-100 text-slate-600 whitespace-nowrap" data-status="EN PROCESO">En Obras</button>
-          <button onclick="window.app.setProjectStatusFilter('TERMINADO')" class="proj-status-btn px-2.5 sm:px-3 py-1 text-[11px] font-bold rounded-full bg-slate-100 text-slate-600 whitespace-nowrap" data-status="TERMINADO">Concluidos</button>
-        </div>
-      </div>
-    </div>
-
-    <div id="projectsContainer"></div>
-  </section>
-
-  <!-- ==========================================================
-       VISTA 2: MÓDULO DE ÓRDENES DE TRABAJO (OTs)
-       ========================================================== -->
-  <section id="moduleOrdersView" class="hidden max-w-7xl w-full mx-auto px-3 sm:px-4 py-3 sm:py-4 flex-1">
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5 mb-3 sm:mb-4">
+  <!-- Main Content (Dashboard) -->
+  <main class="max-w-7xl w-full mx-auto px-3 sm:px-4 py-4 flex-1">
+    <section class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-4">
       <div onclick="window.app.setFilterStatus('Pendiente')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer active:scale-95 transition">
         <div class="flex items-center justify-between">
-          <span class="text-[10px] sm:text-xs font-semibold text-slate-500 uppercase">En Curso</span>
+          <span class="text-xs font-semibold text-slate-500 uppercase">En Curso</span>
           <span class="text-xs" aria-hidden="true">⏳</span>
         </div>
-        <p id="kpiPendientes" class="text-xl sm:text-2xl font-black text-amber-600 mt-1">0</p>
+        <p id="kpiPendientes" class="text-2xl font-black text-amber-600 mt-1">0</p>
       </div>
       <div onclick="window.app.setFilterStatus('En Ejecución')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer active:scale-95 transition">
         <div class="flex items-center justify-between">
-          <span class="text-[10px] sm:text-xs font-semibold text-slate-500 uppercase">En Ejecución</span>
+          <span class="text-xs font-semibold text-slate-500 uppercase">En Ejecución</span>
           <span class="text-xs" aria-hidden="true">🔧</span>
         </div>
-        <p id="kpiEjecucion" class="text-xl sm:text-2xl font-black text-blue-600 mt-1">0</p>
+        <p id="kpiEjecucion" class="text-2xl font-black text-blue-600 mt-1">0</p>
       </div>
       <div onclick="window.app.setFilterStatus('Solicitud Cierre')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer active:scale-95 transition">
         <div class="flex items-center justify-between">
-          <span class="text-[10px] sm:text-xs font-semibold text-slate-500 uppercase">Solic. Cierre</span>
+          <span class="text-xs font-semibold text-slate-500 uppercase">Solic. Cierre</span>
           <span class="text-xs" aria-hidden="true">⚡</span>
         </div>
-        <p id="kpiSolicitudCierre" class="text-xl sm:text-2xl font-black text-indigo-600 mt-1">0</p>
+        <p id="kpiSolicitudCierre" class="text-2xl font-black text-indigo-600 mt-1">0</p>
       </div>
       <div onclick="window.app.setFilterStatus('Terminada')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer active:scale-95 transition">
         <div class="flex items-center justify-between">
-          <span class="text-[10px] sm:text-xs font-semibold text-slate-500 uppercase">Terminadas</span>
+          <span class="text-xs font-semibold text-slate-500 uppercase">Terminadas</span>
           <span class="text-xs" aria-hidden="true">✅</span>
         </div>
-        <p id="kpiTerminadas" class="text-xl sm:text-2xl font-black text-emerald-600 mt-1">0</p>
+        <p id="kpiTerminadas" class="text-2xl font-black text-emerald-600 mt-1">0</p>
       </div>
-    </div>
+    </section>
 
-    <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm mb-4 space-y-2.5">
+    <section class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm mb-4 space-y-2.5">
       <div class="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center justify-between">
         <div class="relative flex-1">
           <label for="searchInput" class="sr-only">Buscar</label>
           <input type="text" id="searchInput" oninput="window.app.renderOrdersList()" placeholder="Buscar folio, recinto, solicitante, PMA..." 
-                 class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white">
-          <span class="absolute left-3 top-2.5 text-slate-400 text-xs sm:text-sm" aria-hidden="true">🔍</span>
+                 class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white">
+          <span class="absolute left-3 top-2.5 text-slate-400 text-sm" aria-hidden="true">🔍</span>
         </div>
         <div class="flex items-center space-x-1 self-end sm:self-auto bg-slate-100 p-1 rounded-lg border border-slate-200">
-          <button id="viewCardsBtn" onclick="window.app.setViewMode('cards')" class="px-3 py-1.5 text-xs font-bold rounded-md bg-white text-slate-800 shadow-sm transition">⊞ Tarjetas</button>
-          <button id="viewTableBtn" onclick="window.app.setViewMode('table')" class="px-3 py-1.5 text-xs font-bold rounded-md text-slate-600 hover:text-slate-900 transition">☰ Filas</button>
+          <button id="viewCardsBtn" onclick="window.app.setViewMode('cards')" class="px-3 py-1.5 text-xs font-bold rounded-md bg-white text-slate-800 shadow-sm transition" aria-label="Vista de tarjetas">⊞ Tarjetas</button>
+          <button id="viewTableBtn" onclick="window.app.setViewMode('table')" class="px-3 py-1.5 text-xs font-bold rounded-md text-slate-600 hover:text-slate-900 transition" aria-label="Vista de tabla">☰ Filas / Tabla</button>
         </div>
       </div>
 
       <div class="flex items-center space-x-1.5 overflow-x-auto custom-scroll pb-1">
-        <button onclick="window.app.setFilterStatus('TODOS')" class="status-filter-btn px-2.5 sm:px-3 py-1 text-[11px] font-bold rounded-full bg-slate-800 text-white whitespace-nowrap" data-status="TODOS">Todos</button>
-        <button onclick="window.app.setFilterStatus('Pendiente')" class="status-filter-btn px-2.5 sm:px-3 py-1 text-[11px] font-bold rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap" data-status="Pendiente">Pendientes</button>
-        <button onclick="window.app.setFilterStatus('En Ejecución')" class="status-filter-btn px-2.5 sm:px-3 py-1 text-[11px] font-bold rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap" data-status="En Ejecución">En Ejecución</button>
-        <button onclick="window.app.setFilterStatus('Solicitud Cierre')" class="status-filter-btn px-2.5 sm:px-3 py-1 text-[11px] font-bold rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap" data-status="Solicitud Cierre">Solicitud Cierre</button>
-        <button onclick="window.app.setFilterStatus('Terminada')" class="status-filter-btn px-2.5 sm:px-3 py-1 text-[11px] font-bold rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap" data-status="Terminada">Terminadas</button>
+        <button onclick="window.app.setFilterStatus('TODOS')" class="status-filter-btn px-3 py-1 text-xs font-bold rounded-full bg-slate-800 text-white whitespace-nowrap" data-status="TODOS">Todos</button>
+        <button onclick="window.app.setFilterStatus('Pendiente')" class="status-filter-btn px-3 py-1 text-xs font-bold rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap" data-status="Pendiente">Pendientes</button>
+        <button onclick="window.app.setFilterStatus('En Ejecución')" class="status-filter-btn px-3 py-1 text-xs font-bold rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap" data-status="En Ejecución">En Ejecución</button>
+        <button onclick="window.app.setFilterStatus('Solicitud Cierre')" class="status-filter-btn px-3 py-1 text-xs font-bold rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap" data-status="Solicitud Cierre">Solicitud Cierre</button>
+        <button onclick="window.app.setFilterStatus('Terminada')" class="status-filter-btn px-3 py-1 text-xs font-bold rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap" data-status="Terminada">Terminadas</button>
       </div>
-    </div>
+    </section>
 
-    <div id="ordersContainer"></div>
-  </section>
+    <section id="ordersContainer"></section>
+  </main>
 
-  <!-- Modal Auth (PIN Pad) -->
+  <!-- Modal Auth -->
   <div id="authModal" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-xs rounded-2xl p-5 shadow-2xl border border-slate-200 text-center relative">
       <button onclick="window.app.closeAuthModal()" class="absolute top-3 right-3 text-slate-400 hover:text-slate-700" aria-label="Cerrar">✕</button>
@@ -326,7 +409,7 @@
       <h3 class="font-black text-lg text-slate-900">Acceso SDO Cloud</h3>
       <p class="text-xs text-slate-500 mb-4">Seleccione su rol e ingrese su PIN</p>
       <div class="grid grid-cols-2 gap-2 mb-4">
-        <button id="roleBtnSupervisor" onclick="window.app.selectAuthRole('supervisor')" class="py-2 text-xs font-bold rounded-lg border-2 border-indigo-600 bg-indigo-50 text-indigo-700">Supervisor</button>
+        <button id="roleBtnSupervisor" onclick="window.app.selectAuthRole('supervisor')" class="py-2 text-xs font-bold rounded-lg border-2 border-blue-600 bg-blue-50 text-blue-700">Supervisor</button>
         <button id="roleBtnTecnico" onclick="window.app.selectAuthRole('tecnico')" class="py-2 text-xs font-bold rounded-lg border-2 border-slate-200 bg-white text-slate-600">Técnico</button>
       </div>
       <div class="flex justify-center space-x-3 mb-4">
@@ -353,129 +436,6 @@
     </div>
   </div>
 
-  <!-- Modal Ficha de Proyecto / Nuevo Proyecto -->
-  <div id="projectModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-    <div class="bg-white rounded-2xl max-w-3xl w-full shadow-2xl overflow-hidden border border-slate-200 my-6 max-h-[92vh] flex flex-col">
-      <div class="bg-slate-900 text-white px-6 py-4 flex items-center justify-between">
-        <div>
-          <h3 id="modalProjectTitle" class="font-bold text-base">Ficha de Proyecto</h3>
-          <p class="text-xs text-slate-400">Control arquitectónico y de infraestructura</p>
-        </div>
-        <div class="flex items-center gap-2">
-          <button type="button" id="btnConvertToOt" onclick="window.app.convertCurrentProjectToOT()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-lg transition shadow-sm flex items-center gap-1.5">
-            <i class="fa-solid fa-bolt"></i> <span>Derivar a OT</span>
-          </button>
-          <button onclick="window.app.closeProjectModal()" class="text-slate-400 hover:text-white text-lg p-1" aria-label="Cerrar">✕</button>
-        </div>
-      </div>
-
-      <form id="projectForm" onsubmit="window.app.saveProject(event)" class="p-6 space-y-4 text-xs overflow-y-auto custom-scroll flex-1">
-        <input type="hidden" id="formProjectId">
-
-        <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 bg-slate-50 p-3 rounded-xl border border-slate-200">
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Código Proyecto *</label>
-            <input type="text" id="formProjCodigo" required class="w-full border border-slate-200 rounded-lg p-2 font-bold text-indigo-700">
-          </div>
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Ticket / OC</label>
-            <input type="text" id="formProjTicket" class="w-full border border-slate-200 rounded-lg p-2" placeholder="Ej. #66458">
-          </div>
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Tipología *</label>
-            <select id="formProjTipologia" required class="w-full border border-slate-200 rounded-lg p-2 font-semibold">
-              <option value="PROYECTO">PROYECTO</option>
-              <option value="REPARACION">REPARACIÓN</option>
-              <option value="APOYO TECNICO">APOYO TÉCNICO</option>
-            </select>
-          </div>
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Prioridad *</label>
-            <select id="formProjPrioridad" required class="w-full border border-slate-200 rounded-lg p-2 font-semibold">
-              <option value="MUY ALTA">🚨 Muy Alta</option>
-              <option value="ALTA">🟠 Alta</option>
-              <option value="MEDIA" selected>🟡 Media</option>
-              <option value="BAJA">🟢 Baja</option>
-            </select>
-          </div>
-        </div>
-
-        <div>
-          <label class="block font-bold text-slate-700 mb-1">Requerimiento / Asunto *</label>
-          <textarea id="formProjRequerimiento" rows="2" required placeholder="Nombre descriptivo del proyecto..." class="w-full border border-slate-200 rounded-lg p-2 font-medium"></textarea>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Unidad Solicitante</label>
-            <input type="text" id="formProjUnidad" placeholder="Ej. Subdirección de Operaciones, Urgencia..." class="w-full border border-slate-200 rounded-lg p-2">
-          </div>
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Solicitante (Persona)</label>
-            <input type="text" id="formProjSolicitante" placeholder="Nombre de quien solicita..." class="w-full border border-slate-200 rounded-lg p-2">
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Piso</label>
-            <input type="text" id="formProjPiso" placeholder="Ej. -1, 1, 2, 3..." class="w-full border border-slate-200 rounded-lg p-2">
-          </div>
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Recinto / Emplazamiento</label>
-            <input type="text" id="formProjUbicacion" placeholder="Ej. Terraza, Box..." class="w-full border border-slate-200 rounded-lg p-2">
-          </div>
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Código PMA</label>
-            <input type="text" id="formProjPMA" placeholder="Ej. D-3-40, G-S1-45" class="w-full border border-slate-200 rounded-lg p-2">
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-indigo-50/50 p-3 rounded-xl border border-indigo-100">
-          <div>
-            <label class="block font-bold text-indigo-900 mb-1">Fase / Estado *</label>
-            <select id="formProjEstado" required class="w-full border border-slate-200 rounded-lg p-2 font-bold text-indigo-950">
-              <option value="PENDIENTE">📋 Pendiente / En Evaluación</option>
-              <option value="Propuesta enviada">📑 Propuesta Enviada</option>
-              <option value="EN PROCESO">🏗️ En Proceso / En Obras</option>
-              <option value="TERMINADO">✅ Concluido / Entregado</option>
-            </select>
-          </div>
-          <div>
-            <label class="block font-bold text-indigo-900 mb-1">Fecha de Ingreso</label>
-            <input type="date" id="formProjFechaIngreso" class="w-full border border-slate-200 rounded-lg p-2">
-          </div>
-          <div>
-            <label class="block font-bold text-indigo-900 mb-1">Última Actualización</label>
-            <input type="date" id="formProjFechaActualizacion" class="w-full border border-slate-200 rounded-lg p-2">
-          </div>
-        </div>
-
-        <div>
-          <label class="block font-bold text-amber-900 mb-1">Hito Pendiente / Bloqueante</label>
-          <input type="text" id="formProjPendiente" placeholder="Ej: Control Centralizado envía EE.TT., Reunión 07/JULIO..." class="w-full border border-amber-300 bg-amber-50 rounded-lg p-2 text-amber-950 font-semibold">
-        </div>
-
-        <div>
-          <label class="block font-bold text-slate-700 mb-1">Memoria Descriptiva y Especificaciones</label>
-          <textarea id="formProjDescripcion" rows="4" placeholder="Detalle técnico de los trabajos, materiales..." class="w-full border border-slate-200 rounded-lg p-2"></textarea>
-        </div>
-
-        <div class="pt-4 border-t border-slate-100 flex items-center justify-between">
-          <button type="button" id="btnDeleteProject" onclick="window.app.deleteProject()" class="text-rose-600 hover:text-rose-800 font-bold flex items-center gap-1">
-            <i class="fa-solid fa-trash-can"></i> Eliminar Proyecto
-          </button>
-          <div class="flex items-center gap-2">
-            <button type="button" onclick="window.app.closeProjectModal()" class="px-4 py-2 border border-slate-200 rounded-lg font-bold">Cancelar</button>
-            <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-bold shadow">
-              <i class="fa-solid fa-floppy-disk mr-1"></i> Guardar Proyecto
-            </button>
-          </div>
-        </div>
-      </form>
-    </div>
-  </div>
-
   <!-- Modal Crear OT -->
   <div id="createModal" class="hidden fixed inset-0 z-50 bg-slate-900/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
     <div class="bg-white w-full max-w-lg rounded-2xl p-5 shadow-2xl border border-slate-200 max-h-[92vh] flex flex-col">
@@ -484,7 +444,6 @@
         <button onclick="window.app.closeCreateModal()" class="text-slate-400 hover:text-slate-700 text-xl font-bold p-1" aria-label="Cerrar">✕</button>
       </div>
       <form id="createOtForm" onsubmit="window.app.handleCreateOT(event)" class="space-y-3 pt-3 overflow-y-auto custom-scroll flex-1">
-        <input type="hidden" id="newOtSourceProjectId">
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label for="newOtEspecialidad" class="block text-xs font-bold text-slate-600 mb-1">Especialidad</label>
@@ -799,7 +758,7 @@
         </div>
 
         <div>
-          <label for="cfgFolioPrefix" class="block font-bold text-slate-700 mb-1">Prefijo de Folio OT</label>
+          <label for="cfgFolioPrefix" class="block font-bold text-slate-700 mb-1">Prefijo de Folio</label>
           <input type="text" id="cfgFolioPrefix" required placeholder="Ej: OT-INFRA" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg font-medium">
         </div>
 
@@ -836,7 +795,7 @@
         </div>
 
         <div class="pt-2 flex items-center justify-between">
-          <button type="button" onclick="window.app.hardResetDatabase()" class="px-3 py-2 text-rose-600 bg-rose-50 border border-rose-200 hover:bg-rose-100 font-bold rounded-lg" title="Borrar todas las OTs">⚠️ Borrar OTs</button>
+          <button type="button" onclick="window.app.hardResetDatabase()" class="px-3 py-2 text-rose-600 bg-rose-50 border border-rose-200 hover:bg-rose-100 font-bold rounded-lg" title="Borrar todas las OTs">⚠️ Borrar Todo</button>
           <div class="flex space-x-2">
             <button type="button" onclick="window.app.closeSettingsModal()" class="px-4 py-2 font-bold text-slate-600 bg-slate-100 rounded-lg">Cancelar</button>
             <button type="submit" class="px-5 py-2 font-black text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-md">Guardar Global</button>
@@ -846,7 +805,7 @@
     </div>
   </div>
 
-  <!-- Modal Reporte de Avance -->
+  <!-- Modal Reporte -->
   <div id="advanceReportModal" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
     <div class="bg-white w-full max-w-2xl rounded-2xl p-5 shadow-2xl border border-slate-200 max-h-[94vh] flex flex-col text-xs">
       <div class="flex items-center justify-between pb-3 border-b border-slate-100">
@@ -909,7 +868,7 @@
 
   <!-- Modal Custom Confirm -->
   <div id="customConfirmModal" class="hidden fixed inset-0 z-[100] bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl p-5 max-w-sm w-full text-center shadow-2xl border border-slate-200">
+    <div class="bg-white rounded-2xl p-5 max-w-sm w-full text-center shadow-2xl">
       <h3 id="confirmModalTitle" class="text-lg font-black text-slate-900 mb-2"></h3>
       <p id="confirmModalText" class="text-sm text-slate-600 mb-5"></p>
       <div class="flex gap-2">
@@ -919,17 +878,14 @@
     </div>
   </div>
 
-  <!-- SDO Cloud Master Engine Script -->
   <script>
     const SGM_CONFIG = {
-      supabaseUrl: "https://izyxyycwhszkmosyszzx.supabase.co",
-      supabaseAnonKey: "sb_publishable_nK2G8pWWkR7A59B_xGQJ9A_NFNPy0--",
-      defaultHospital: "HBQP - Infraestructura & Operaciones",
+      supabaseUrl: "https://xtrzyioxbanyjvjeqedw.supabase.co",
+      supabaseAnonKey: "sb_publishable__rmY-7gpN8Ijh7Bn5e9HtA_Bu6Z4Yqy",
+      defaultHospital: "SDO Hospital Regional",
       defaultPrefix: "OT-INFRA",
       defaultPins: { supervisor: "1234", tecnico: "5678" }
     };
-
-    const INITIAL_PROJECTS = [{"id": 1, "codigo": "PROY-001", "ticket": "", "tipologia": "APOYO TECNICO", "unidad": "Jefatura Unidad Traumatología (TMT)", "solicitante": "", "ubicacion": "Oficina Traumatología", "piso": "1", "pma": "", "requerimiento": "Implementación de mobiliario para oficina (escritorio, sillas y mueble)", "estado": "TERMINADO", "fecha_ingreso": "2026-05-20", "fecha_actualizacion": "2026-05-26", "descripcion": "Implementación de mobiliario para oficina (escritorio, sillas y mueble institucional)", "pendiente": "", "prioridad": "MEDIA"}, {"id": 2, "codigo": "PROY-002", "ticket": "OC N° 1704-673-AG26", "tipologia": "PROYECTO", "unidad": "Unidad de Ingeniería Operacional", "solicitante": "", "ubicacion": "Terrazas de piso 1 y 3", "piso": "1 y 3", "pma": "", "requerimiento": "Servicio de instalación de malla de seguridad anticaídas en terrazas de piso 1 y 3", "estado": "TERMINADO", "fecha_ingreso": "2026-01-29", "fecha_actualizacion": "2026-01-29", "descripcion": "Servicio de instalación de malla de seguridad anticaídas en terrazas de piso 1 y 3 (OC N° 1704-673-AG26)", "pendiente": "", "prioridad": "ALTA"}, {"id": 3, "codigo": "PROY-003", "ticket": "", "tipologia": "PROYECTO", "unidad": "Subdepartamento de Infraestructura", "solicitante": "", "ubicacion": "Anatomía Patológica", "piso": "1", "pma": "", "requerimiento": "Readecuación estructural para habilitar sala de macroscopía #2 en Anatomía Patológica", "estado": "TERMINADO", "fecha_ingreso": "2026-02-27", "fecha_actualizacion": "2026-02-27", "descripcion": "Readecuación estructural para habilitar sala de macroscopía #2 en Anatomía Patológica", "pendiente": "", "prioridad": "MEDIA"}, {"id": 4, "codigo": "PROY-004", "ticket": "Solicitud de Compra N° 606", "tipologia": "PROYECTO", "unidad": "GESCAS (Asistentes Sociales)", "solicitante": "", "ubicacion": "Sector de espera de Pensionados", "piso": "6", "pma": "", "requerimiento": "Habilitación de oficinas en sector de espera de Pensionados en 6to piso", "estado": "TERMINADO", "fecha_ingreso": "2026-02-24", "fecha_actualizacion": "2026-02-24", "descripcion": "Habilitación de oficinas en sector de espera de Pensionados en 6to piso (Solicitud de Compra N° 606)", "pendiente": "", "prioridad": "MEDIA"}, {"id": 5, "codigo": "PROY-005", "ticket": "OC N° 1704-766-TD26", "tipologia": "APOYO TECNICO", "unidad": "Subdirección Administrativa", "solicitante": "", "ubicacion": "Edificio energético HBQP", "piso": "1", "pma": "", "requerimiento": "Servicio de estudio de cálculo de losa de edificio energético HBQP", "estado": "TERMINADO", "fecha_ingreso": "2026-02-04", "fecha_actualizacion": "2026-02-04", "descripcion": "Servicio de estudio de cálculo de losa de edificio energético HBQP (OC N° 1704-766-TD26)", "pendiente": "", "prioridad": "ALTA"}, {"id": 6, "codigo": "PROY-006", "ticket": "OC N° 1704-765-TD26", "tipologia": "REPARACION", "unidad": "Unidad de Ingeniería Operacional", "solicitante": "", "ubicacion": "Entrada principal tercer piso", "piso": "3", "pma": "", "requerimiento": "Reparación de cielorraso para losa de tercer piso en entrada principal", "estado": "TERMINADO", "fecha_ingreso": "2026-02-04", "fecha_actualizacion": "2026-02-04", "descripcion": "Reparación de cielorraso para losa de tercer piso en entrada principal (OC N° 1704-765-TD26)", "pendiente": "", "prioridad": "ALTA"}, {"id": 7, "codigo": "PROY-007", "ticket": "D-3-40", "tipologia": "PROYECTO", "unidad": "Subdirección de Operaciones", "solicitante": "Hospitalización Domiciliaria", "ubicacion": "HD (Hospitalización Domiciliaria)", "piso": "3", "pma": "D-3-40", "requerimiento": "Conclusión de trabajos de infraestructura en oficinas, kitchenette y bodega", "estado": "PENDIENTE", "fecha_ingreso": "2026-02-02", "fecha_actualizacion": "2026-06-16", "descripcion": "Solicitud de modificación de proyecto en recintos de oficinas, kitchenette y bodega", "pendiente": "Reunión Programada 07/JULIO", "prioridad": "ALTA"}, {"id": 8, "codigo": "PROY-008", "ticket": "5-58", "tipologia": "REPARACION", "unidad": "Médico Quirúrgico (5to piso)", "solicitante": "", "ubicacion": "Sala de aislamiento 5-58", "piso": "5", "pma": "5-58", "requerimiento": "Bloqueo, mitigación y reparación de filtración activa de agua en sala de aislamiento 5-58", "estado": "TERMINADO", "fecha_ingreso": "2026-01-29", "fecha_actualizacion": "2026-01-29", "descripcion": "Bloqueo mitigación y reparación de filtración activa de agua en sala de aislamiento 5-58", "pendiente": "", "prioridad": "MUY ALTA"}, {"id": 9, "codigo": "PROY-009", "ticket": "Salas 37-38", "tipologia": "REPARACION", "unidad": "Consultorio de Especialidades", "solicitante": "", "ubicacion": "Salas de preparación 37 y 38", "piso": "1", "pma": "", "requerimiento": "Readecuación de estaciones de trabajo y traslado de soportes en salas de preparación 37 y 38", "estado": "TERMINADO", "fecha_ingreso": "2026-01-29", "fecha_actualizacion": "2026-01-29", "descripcion": "Readecuación de estaciones de trabajo y traslado de soportes en salas de preparación 37 y 38", "pendiente": "", "prioridad": "MEDIA"}, {"id": 10, "codigo": "PROY-010", "ticket": "", "tipologia": "PROYECTO", "unidad": "Unidad de Desarrollo Organizacional", "solicitante": "", "ubicacion": "Recinto de oficinas", "piso": "2", "pma": "", "requerimiento": "Layout y propuesta de distribución de oficinas en recinto", "estado": "TERMINADO", "fecha_ingreso": "2026-01-28", "fecha_actualizacion": "2026-01-28", "descripcion": "Layout y propuesta arquitectónica de distribución de oficinas en recinto", "pendiente": "", "prioridad": "MEDIA"}, {"id": 11, "codigo": "PROY-011", "ticket": "", "tipologia": "REPARACION", "unidad": "Sala Cuna y Jardín Infantil", "solicitante": "", "ubicacion": "Puerta principal de ingreso", "piso": "1", "pma": "", "requerimiento": "Reparación urgente de puerta principal de ingreso descuadrada con riesgo de desprendimiento", "estado": "TERMINADO", "fecha_ingreso": "2026-01-27", "fecha_actualizacion": "2026-01-27", "descripcion": "Reparación urgente de puerta principal de ingreso descuadrada con riesgo de desprendimiento", "pendiente": "", "prioridad": "MUY ALTA"}, {"id": 12, "codigo": "PROY-012", "ticket": "G-S1-45", "tipologia": "PROYECTO", "unidad": "Farmacia CRD / Especialidades", "solicitante": "Camila Aedo Jiménez", "ubicacion": "Oficina farmacéuticos", "piso": "-1", "pma": "G-S1-45", "requerimiento": "Propuestas de remodelación para oficina QF G-S1-45 y oficinas QF del Consultorio de Especialidades", "estado": "PENDIENTE", "fecha_ingreso": "2026-01-19", "fecha_actualizacion": "2026-01-19", "descripcion": "Propuestas de remodelación para oficina QF G-S1-45 y oficinas QF del Consultorio de Especialidades", "pendiente": "", "prioridad": "MEDIA"}, {"id": 13, "codigo": "PROY-013", "ticket": "", "tipologia": "APOYO TECNICO", "unidad": "Subdirección de Operaciones", "solicitante": "Rafael", "ubicacion": "Sala Infantil 4to piso", "piso": "4", "pma": "", "requerimiento": "RETIRO DE MACETEROS SALA INFANTIL (4TO PISO)", "estado": "PENDIENTE", "fecha_ingreso": "2026-05-15", "fecha_actualizacion": "2026-05-15", "descripcion": "Maceteros anclados a piso en sala infantil", "pendiente": "Coordinación con Logística", "prioridad": "MEDIA"}, {"id": 14, "codigo": "PROY-014", "ticket": "", "tipologia": "APOYO TECNICO", "unidad": "Subdirección de Operaciones", "solicitante": "Rafael", "ubicacion": "SALA TICS", "piso": "3", "pma": "", "requerimiento": "MALLA MOSQUITERA TICS, Roberto Schiaffino", "estado": "Propuesta enviada", "fecha_ingreso": "2026-05-20", "fecha_actualizacion": "2026-05-27", "descripcion": "Propuesta técnica enviada para malla mosquitera en Sala TICS", "pendiente": "", "prioridad": "MEDIA"}, {"id": 15, "codigo": "PROY-015", "ticket": "", "tipologia": "PROYECTO", "unidad": "Servicio de Medicina Física", "solicitante": "Klga. Claudia Franceschi Á.", "ubicacion": "Sector ascensor", "piso": "1", "pma": "", "requerimiento": "Evaluar y desarrollar la construcción de una bodega para ayudas físicas", "estado": "PENDIENTE", "fecha_ingreso": "2026-04-08", "fecha_actualizacion": "2026-04-08", "descripcion": "Evaluar y desarrollar anteproyecto para la construcción de una bodega de ayudas físicas", "pendiente": "", "prioridad": "MEDIA"}, {"id": 16, "codigo": "PROY-016", "ticket": "#66458", "tipologia": "REPARACION", "unidad": "UMQ", "solicitante": "José Rocabado Jefe UMQ", "ubicacion": "Terrazas 5to Piso", "piso": "5", "pma": "N-5-23", "requerimiento": "Solicita instalación de Mallas en terrazas para el 5to Piso", "estado": "PENDIENTE", "fecha_ingreso": "2026-05-01", "fecha_actualizacion": "2026-05-01", "descripcion": "Instalación de mallas de protección en terrazas de 5to piso", "pendiente": "Planos y EE.TT", "prioridad": "ALTA"}, {"id": 17, "codigo": "PROY-017", "ticket": "", "tipologia": "PROYECTO", "unidad": "URGENCIA", "solicitante": "", "ubicacion": "Mamparas Urgencia", "piso": "1", "pma": "", "requerimiento": "PUERTA PARA URGENCIA Y CONTROL ACCESO EN MAMPARAS", "estado": "PENDIENTE", "fecha_ingreso": "2026-05-11", "fecha_actualizacion": "2026-05-11", "descripcion": "Control Centralizado envía EE.TT. para puerta y mamparas de acceso", "pendiente": "TERMINAR PROYECTO", "prioridad": "ALTA"}, {"id": 18, "codigo": "PROY-018", "ticket": "", "tipologia": "PROYECTO", "unidad": "UHYS", "solicitante": "", "ubicacion": "Bodega UHYS", "piso": "-1", "pma": "", "requerimiento": "BODEGA UHYS", "estado": "EN PROCESO", "fecha_ingreso": "2026-04-27", "fecha_actualizacion": "2026-05-27", "descripcion": "Terminados tabiquería y terminaciones interiores en bodega UHYS", "pendiente": "PUERTA Y CELOSIA", "prioridad": "ALTA"}, {"id": 19, "codigo": "PROY-019", "ticket": "", "tipologia": "PROYECTO", "unidad": "CONTROL CENTRALIZADO", "solicitante": "", "ubicacion": "Taller y Oficinas Piso 3", "piso": "3", "pma": "", "requerimiento": "CONSTRUCCION TALLER Y OFICINAS", "estado": "TERMINADO", "fecha_ingreso": "2026-05-01", "fecha_actualizacion": "2026-05-27", "descripcion": "Construcción y habilitación de taller y oficinas de control centralizado", "pendiente": "ASEO FINAL", "prioridad": "MEDIA"}, {"id": 20, "codigo": "PROY-020", "ticket": "", "tipologia": "REPARACION", "unidad": "MQ 4TO PISO", "solicitante": "Eugenia Rojas Avilés", "ubicacion": "Lavamanos MQ Piso 4", "piso": "4", "pma": "", "requerimiento": "REPARACION FILTRACION LAVAMANOS", "estado": "PENDIENTE", "fecha_ingreso": "2026-05-15", "fecha_actualizacion": "2026-05-15", "descripcion": "Reparación de filtración activa en lavamanos", "pendiente": "Solicitud de Bloqueo y coordinación", "prioridad": "ALTA"}, {"id": 21, "codigo": "PROY-021", "ticket": "", "tipologia": "PROYECTO", "unidad": "SDO", "solicitante": "", "ubicacion": "Terraza Piso 2", "piso": "2", "pma": "", "requerimiento": "IMPERMEABILIZACION TERRAZA", "estado": "TERMINADO", "fecha_ingreso": "2026-05-20", "fecha_actualizacion": "2026-06-09", "descripcion": "Impermeabilización técnica de losa y terraza en segundo piso", "pendiente": "", "prioridad": "MEDIA"}, {"id": 22, "codigo": "PROY-022", "ticket": "", "tipologia": "PROYECTO", "unidad": "Subdirección de Operaciones", "solicitante": "", "ubicacion": "Ascensor Piso 7", "piso": "7", "pma": "", "requerimiento": "PINTURA PISO PISO 7 ASCENSOR", "estado": "PENDIENTE", "fecha_ingreso": "2026-05-22", "fecha_actualizacion": "2026-05-22", "descripcion": "Pintura de alto tráfico y demarcación en piso 7 área ascensores", "pendiente": "", "prioridad": "BAJA"}, {"id": 23, "codigo": "PROY-023", "ticket": "", "tipologia": "PROYECTO", "unidad": "FARMACIA", "solicitante": "", "ubicacion": "Farmacia Urgencia", "piso": "1", "pma": "", "requerimiento": "FARMACIA URGENCIA", "estado": "PENDIENTE", "fecha_ingreso": "2026-05-25", "fecha_actualizacion": "2026-05-25", "descripcion": "Adecuación y reestructuración de recintos para Farmacia de Urgencia", "pendiente": "", "prioridad": "ALTA"}, {"id": 24, "codigo": "PROY-024", "ticket": "", "tipologia": "PROYECTO", "unidad": "IMAGENOLOGIA", "solicitante": "", "ubicacion": "Kitchenette Imagenología", "piso": "1", "pma": "", "requerimiento": "RESTRUCTURACION KITCHENETTE", "estado": "PENDIENTE", "fecha_ingreso": "2026-05-25", "fecha_actualizacion": "2026-05-25", "descripcion": "Reestructuración y rediseño de kitchenette en servicio de Imagenología", "pendiente": "", "prioridad": "MEDIA"}, {"id": 25, "codigo": "PROY-025", "ticket": "", "tipologia": "PROYECTO", "unidad": "IMAGENOLOGIA / SALA DE RADIOLOGOS", "solicitante": "", "ubicacion": "Sala de informes médicos", "piso": "1", "pma": "", "requerimiento": "AUMENTO DE PUESTOS DE TRABAJO", "estado": "PENDIENTE", "fecha_ingreso": "2026-05-25", "fecha_actualizacion": "2026-05-25", "descripcion": "Ampliación y habilitación de nuevos puestos de trabajo para médicos radiólogos", "pendiente": "", "prioridad": "MEDIA"}, {"id": 26, "codigo": "PROY-026", "ticket": "", "tipologia": "PROYECTO", "unidad": "LABORATORIO CLINICO VDLR", "solicitante": "TM. Dobrana Torres Rojas", "ubicacion": "Autoinmunidad y Biología Molecular", "piso": "2", "pma": "", "requerimiento": "CAMBIO DE MOBILIARIO (Inmunología/VDRL y Biología Molecular)", "estado": "TERMINADO", "fecha_ingreso": "2026-05-25", "fecha_actualizacion": "2026-05-25", "descripcion": "Cambio y adaptación de mesones y mobiliario clínico", "pendiente": "", "prioridad": "MEDIA"}, {"id": 27, "codigo": "PROY-027", "ticket": "", "tipologia": "PROYECTO", "unidad": "SEDILE", "solicitante": "", "ubicacion": "Oficina nutricionistas", "piso": "-1", "pma": "", "requerimiento": "Instalación de mesones y mobiliario para nutricionistas", "estado": "PENDIENTE", "fecha_ingreso": "2026-05-26", "fecha_actualizacion": "2026-05-26", "descripcion": "Fabricación e instalación de mesones de trabajo en SEDILE", "pendiente": "", "prioridad": "MEDIA"}, {"id": 28, "codigo": "PROY-028", "ticket": "P-5-40", "tipologia": "PROYECTO", "unidad": "SALA PRE ALTA GO", "solicitante": "Roxana Montino Bahamondes", "ubicacion": "Sala de espera de familiares", "piso": "5", "pma": "P-5-40", "requerimiento": "HABILITACION SALA DE PRE ALTA GINECO OBSTETRA", "estado": "Propuesta enviada", "fecha_ingreso": "2026-03-25", "fecha_actualizacion": "2026-05-18", "descripcion": "Habilitación arquitectónica y tabiquería para sala de pre alta gineco obstétrica", "pendiente": "", "prioridad": "ALTA"}, {"id": 29, "codigo": "PROY-029", "ticket": "N-5-4", "tipologia": "PROYECTO", "unidad": "PATOLOGIA MAMARIA", "solicitante": "Antonia Ávila Toro", "ubicacion": "TERRAZA BLOQUE C", "piso": "5", "pma": "N-5-4", "requerimiento": "CONSTRUCCION DE BOX Y POOL PROFESIONALES", "estado": "Propuesta enviada", "fecha_ingreso": "2026-02-20", "fecha_actualizacion": "2026-02-20", "descripcion": "Construcción y cierre de terraza para box clínico y pool de profesionales", "pendiente": "", "prioridad": "ALTA"}, {"id": 30, "codigo": "PROY-030", "ticket": "", "tipologia": "PROYECTO", "unidad": "IMAGENOLOGIA", "solicitante": "", "ubicacion": "TERRAZA PISO 1", "piso": "1", "pma": "", "requerimiento": "ANGIOGRAFO, CONSTRUCCION DE RECINTOS", "estado": "PENDIENTE", "fecha_ingreso": "2026-05-26", "fecha_actualizacion": "2026-05-26", "descripcion": "Proyecto de infraestructura para instalación de equipo Angiógrafo", "pendiente": "", "prioridad": "ALTA"}, {"id": 31, "codigo": "PROY-031", "ticket": "G-1-43", "tipologia": "REPARACION", "unidad": "HOSPITALIZACION", "solicitante": "", "ubicacion": "Duchas en Baños", "piso": "1", "pma": "G-1-43", "requerimiento": "REPARACION DUCHAS EN BAÑOS", "estado": "PENDIENTE", "fecha_ingreso": "2026-05-26", "fecha_actualizacion": "2026-05-26", "descripcion": "Reparación y reposición de sellos, griferías y desagües de duchas", "pendiente": "", "prioridad": "ALTA"}, {"id": 32, "codigo": "PROY-032", "ticket": "MEMO N°162", "tipologia": "PROYECTO", "unidad": "ESTERILIZACION", "solicitante": "", "ubicacion": "Central de Esterilización", "piso": "-1", "pma": "", "requerimiento": "ADECUACIONES VARIAS MEMO N°162", "estado": "Propuesta enviada", "fecha_ingreso": "2026-05-26", "fecha_actualizacion": "2026-05-26", "descripcion": "Adecuaciones de infraestructura según requerimientos formalizados en Memo 162", "pendiente": "", "prioridad": "MEDIA"}, {"id": 33, "codigo": "PROY-033", "ticket": "", "tipologia": "PROYECTO", "unidad": "OFICINA PERSONAL", "solicitante": "", "ubicacion": "OFICINA PERSONAL", "piso": "1", "pma": "", "requerimiento": "ALMACENAMIENTO PARA OFICINA DE PERSONAL", "estado": "PENDIENTE", "fecha_ingreso": "2026-05-26", "fecha_actualizacion": "2026-05-26", "descripcion": "Habilitación de estanterías y muebles de almacenamiento para legajos de personal", "pendiente": "", "prioridad": "BAJA"}, {"id": 34, "codigo": "PROY-034", "ticket": "P-6-5", "tipologia": "PROYECTO", "unidad": "UROLOGIA", "solicitante": "", "ubicacion": "Biblioteca Urólogos", "piso": "6", "pma": "P-6-5", "requerimiento": "BIBLIOTECA UROLOGOS", "estado": "PENDIENTE", "fecha_ingreso": "2026-05-26", "fecha_actualizacion": "2026-05-26", "descripcion": "Habilitación de espacio de estudio y biblioteca médica de Urología", "pendiente": "", "prioridad": "BAJA"}, {"id": 35, "codigo": "PROY-035", "ticket": "", "tipologia": "REPARACION", "unidad": "Subdirección de Operaciones", "solicitante": "Rafael", "ubicacion": "UHCIP", "piso": "1", "pma": "", "requerimiento": "FILTRACION UHCIP", "estado": "TERMINADO", "fecha_ingreso": "2026-05-26", "fecha_actualizacion": "2026-05-26", "descripcion": "Detección y reparación de filtración en sector UHCIP", "pendiente": "", "prioridad": "ALTA"}, {"id": 36, "codigo": "PROY-036", "ticket": "", "tipologia": "REPARACION", "unidad": "Subdirección de Operaciones", "solicitante": "Rafael", "ubicacion": "PASILLO ESTERILIZACION", "piso": "-1", "pma": "", "requerimiento": "FILTRACION ESTERILIZACION", "estado": "TERMINADO", "fecha_ingreso": "2026-05-26", "fecha_actualizacion": "2026-05-26", "descripcion": "Reparación de filtración en cielo pasillo esterilización", "pendiente": "CON OBSERVACIONES", "prioridad": "MEDIA"}, {"id": 37, "codigo": "PROY-037", "ticket": "", "tipologia": "REPARACION", "unidad": "Subdirección de Operaciones", "solicitante": "Rafael", "ubicacion": "PASILLO OPERACIONES / ORIENTADORES", "piso": "-1", "pma": "", "requerimiento": "FILTRACION ORIENTADORES", "estado": "PENDIENTE", "fecha_ingreso": "2026-05-26", "fecha_actualizacion": "2026-05-26", "descripcion": "Reparación de filtración en sector pasillo orientadores", "pendiente": "", "prioridad": "ALTA"}, {"id": 38, "codigo": "PROY-038", "ticket": "", "tipologia": "REPARACION", "unidad": "Subdirección de Operaciones", "solicitante": "Rafael", "ubicacion": "ACCESO URGENCIA ADULTO", "piso": "1", "pma": "", "requerimiento": "FILTRACION URGENCIA ADULTO", "estado": "TERMINADO", "fecha_ingreso": "2026-05-10", "fecha_actualizacion": "2026-05-12", "descripcion": "Reparación urgente de filtración en marquesina y acceso urgencia adulto", "pendiente": "", "prioridad": "MUY ALTA"}, {"id": 39, "codigo": "PROY-039", "ticket": "", "tipologia": "REPARACION", "unidad": "Subdirección de Operaciones", "solicitante": "Rafael", "ubicacion": "CAJA ESCALA E5", "piso": "1", "pma": "", "requerimiento": "FILTRACION -1 CAJA ESCALA", "estado": "TERMINADO", "fecha_ingreso": "2026-05-26", "fecha_actualizacion": "2026-05-26", "descripcion": "Sellado e impermeabilización en caja escala E5", "pendiente": "", "prioridad": "MEDIA"}, {"id": 40, "codigo": "PROY-040", "ticket": "", "tipologia": "PROYECTO", "unidad": "HOSPITAL AMIGO", "solicitante": "", "ubicacion": "Sector Hospital Amigo", "piso": "1", "pma": "", "requerimiento": "DUCHA HOSPITAL AMIGO", "estado": "Propuesta enviada", "fecha_ingreso": "2026-05-26", "fecha_actualizacion": "2026-06-04", "descripcion": "Propuesta técnica para habilitación de ducha accesible en sector Hospital Amigo", "pendiente": "", "prioridad": "MEDIA"}, {"id": 41, "codigo": "PROY-041", "ticket": "", "tipologia": "PROYECTO", "unidad": "Subdirección de Operaciones", "solicitante": "", "ubicacion": "Terraza Choferes", "piso": "1", "pma": "", "requerimiento": "HABILITACION TERRAZA CHOFERES", "estado": "Propuesta enviada", "fecha_ingreso": "2026-05-26", "fecha_actualizacion": "2026-06-16", "descripcion": "Propuesta de cierre y techumbre para terraza de choferes", "pendiente": "", "prioridad": "MEDIA"}, {"id": 42, "codigo": "PROY-042", "ticket": "", "tipologia": "PROYECTO", "unidad": "COORDINACION CLINICA", "solicitante": "", "ubicacion": "Oficina Coordinadoras", "piso": "1", "pma": "", "requerimiento": "OFICINA COORDINADORAS", "estado": "PENDIENTE", "fecha_ingreso": "2026-05-26", "fecha_actualizacion": "2026-05-26", "descripcion": "Adecuación de puestos y tabiquería para oficinas de coordinadoras clínicas", "pendiente": "", "prioridad": "MEDIA"}, {"id": 43, "codigo": "PROY-043", "ticket": "#61819", "tipologia": "REPARACION", "unidad": "SUPERVISION UHCIP", "solicitante": "ANA ROJAS BRIONES", "ubicacion": "PATIO INTERIOR UHCIP", "piso": "1", "pma": "", "requerimiento": "RETIRO DE MACETEROS UHCIP PATIO", "estado": "PENDIENTE", "fecha_ingreso": "2026-02-18", "fecha_actualizacion": "2026-02-18", "descripcion": "Retiro y despeje de maceteros en patio interior UHCIP", "pendiente": "", "prioridad": "BAJA"}, {"id": 44, "codigo": "PROY-044", "ticket": "#61820", "tipologia": "PROYECTO", "unidad": "SUPERVISION UHCIP", "solicitante": "ANA ROJAS BRIONES", "ubicacion": "CONSULTA UHCIP", "piso": "1", "pma": "", "requerimiento": "CIELO BOX CONSULTA", "estado": "PENDIENTE", "fecha_ingreso": "2026-05-26", "fecha_actualizacion": "2026-05-26", "descripcion": "Reinstalación y terminación de cielo modular en Box de Consulta UHCIP", "pendiente": "", "prioridad": "MEDIA"}, {"id": 45, "codigo": "PROY-045", "ticket": "", "tipologia": "REPARACION", "unidad": "Subdirección de Operaciones", "solicitante": "Rafael", "ubicacion": "PATIO ABASTECIMIENTO", "piso": "-1", "pma": "", "requerimiento": "REPARACION FACHADA ALUCOBOND", "estado": "PENDIENTE", "fecha_ingreso": "2026-05-26", "fecha_actualizacion": "2026-05-26", "descripcion": "Fijación y reposición de paneles de revestimiento Alucobond en fachada patio", "pendiente": "", "prioridad": "MEDIA"}, {"id": 46, "codigo": "PROY-046", "ticket": "", "tipologia": "REPARACION", "unidad": "Subdirección de Operaciones", "solicitante": "", "ubicacion": "SALA DE RECUPERACION", "piso": "2", "pma": "", "requerimiento": "MEJORA LAVAMANOS / INCORPORA CERAMICA", "estado": "PENDIENTE", "fecha_ingreso": "2026-05-26", "fecha_actualizacion": "2026-05-26", "descripcion": "Instalación de revestimiento cerámico lavable en zona de lavamanos", "pendiente": "", "prioridad": "MEDIA"}];
 
     function escapeHtml(unsafe) {
       if (!unsafe) return '';
@@ -940,7 +896,7 @@
       if (!window.crypto || !window.crypto.subtle) {
         let h = 0;
         for(let i=0; i<pin.length; i++) h = Math.imul(31, h) + pin.charCodeAt(i) | 0;
-        return 'fallback_' + h;
+        return `fallback_${h}`;
       }
       const msgBuffer = new TextEncoder().encode(pin);
       const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
@@ -948,37 +904,30 @@
       return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     }
 
-    class UnifiedPlatformApp {
+    class HospitalApp {
       constructor() {
-        this.currentRole = 'supervisor';
+        this.currentRole = null;
         this.enteredPin = '';
         this.selectedAuthRole = 'supervisor';
-        this.activeModule = 'projects';
-
-        this.projects = [];
         this.orders = [];
         this.viewMode = 'cards';
-        this.projectsViewMode = 'kanban';
-        this.projectStatusFilter = 'ALL';
         this.filterStatus = 'TODOS';
         this.activeOperativeOt = null;
-        this.currentProjectInModal = null;
-        this.draggedProjectId = null;
         this.reportFilteredList = [];
-
+        
         this.hospitalName = SGM_CONFIG.defaultHospital;
         this.folioPrefix = SGM_CONFIG.defaultPrefix;
         this.customLogo = null;
-        this.technicians = ["Pablo Loira", "Rafael", "Ángel Asencio"];
+        this.technicians = ["Pablo Loira"];
         this.hashes = { supervisor: "", tecnico: "" };
 
         this.supabase = null;
         this.syncing = false;
-
         this.initAuth();
         this.initScrollSpy();
-
-        window.addEventListener('popstate', () => {
+        
+        // Manejar botón "Atrás" del navegador y móviles
+        window.addEventListener('popstate', (e) => {
           if (!document.getElementById('unifiedOperativeView').classList.contains('hidden')) {
             this.closeOperativeView(true);
           }
@@ -989,34 +938,35 @@
         this.hashes.supervisor = await hashPin(SGM_CONFIG.defaultPins.supervisor);
         this.hashes.tecnico = await hashPin(SGM_CONFIG.defaultPins.tecnico);
         
-        this.loadInitialStores();
         this.initSupabase();
-
-        setInterval(() => this.updateTimeElapsedElements(), 60000);
-
+        this.loadInitialData();
+        setInterval(() => this.updateTimeElapsedElements(), 60000); // 1 min update
+        
         const cachedRole = sessionStorage.getItem('sdo_active_role');
         if (cachedRole) {
           this.currentRole = cachedRole;
+          this.applyRoleRestrictions();
+        } else {
+          this.openAuthModal();
         }
-        this.applyRoleRestrictions();
       }
-
+      
       initScrollSpy() {
-        const links = document.querySelectorAll('.uov-nav-link');
-        links.forEach(link => {
-          link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const targetId = link.getAttribute('href').substring(1);
-            const targetEl = document.getElementById(targetId);
-            if (targetEl) {
-              const yOffset = -20;
-              const y = targetEl.getBoundingClientRect().top + window.pageYOffset + yOffset;
-              window.scrollTo({ top: y, behavior: 'smooth' });
-              links.forEach(l => l.classList.remove('active'));
-              link.classList.add('active');
-            }
+          const links = document.querySelectorAll('.uov-nav-link');
+          links.forEach(link => {
+              link.addEventListener('click', (e) => {
+                  e.preventDefault();
+                  const targetId = link.getAttribute('href').substring(1);
+                  const targetEl = document.getElementById(targetId);
+                  if (targetEl) {
+                      const yOffset = -20; 
+                      const y = targetEl.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                      window.scrollTo({top: y, behavior: 'smooth'});
+                      links.forEach(l => l.classList.remove('active'));
+                      link.classList.add('active');
+                  }
+              });
           });
-        });
       }
 
       initSupabase() {
@@ -1024,22 +974,17 @@
           if (window.supabase && SGM_CONFIG.supabaseUrl.startsWith("https://")) {
             this.supabase = window.supabase.createClient(SGM_CONFIG.supabaseUrl, SGM_CONFIG.supabaseAnonKey);
             this.subscribeRealtime();
-            this.fetchConfigFromSupabase();
-            this.fetchOrdersFromSupabase();
-            this.fetchProjectsFromSupabase();
           }
-        } catch (e) { console.warn("Supabase local mode:", e); }
+        } catch (e) { console.warn("Supabase local mode"); }
       }
 
       subscribeRealtime() {
         if (!this.supabase) return;
-        
-        this.supabase.channel('sdo_unified_realtime')
+        this.supabase.channel('orders_realtime')
           .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, (payload) => {
-            console.log("Realtime evento en orders:", payload.eventType);
-            if (payload.eventType === 'DELETE' && payload.old) {
+            if (payload.eventType === 'DELETE') {
               this.orders = this.orders.filter(o => o.id !== payload.old.id);
-            } else if (payload.new && payload.new.data) {
+            } else {
               const idx = this.orders.findIndex(o => o.id === payload.new.id);
               if (idx !== -1) {
                 this.orders[idx] = payload.new.data;
@@ -1047,29 +992,15 @@
                 this.orders.unshift(payload.new.data);
               }
             }
-            localStorage.setItem('sdo_orders_cache_v6', JSON.stringify(this.orders));
+            localStorage.setItem('sdo_orders_cache', JSON.stringify(this.orders));
             this.updateKpis();
             this.renderOrdersList();
-
+            
+            // Refresh Active Operative View without losing unsaved field edits if it's open
             if (this.activeOperativeOt && payload.new && payload.new.id === this.activeOperativeOt.id) {
-              this.activeOperativeOt = payload.new.data;
-              this.renderOperativeHistory(this.activeOperativeOt);
+               this.activeOperativeOt = payload.new.data;
+               this.renderOperativeHistory(this.activeOperativeOt);
             }
-          })
-          .on('postgres_changes', { event: '*', schema: 'public', table: 'projects_hbqp' }, (payload) => {
-            console.log("Realtime evento en projects_hbqp:", payload.eventType);
-            if (payload.eventType === 'DELETE' && payload.old) {
-              this.projects = this.projects.filter(p => String(p.id) !== String(payload.old.id));
-            } else if (payload.new && payload.new.data) {
-              const idx = this.projects.findIndex(p => String(p.id) === String(payload.new.id));
-              if (idx !== -1) {
-                this.projects[idx] = payload.new.data;
-              } else {
-                this.projects.unshift(payload.new.data);
-              }
-            }
-            localStorage.setItem('hbqp_projects_store_v6', JSON.stringify(this.projects));
-            this.renderProjects();
           })
           .on('postgres_changes', { event: '*', schema: 'public', table: 'system_settings' }, () => {
             this.fetchConfigFromSupabase();
@@ -1080,47 +1011,14 @@
       async fetchOrdersFromSupabase() {
         if (!this.supabase) return;
         try {
-          const { data, error } = await this.supabase.from('orders').select('*').order('created_at', { ascending: false });
+          const { data, error } = await this.supabase.from('orders').select('*');
           if (!error && data) {
-            if (data.length > 0) {
-              this.orders = data.map(row => row.data);
-              localStorage.setItem('sdo_orders_cache_v6', JSON.stringify(this.orders));
-              this.updateKpis();
-              this.renderOrdersList();
-            } else if (this.orders.length > 0) {
-              for (const o of this.orders) {
-                await this.supabase.from('orders').upsert({
-                  id: String(o.id),
-                  data: o,
-                  created_at: o.fechaCreacion || new Date().toISOString()
-                });
-              }
-            }
+            this.orders = data.map(row => row.data);
+            this.updateKpis();
+            this.renderOrdersList();
+            localStorage.setItem('sdo_orders_cache', JSON.stringify(this.orders));
           }
-        } catch (e) { console.warn("Error fetching orders:", e); }
-      }
-
-      async fetchProjectsFromSupabase() {
-        if (!this.supabase) return;
-        try {
-          const { data, error } = await this.supabase.from('projects_hbqp').select('*');
-          if (!error && data) {
-            if (data.length > 0) {
-              this.projects = data.map(row => row.data);
-              localStorage.setItem('hbqp_projects_store_v6', JSON.stringify(this.projects));
-              this.renderProjects();
-            } else if (this.projects.length > 0) {
-              for (const p of this.projects) {
-                await this.supabase.from('projects_hbqp').upsert({
-                  id: String(p.id),
-                  codigo: p.codigo,
-                  data: p,
-                  updated_at: new Date().toISOString()
-                });
-              }
-            }
-          }
-        } catch (e) { console.warn("Error fetching projects:", e); }
+        } catch (e) {}
       }
 
       async fetchConfigFromSupabase() {
@@ -1138,41 +1036,13 @@
               this.hashes.tecnico = cfg.hashes.tecnico || this.hashes.tecnico;
             }
             this.updateUIWithConfig();
-            localStorage.setItem('sdo_settings_cache_v6', JSON.stringify(cfg));
+            localStorage.setItem('sdo_settings_cache', JSON.stringify(cfg));
           }
         } catch (e) {}
       }
 
-      async forceSyncAll() {
-        this.showToast('Sincronizando con Supabase...', '🔄');
-        if (this.supabase) {
-          try {
-            for (const o of this.orders) {
-              await this.supabase.from('orders').upsert({
-                id: String(o.id),
-                data: o,
-                created_at: o.fechaCreacion || new Date().toISOString()
-              });
-            }
-            for (const p of this.projects) {
-              await this.supabase.from('projects_hbqp').upsert({
-                id: String(p.id),
-                codigo: p.codigo,
-                data: p,
-                updated_at: new Date().toISOString()
-              });
-            }
-            await this.fetchOrdersFromSupabase();
-            await this.fetchProjectsFromSupabase();
-            this.showToast('Nube y dispositivos sincronizados', '✅');
-          } catch(e) {
-            this.showToast('Error de conexión con Supabase', '⚠️');
-          }
-        }
-      }
-
-      loadInitialStores() {
-        const storedCfg = localStorage.getItem('sdo_settings_cache_v6');
+      loadInitialData() {
+        const storedCfg = localStorage.getItem('sdo_settings_cache');
         if (storedCfg) {
           try {
             const cfg = JSON.parse(storedCfg);
@@ -1188,47 +1058,36 @@
         }
         this.updateUIWithConfig();
 
-        const storedProjects = localStorage.getItem('hbqp_projects_store_v6');
-        if (storedProjects) {
-          try {
-            const parsed = JSON.parse(storedProjects);
-            this.projects = (parsed && parsed.length > 0) ? parsed : INITIAL_PROJECTS;
-          } catch (e) { this.projects = INITIAL_PROJECTS; }
-        } else {
-          this.projects = JSON.parse(JSON.stringify(INITIAL_PROJECTS));
-          localStorage.setItem('hbqp_projects_store_v6', JSON.stringify(this.projects));
-        }
-
-        const storedOrders = localStorage.getItem('sdo_orders_cache_v6');
+        const storedOrders = localStorage.getItem('sdo_orders_cache');
         if (storedOrders) {
-          try { this.orders = JSON.parse(storedOrders); } catch (e) { this.orders = []; }
-        } else {
-          this.orders = [];
+          try { this.orders = JSON.parse(storedOrders); } catch (e) {}
+        }
+        
+        if (this.supabase) {
+          this.fetchConfigFromSupabase();
+          this.fetchOrdersFromSupabase();
         }
 
         this.updateKpis();
         this.renderOrdersList();
-        this.renderProjects();
         this.checkDeepLink();
       }
 
       updateUIWithConfig() {
-        const headerHosp = document.getElementById('headerHospitalName');
-        if (headerHosp) headerHosp.textContent = this.hospitalName;
-
+        document.getElementById('headerHospitalName').textContent = this.hospitalName;
         const containers = ['headerLogoContainer', 'authLogoContainer', 'settingsLogoPreview'];
         containers.forEach(id => {
           const el = document.getElementById(id);
           if (el) {
-            if (this.customLogo) { el.innerHTML = '<img src="' + escapeHtml(this.customLogo) + '" class="w-full h-full object-contain">'; } 
-            else { el.innerHTML = '<span class="text-lg sm:text-xl" aria-hidden="true">🏥</span>'; }
+            if (this.customLogo) { el.innerHTML = `<img src="${escapeHtml(this.customLogo)}" class="w-full h-full object-contain">`; } 
+            else { el.innerHTML = `<span class="text-xl" aria-hidden="true">🏥</span>`; }
           }
         });
         this.populateTechDropdowns();
       }
 
       populateTechDropdowns() {
-        const options = this.technicians.map(t => '<option value="' + escapeHtml(t) + '">' + escapeHtml(t) + '</option>').join('');
+        const options = this.technicians.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('');
         document.querySelectorAll('.dynamic-tech-select').forEach(sel => {
           const val = sel.value;
           sel.innerHTML = options;
@@ -1248,48 +1107,20 @@
       }
 
       async syncOrderToCloud(order) {
-        localStorage.setItem('sdo_orders_cache_v6', JSON.stringify(this.orders));
+        localStorage.setItem('sdo_orders_cache', JSON.stringify(this.orders));
         if (this.supabase) {
           this.syncing = true;
           try {
-            const payload = {
-              id: String(order.id),
-              data: order,
-              created_at: order.fechaCreacion || new Date().toISOString()
-            };
-            const { error } = await this.supabase.from('orders').upsert(payload);
+            const { error } = await this.supabase.from('orders').upsert({ id: order.id, data: order, created_at: order.fechaCreacion });
             if (error) throw error;
-            this.showToast('OT sincronizada con Supabase', '☁️');
-          } catch (e) {
-            console.error("Error sincronizando orden con Supabase:", e);
-            this.showToast('Guardado local (Sin conexión)', '⚠️');
-          } finally {
-            this.syncing = false;
-          }
-        } else {
-          this.showToast('Guardado localmente');
-        }
-      }
-
-      async syncProject(p) {
-        localStorage.setItem('hbqp_projects_store_v6', JSON.stringify(this.projects));
-        if (this.supabase) {
-          try {
-            await this.supabase.from('projects_hbqp').upsert({
-              id: String(p.id),
-              codigo: p.codigo,
-              data: p,
-              updated_at: new Date().toISOString()
-            });
-          } catch(e) {
-            console.error("Error sincronizando proyecto:", e);
-          }
-        }
+            this.showToast('Sincronizado con Supabase');
+          } catch (e) { this.showToast('Guardado local (Sin conexión)', '⚠️'); } finally { this.syncing = false; }
+        } else { this.showToast('Guardado localmente'); }
       }
 
       async syncConfigToCloud() {
         const cfg = { hospitalName: this.hospitalName, folioPrefix: this.folioPrefix, customLogo: this.customLogo, technicians: this.technicians, hashes: this.hashes };
-        localStorage.setItem('sdo_settings_cache_v6', JSON.stringify(cfg));
+        localStorage.setItem('sdo_settings_cache', JSON.stringify(cfg));
         if (this.supabase) {
           try {
             await this.supabase.from('system_settings').upsert({ id: 'global_config', config_data: cfg });
@@ -1302,8 +1133,8 @@
         const container = document.getElementById('toastContainer');
         if (!container) return;
         const t = document.createElement('div');
-        t.className = 'bg-slate-900 text-white px-4 py-2 rounded-xl shadow-2xl text-xs font-bold flex items-center gap-2 toast-anim border border-slate-700 pointer-events-auto';
-        t.innerHTML = '<span>' + icon + '</span> <span>' + escapeHtml(message) + '</span>';
+        t.className = 'bg-slate-900 text-white px-4 py-2 rounded-lg shadow-xl text-xs font-bold flex items-center gap-2 toast-anim';
+        t.innerHTML = `<span>${icon}</span> <span>${escapeHtml(message)}</span>`;
         container.appendChild(t);
         setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 3000);
       }
@@ -1311,21 +1142,21 @@
       openAuthModal() {
         this.enteredPin = '';
         this.updatePinDots();
-        document.getElementById('authErrorMsg')?.classList.add('hidden');
-        document.getElementById('authModal')?.classList.remove('hidden');
+        document.getElementById('authErrorMsg').classList.add('hidden');
+        document.getElementById('authModal').classList.remove('hidden');
       }
-      closeAuthModal() { if (this.currentRole) document.getElementById('authModal')?.classList.add('hidden'); }
+      closeAuthModal() { if (this.currentRole) document.getElementById('authModal').classList.add('hidden'); }
 
       selectAuthRole(role) {
         this.selectedAuthRole = role;
         const btnSup = document.getElementById('roleBtnSupervisor');
         const btnTec = document.getElementById('roleBtnTecnico');
         if (role === 'supervisor') {
-          if (btnSup) btnSup.className = "py-2 text-xs font-bold rounded-lg border-2 border-indigo-600 bg-indigo-50 text-indigo-700";
-          if (btnTec) btnTec.className = "py-2 text-xs font-bold rounded-lg border-2 border-slate-200 bg-white text-slate-600";
+          btnSup.className = "py-2 text-xs font-bold rounded-lg border-2 border-blue-600 bg-blue-50 text-blue-700";
+          btnTec.className = "py-2 text-xs font-bold rounded-lg border-2 border-slate-200 bg-white text-slate-600";
         } else {
-          if (btnTec) btnTec.className = "py-2 text-xs font-bold rounded-lg border-2 border-indigo-600 bg-indigo-50 text-indigo-700";
-          if (btnSup) btnSup.className = "py-2 text-xs font-bold rounded-lg border-2 border-slate-200 bg-white text-slate-600";
+          btnTec.className = "py-2 text-xs font-bold rounded-lg border-2 border-blue-600 bg-blue-50 text-blue-700";
+          btnSup.className = "py-2 text-xs font-bold rounded-lg border-2 border-slate-200 bg-white text-slate-600";
         }
       }
 
@@ -1341,8 +1172,8 @@
 
       updatePinDots() {
         for (let i = 0; i < 4; i++) {
-          const dot = document.getElementById('pinDot' + i);
-          if (dot) dot.className = i < this.enteredPin.length ? "w-3.5 h-3.5 rounded-full border-2 border-indigo-600 bg-indigo-600" : "w-3.5 h-3.5 rounded-full border-2 border-slate-300 bg-white";
+          const dot = document.getElementById(`pinDot${i}`);
+          dot.className = i < this.enteredPin.length ? "w-3.5 h-3.5 rounded-full border-2 border-blue-600 bg-blue-600" : "w-3.5 h-3.5 rounded-full border-2 border-slate-300 bg-white";
         }
       }
 
@@ -1353,10 +1184,10 @@
           this.currentRole = this.selectedAuthRole;
           sessionStorage.setItem('sdo_active_role', this.currentRole);
           this.applyRoleRestrictions();
-          this.closeAuthModal();
-          this.clearPin();
+          document.getElementById('authModal').classList.add('hidden');
+          this.renderDashboard();
         } else {
-          document.getElementById('authErrorMsg')?.classList.remove('hidden');
+          document.getElementById('authErrorMsg').classList.remove('hidden');
           this.clearPin();
         }
       }
@@ -1364,575 +1195,29 @@
       applyRoleRestrictions() {
         if (!this.currentRole) return;
         const badge = document.getElementById('roleBadge');
-        const switcher = document.getElementById('moduleSwitcher');
-        const mob = document.getElementById('mobileModuleOptions');
-        const sup = document.getElementById('supervisorMenuOptions');
+        badge.textContent = this.currentRole.toUpperCase();
+        badge.className = this.currentRole === 'supervisor' ? 'text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-blue-600 text-white' : 'text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-amber-600 text-white';
+        document.getElementById('supervisorMenuOptions').classList.toggle('hidden', this.currentRole === 'tecnico');
+        this.renderOrdersList();
+      }
+      toggleMenu() { if (this.currentRole) document.getElementById('appMenuDropdown').classList.toggle('hidden'); }
 
-        if (this.currentRole === 'supervisor') {
-          if (badge) {
-            badge.textContent = 'SUPERVISOR';
-            badge.className = 'text-[9px] sm:text-[10px] uppercase font-black tracking-wider px-1.5 py-0.5 rounded bg-indigo-600 text-white shrink-0';
-          }
-          switcher?.classList.remove('hidden');
-          mob?.classList.remove('hidden');
-          sup?.classList.remove('hidden');
-          this.switchModule('projects');
-        } else {
-          if (badge) {
-            badge.textContent = 'TÉCNICO';
-            badge.className = 'text-[9px] sm:text-[10px] uppercase font-black tracking-wider px-1.5 py-0.5 rounded bg-amber-600 text-white shrink-0';
-          }
-          switcher?.classList.add('hidden');
-          mob?.classList.add('hidden');
-          sup?.classList.add('hidden');
-          this.switchModule('orders');
-        }
+      renderDashboard() {
+        document.getElementById('unifiedOperativeView').classList.add('hidden');
+        this.updateKpis();
+        this.renderOrdersList();
       }
 
-      switchModule(m) {
-        if (m === 'projects' && this.currentRole !== 'supervisor') return;
-        this.activeModule = m;
-        
-        const navP = document.getElementById('navBtnProjects');
-        const navO = document.getElementById('navBtnOrders');
-        const viewP = document.getElementById('moduleProjectsView');
-        const viewO = document.getElementById('moduleOrdersView');
-
-        if (m === 'projects') {
-          if (navP) navP.className = "px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg bg-indigo-600 text-white shadow transition flex items-center gap-1";
-          if (navO) navO.className = "px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-slate-300 hover:text-white transition flex items-center gap-1";
-          viewP?.classList.remove('hidden');
-          viewO?.classList.add('hidden');
-          this.renderProjects();
-        } else {
-          if (navO) navO.className = "px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg bg-blue-600 text-white shadow transition flex items-center gap-1";
-          if (navP) navP.className = "px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-slate-300 hover:text-white transition flex items-center gap-1";
-          viewO?.classList.remove('hidden');
-          viewP?.classList.add('hidden');
-          this.updateKpis();
-          this.renderOrdersList();
-        }
-        this.updateHeaderContext();
-      }
-
-      updateHeaderContext() {
-        const sum = document.getElementById('moduleStatsSummary');
-        const accessLabel = document.getElementById('moduleAccessLabel');
-        const btnHeader = document.getElementById('btnHeaderAction');
-        const btnText = document.getElementById('btnHeaderActionText');
-        const btnIcon = document.getElementById('btnHeaderActionIcon');
-
-        if (this.activeModule === 'orders') {
-          const p = this.orders.filter(o => o.estado === 'Pendiente').length;
-          const e = this.orders.filter(o => o.estado === 'En Ejecución').length;
-          const r = this.orders.filter(o => o.estado === 'Solicitud Cierre').length;
-          const t = this.orders.filter(o => o.estado === 'Terminada').length;
-
-          if (sum) {
-            sum.innerHTML = `
-              <div class="flex items-center gap-2 flex-wrap">
-                <span class="px-2 py-0.5 rounded bg-blue-600 text-white font-black text-[10px] uppercase flex items-center gap-1 shadow-sm">
-                  <i class="fa-solid fa-wrench"></i> ÓRDENES DE TRABAJO
-                </span>
-                <span class="text-slate-600 hidden sm:inline">|</span>
-                <span>Total OTs: <strong class="text-white font-bold">${this.orders.length}</strong></span>
-                <span class="cursor-pointer hover:underline" onclick="window.app.setFilterStatus('Pendiente')">
-                  <span class="w-2 h-2 rounded-full bg-amber-400 inline-block mr-1"></span>En Curso: <strong class="text-amber-300 font-bold">${p}</strong>
-                </span>
-                <span class="cursor-pointer hover:underline" onclick="window.app.setFilterStatus('En Ejecución')">
-                  <span class="w-2 h-2 rounded-full bg-blue-400 inline-block mr-1"></span>Ejecución: <strong class="text-blue-300 font-bold">${e}</strong>
-                </span>
-                <span class="cursor-pointer hover:underline" onclick="window.app.setFilterStatus('Solicitud Cierre')">
-                  <span class="w-2 h-2 rounded-full bg-indigo-400 inline-block mr-1"></span>Cierre: <strong class="text-indigo-300 font-bold">${r}</strong>
-                </span>
-                <span class="cursor-pointer hover:underline" onclick="window.app.setFilterStatus('Terminada')">
-                  <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block mr-1"></span>Terminadas: <strong class="text-emerald-300 font-bold">${t}</strong>
-                </span>
-              </div>
-            `;
-          }
-
-          if (accessLabel) accessLabel.innerHTML = '<i class="fa-solid fa-wrench text-blue-400 mr-1"></i> Base de Datos OTs Conectada';
-          if (btnHeader) {
-            btnHeader.className = "px-2.5 sm:px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 active:scale-95 text-white text-xs font-bold transition flex items-center gap-1 shadow-sm";
-          }
-          if (btnIcon) btnIcon.innerHTML = '<i class="fa-solid fa-plus mr-0.5"></i>';
-          if (btnText) btnText.textContent = "Nueva OT";
-
-        } else {
-          const pCount = this.projects.filter(p => this.normalizeProjectStatus(p.estado) === 'PENDIENTE').length;
-          const propCount = this.projects.filter(p => this.normalizeProjectStatus(p.estado) === 'Propuesta enviada').length;
-          const procCount = this.projects.filter(p => this.normalizeProjectStatus(p.estado) === 'EN PROCESO').length;
-          const doneCount = this.projects.filter(p => this.normalizeProjectStatus(p.estado) === 'TERMINADO').length;
-
-          if (sum) {
-            sum.innerHTML = `
-              <div class="flex items-center gap-2 flex-wrap">
-                <span class="px-2 py-0.5 rounded bg-indigo-600 text-white font-black text-[10px] uppercase flex items-center gap-1 shadow-sm">
-                  <i class="fa-solid fa-diagram-project"></i> PROYECTOS
-                </span>
-                <span class="text-slate-600 hidden sm:inline">|</span>
-                <span>Total Proyectos: <strong class="text-white font-bold">${this.projects.length}</strong></span>
-                <span class="cursor-pointer hover:underline" onclick="window.app.setProjectStatusFilter('PENDIENTE')">
-                  <span class="w-2 h-2 rounded-full bg-amber-400 inline-block mr-1"></span>Pend: <strong class="text-amber-300 font-bold">${pCount}</strong>
-                </span>
-                <span class="cursor-pointer hover:underline" onclick="window.app.setProjectStatusFilter('Propuesta enviada')">
-                  <span class="w-2 h-2 rounded-full bg-blue-400 inline-block mr-1"></span>Prop: <strong class="text-blue-300 font-bold">${propCount}</strong>
-                </span>
-                <span class="cursor-pointer hover:underline" onclick="window.app.setProjectStatusFilter('EN PROCESO')">
-                  <span class="w-2 h-2 rounded-full bg-indigo-400 inline-block mr-1"></span>Obras: <strong class="text-indigo-300 font-bold">${procCount}</strong>
-                </span>
-                <span class="cursor-pointer hover:underline" onclick="window.app.setProjectStatusFilter('TERMINADO')">
-                  <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block mr-1"></span>Concluidos: <strong class="text-emerald-300 font-bold">${doneCount}</strong>
-                </span>
-              </div>
-            `;
-          }
-
-          if (accessLabel) accessLabel.innerHTML = '<i class="fa-solid fa-diagram-project text-indigo-400 mr-1"></i> Catálogo Proyectos Conectado';
-          if (btnHeader) {
-            btnHeader.className = "px-2.5 sm:px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white text-xs font-bold transition flex items-center gap-1 shadow-sm";
-          }
-          if (btnIcon) btnIcon.innerHTML = '<i class="fa-solid fa-plus mr-0.5"></i>';
-          if (btnText) btnText.textContent = "Nuevo Proyecto";
-        }
-      }
-
-
-      handleHeaderPrimaryAction() {
-        if (this.activeModule === 'projects') this.openCreateProjectModal();
-        else this.openCreateOtModal();
-      }
-
-      toggleMenu() { document.getElementById('appMenuDropdown')?.classList.toggle('hidden'); }
-      renderActiveModule() { this.switchModule(this.activeModule); }
-
-      // --- PROYECTOS (KANBAN) ---
-      normalizeProjectStatus(s) {
-        if (!s) return 'PENDIENTE';
-        const u = s.toUpperCase();
-        if (u.includes('PENDIENTE')) return 'PENDIENTE';
-        if (u.includes('PROPUESTA')) return 'Propuesta enviada';
-        if (u.includes('PROCESO') || u.includes('EJECUC')) return 'EN PROCESO';
-        if (u.includes('TERMINADO') || u.includes('LISTO')) return 'TERMINADO';
-        return 'PENDIENTE';
-      }
-
-      renderProjects() {
-        const c = document.getElementById('projectsContainer');
-        if (!c) return;
-
-        const q = (document.getElementById('searchProjectsInput')?.value || '').toLowerCase().trim();
-        const tipo = (document.getElementById('filterProjTipologia')?.value || '').toUpperCase();
-        const piso = document.getElementById('filterProjPiso')?.value || '';
-
-        const pCount = this.projects.filter(p => this.normalizeProjectStatus(p.estado) === 'PENDIENTE').length;
-        const propCount = this.projects.filter(p => this.normalizeProjectStatus(p.estado) === 'Propuesta enviada').length;
-        const procCount = this.projects.filter(p => this.normalizeProjectStatus(p.estado) === 'EN PROCESO').length;
-        const doneCount = this.projects.filter(p => this.normalizeProjectStatus(p.estado) === 'TERMINADO').length;
-
-        if (this.activeModule === 'projects') {
-          this.updateHeaderContext();
-        }
-
-        const filtered = this.projects.filter(p => {
-          const norm = this.normalizeProjectStatus(p.estado);
-          const matchQ = !q || p.codigo?.toLowerCase().includes(q) || p.requerimiento?.toLowerCase().includes(q) || p.unidad?.toLowerCase().includes(q) || p.pma?.toLowerCase().includes(q);
-          const matchS = this.projectStatusFilter === 'ALL' || norm === this.projectStatusFilter;
-          const matchT = !tipo || p.tipologia?.toUpperCase().includes(tipo);
-          const matchP = !piso || String(p.piso).includes(piso);
-          return matchQ && matchS && matchT && matchP;
-        });
-
-        if (this.projectsViewMode === 'kanban') {
-          const cols = [
-            { key: 'PENDIENTE', id: 'kanban_PENDIENTE', title: 'En Evaluación / Pendientes', color: 'bg-amber-500', badge: 'bg-amber-100 text-amber-900', count: pCount },
-            { key: 'Propuesta enviada', id: 'kanban_PROPUESTA', title: 'Propuesta Enviada', color: 'bg-blue-500', badge: 'bg-blue-100 text-blue-900', count: propCount },
-            { key: 'EN PROCESO', id: 'kanban_PROCESO', title: 'En Obras / Ejecución', color: 'bg-indigo-500', badge: 'bg-indigo-100 text-indigo-900', count: procCount },
-            { key: 'TERMINADO', id: 'kanban_TERMINADO', title: 'Concluidos / Entregados', color: 'bg-emerald-500', badge: 'bg-emerald-100 text-emerald-900', count: doneCount }
-          ];
-
-          // Mobile fast stage switcher tabs + Snap carousel board
-          c.innerHTML = `
-            <!-- Barra de navegación rápida móvil entre fases del Kanban -->
-            <div class="md:hidden flex items-center gap-1.5 overflow-x-auto custom-scroll pb-2 mb-2 whitespace-nowrap">
-              ${cols.map(col => `
-                <button type="button" onclick="window.app.scrollToKanbanCol('${col.id}')" 
-                        class="px-2.5 py-1 rounded-full text-xs font-bold ${col.badge} border border-slate-200/60 shadow-sm shrink-0 flex items-center gap-1">
-                  <span class="w-2 h-2 rounded-full ${col.color}"></span>
-                  <span>${col.title.split('/')[0].trim()}</span>
-                  <span class="ml-0.5 opacity-80">(${col.count})</span>
-                </button>
-              `).join('')}
-            </div>
-
-            <!-- Tablero Kanban (Deslizable tipo carrusel en móvil con snap, Grid en desktop) -->
-            <div id="kanbanBoardWrapper" class="flex md:grid md:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 items-start overflow-x-auto snap-x snap-mandatory pb-4 custom-scroll">
-              ${cols.map(col => `
-                <div id="${col.id}" class="kanban-col-container w-[88vw] sm:w-[330px] md:w-auto shrink-0 snap-center shadow-sm">
-                  <div class="flex justify-between items-center pb-2 mb-2.5 border-b border-slate-300">
-                    <span class="font-bold text-xs flex items-center gap-1.5 uppercase text-slate-800">
-                      <span class="w-2.5 h-2.5 rounded-full ${col.color}"></span> ${col.title}
-                    </span>
-                    <span class="text-xs font-bold px-2 py-0.5 rounded-full ${col.badge}">
-                      ${filtered.filter(p => this.normalizeProjectStatus(p.estado) === col.key).length}
-                    </span>
-                  </div>
-                  
-                  <div class="kanban-cards-wrapper custom-scroll" 
-                       ondragover="event.preventDefault(); this.classList.add('drag-over');" 
-                       ondragleave="this.classList.remove('drag-over');" 
-                       ondrop="window.app.handleProjectDrop(event, '${col.key}')">
-                    ${filtered.filter(p => this.normalizeProjectStatus(p.estado) === col.key).map(p => `
-                      <div class="project-card group hover:border-indigo-400" draggable="true" ondragstart="window.app.draggedProjectId=${p.id}" onclick="window.app.openEditProjectModal(${p.id})">
-                        <div class="flex justify-between items-center text-xs mb-1.5">
-                          <span class="font-black text-indigo-900">${escapeHtml(p.codigo || 'PROY-' + p.id)}</span>
-                          <span class="px-2 py-0.5 rounded text-[10px] font-bold ${p.tipologia === 'REPARACION' ? 'badge-reparacion' : (p.tipologia === 'APOYO TECNICO' ? 'badge-apoyo' : 'badge-proyecto')}">
-                            ${p.tipologia || 'PROYECTO'}
-                          </span>
-                        </div>
-                        <h4 class="text-xs font-bold text-slate-900 mb-1.5 group-hover:text-indigo-600 transition line-clamp-2">
-                          ${escapeHtml(p.requerimiento || p.descripcion)}
-                        </h4>
-                        ${p.unidad ? `<p class="text-[11px] text-slate-600 mb-1 truncate">🏢 ${escapeHtml(p.unidad)}</p>` : ''}
-                        <div class="flex items-center gap-1 flex-wrap mb-2 text-[10px] text-slate-500">
-                          ${p.piso ? `<span class="bg-slate-100 px-1.5 py-0.5 rounded font-medium">Piso ${escapeHtml(p.piso)}</span>` : ''}
-                          ${p.pma ? `<span class="bg-cyan-50 text-cyan-800 px-1.5 py-0.5 rounded border border-cyan-200 font-bold">PMA: ${escapeHtml(p.pma)}</span>` : ''}
-                        </div>
-                        ${p.pendiente ? `<div class="p-1.5 bg-amber-50 rounded text-amber-900 text-[10px] font-bold mb-2 border border-amber-200/60">⚠️ ${escapeHtml(p.pendiente)}</div>` : ''}
-                        <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400">
-                          <span>${p.fecha_ingreso || ''}</span>
-                          <span class="text-indigo-600 font-bold group-hover:translate-x-0.5 transition-transform flex items-center gap-1">
-                            Ficha <i class="fa-solid fa-arrow-right text-[9px]"></i>
-                          </span>
-                        </div>
-                      </div>
-                    `).join('')}
-                    ${filtered.filter(p => this.normalizeProjectStatus(p.estado) === col.key).length === 0 ? `
-                      <div class="p-6 text-center text-slate-400 text-xs italic border border-dashed border-slate-300 rounded-xl">
-                        Sin proyectos en esta fase
-                      </div>
-                    ` : ''}
-                  </div>
-                </div>
-              `).join('')}
-            </div>
-          `;
-        } else if (this.projectsViewMode === 'cards') {
-          c.innerHTML = '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">' + filtered.map(p => `
-            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-slate-300 transition" onclick="window.app.openEditProjectModal(${p.id})">
-              <div class="flex justify-between items-center mb-1">
-                <span class="font-bold text-xs text-indigo-700">${escapeHtml(p.codigo || 'PROY-' + p.id)}</span>
-                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100">${p.estado}</span>
-              </div>
-              <h4 class="font-bold text-sm text-slate-900 mb-1 truncate">${escapeHtml(p.requerimiento || p.descripcion)}</h4>
-              <p class="text-xs text-slate-500 mb-1">🏢 ${escapeHtml(p.unidad || '')} · Piso ${escapeHtml(p.piso || '-')}</p>
-              ${p.pendiente ? `<p class="text-xs font-semibold text-amber-700 truncate">⚠️ ${escapeHtml(p.pendiente)}</p>` : ''}
-            </div>
-          `).join('') + '</div>';
-        } else {
-          // Modo Matriz (Tabla) con Scroll Horizontal Suave, Columna Sticky y Hint Móvil
-          c.innerHTML = `
-            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-              <div class="md:hidden px-3 py-2 bg-slate-50 border-b border-slate-200 flex items-center justify-between text-xs text-slate-500 font-medium">
-                <span><i class="fa-solid fa-arrows-left-right text-indigo-500 mr-1"></i> Desliza para ver todas las columnas</span>
-                <span class="font-bold text-indigo-700 text-[11px]">${filtered.length} proyectos</span>
-              </div>
-              <div class="overflow-x-auto custom-scroll w-full">
-                <table class="w-full text-left text-xs min-w-[850px]">
-                  <thead class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200 whitespace-nowrap">
-                    <tr>
-                      <th class="p-3 sticky left-0 bg-slate-50 z-10 shadow-[1px_0_0_#e2e8f0]">Código</th>
-                      <th class="p-3">Tipología</th>
-                      <th class="p-3 min-w-[240px]">Requerimiento</th>
-                      <th class="p-3">Unidad Solicitante</th>
-                      <th class="p-3">Piso / Recinto</th>
-                      <th class="p-3">PMA</th>
-                      <th class="p-3 min-w-[180px]">Hito Pendiente</th>
-                      <th class="p-3 text-right">Fase</th>
-                    </tr>
-                  </thead>
-                  <tbody class="divide-y divide-slate-100">
-                    ${filtered.map(p => `
-                      <tr class="hover:bg-slate-50 cursor-pointer transition" onclick="window.app.openEditProjectModal(${p.id})">
-                        <td class="p-3 font-black text-indigo-700 whitespace-nowrap sticky left-0 bg-white shadow-[1px_0_0_#e2e8f0]">
-                          ${escapeHtml(p.codigo || 'PROY-' + p.id)}
-                        </td>
-                        <td class="p-3 whitespace-nowrap">
-                          <span class="px-2 py-0.5 rounded text-[10px] font-bold ${p.tipologia === 'REPARACION' ? 'badge-reparacion' : (p.tipologia === 'APOYO TECNICO' ? 'badge-apoyo' : 'badge-proyecto')}">
-                            ${p.tipologia || 'PROYECTO'}
-                          </span>
-                        </td>
-                        <td class="p-3 font-semibold text-slate-900 leading-tight">
-                          ${escapeHtml(p.requerimiento || p.descripcion)}
-                        </td>
-                        <td class="p-3 text-slate-600 whitespace-nowrap">${escapeHtml(p.unidad || '-')}</td>
-                        <td class="p-3 whitespace-nowrap">Piso ${escapeHtml(p.piso || '-')} ${p.ubicacion ? '· ' + escapeHtml(p.ubicacion) : ''}</td>
-                        <td class="p-3 font-mono font-bold text-slate-700 whitespace-nowrap">${escapeHtml(p.pma || '-')}</td>
-                        <td class="p-3">
-                          ${p.pendiente ? `<span class="text-amber-800 bg-amber-50 px-2 py-1 rounded border border-amber-200 font-bold block text-[11px] leading-tight">⚠️ ${escapeHtml(p.pendiente)}</span>` : '<span class="text-slate-400">-</span>'}
-                        </td>
-                        <td class="p-3 text-right whitespace-nowrap">
-                          <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${this.normalizeProjectStatus(p.estado) === 'TERMINADO' ? 'bg-emerald-100 text-emerald-800' : (this.normalizeProjectStatus(p.estado) === 'EN PROCESO' ? 'bg-indigo-100 text-indigo-800' : (this.normalizeProjectStatus(p.estado) === 'Propuesta enviada' ? 'bg-blue-100 text-blue-800' : 'bg-amber-100 text-amber-800'))}">
-                            ${p.estado}
-                          </span>
-                        </td>
-                      </tr>
-                    `).join('')}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          `;
-        }
-      }
-
-      scrollToKanbanCol(colId) {
-        const el = document.getElementById(colId);
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-        }
-      }
-
-      setProjectsViewMode(m) {
-        this.projectsViewMode = m;
-        const btnK = document.getElementById('btnProjViewKanban');
-        const btnC = document.getElementById('btnProjViewCards');
-        const btnT = document.getElementById('btnProjViewTable');
-        [btnK, btnC, btnT].forEach(b => { if (b) b.className = "px-2.5 sm:px-3 py-1.5 rounded-md text-slate-600"; });
-        if (m === 'kanban' && btnK) btnK.className = "px-2.5 sm:px-3 py-1.5 rounded-md bg-white text-indigo-600 shadow-sm";
-        if (m === 'cards' && btnC) btnC.className = "px-2.5 sm:px-3 py-1.5 rounded-md bg-white text-indigo-600 shadow-sm";
-        if (m === 'table' && btnT) btnT.className = "px-2.5 sm:px-3 py-1.5 rounded-md bg-white text-indigo-600 shadow-sm";
-        this.renderProjects();
-      }
-
-      setProjectStatusFilter(s) {
-        this.projectStatusFilter = s;
-        document.querySelectorAll('.proj-status-btn').forEach(b => {
-          b.className = b.dataset.status === s ? "proj-status-btn px-2.5 sm:px-3 py-1 text-[11px] font-bold rounded-full bg-slate-800 text-white whitespace-nowrap" : "proj-status-btn px-2.5 sm:px-3 py-1 text-[11px] font-bold rounded-full bg-slate-100 text-slate-600 whitespace-nowrap";
-        });
-        this.renderProjects();
-      }
-
-      clearProjectFilters() {
-        const inSearch = document.getElementById('searchProjectsInput');
-        const inTipo = document.getElementById('filterProjTipologia');
-        const inPiso = document.getElementById('filterProjPiso');
-        if (inSearch) inSearch.value = '';
-        if (inTipo) inTipo.value = '';
-        if (inPiso) inPiso.value = '';
-        this.setProjectStatusFilter('ALL');
-      }
-
-      handleProjectDrop(e, st) {
-        e.preventDefault();
-        e.currentTarget.classList.remove('drag-over');
-        if (!this.draggedProjectId) return;
-        const p = this.projects.find(item => item.id == this.draggedProjectId);
-        if (p && this.normalizeProjectStatus(p.estado) !== st) {
-          p.estado = st;
-          p.fecha_actualizacion = new Date().toISOString().split('T')[0];
-          this.syncProject(p);
-          this.renderProjects();
-          this.showToast('Proyecto ' + p.codigo + ' movido a ' + st);
-        }
-        this.draggedProjectId = null;
-      }
-
-      openCreateProjectModal() {
-        const form = document.getElementById('projectForm');
-        if (form) form.reset();
-        
-        const inId = document.getElementById('formProjectId');
-        const inCod = document.getElementById('formProjCodigo');
-        const title = document.getElementById('modalProjectTitle');
-        const btnDel = document.getElementById('btnDeleteProject');
-        const btnOt = document.getElementById('btnConvertToOt');
-
-        if (inId) inId.value = '';
-        const nextId = this.projects.length > 0 ? Math.max(...this.projects.map(p => Number(p.id) || 0)) + 1 : 1;
-        if (inCod) inCod.value = 'PROY-' + String(nextId).padStart(3, '0');
-        if (title) title.innerText = 'Nuevo Proyecto de Infraestructura';
-        btnDel?.classList.add('hidden');
-        btnOt?.classList.add('hidden');
-
-        const today = new Date().toISOString().split('T')[0];
-        const inFI = document.getElementById('formProjFechaIngreso');
-        const inFA = document.getElementById('formProjFechaActualizacion');
-        if (inFI) inFI.value = today;
-        if (inFA) inFA.value = today;
-
-        document.getElementById('projectModal')?.classList.remove('hidden');
-      }
-
-      openEditProjectModal(id) {
-        const p = this.projects.find(item => item.id == id);
-        if (!p) return;
-        this.currentProjectInModal = p;
-
-        const inId = document.getElementById('formProjectId');
-        const inCod = document.getElementById('formProjCodigo');
-        const inTick = document.getElementById('formProjTicket');
-        const inTipo = document.getElementById('formProjTipologia');
-        const inPrio = document.getElementById('formProjPrioridad');
-        const inReq = document.getElementById('formProjRequerimiento');
-        const inUni = document.getElementById('formProjUnidad');
-        const inSol = document.getElementById('formProjSolicitante');
-        const inPiso = document.getElementById('formProjPiso');
-        const inUbi = document.getElementById('formProjUbicacion');
-        const inPMA = document.getElementById('formProjPMA');
-        const inEst = document.getElementById('formProjEstado');
-        const inFI = document.getElementById('formProjFechaIngreso');
-        const inFA = document.getElementById('formProjFechaActualizacion');
-        const inPend = document.getElementById('formProjPendiente');
-        const inDesc = document.getElementById('formProjDescripcion');
-
-        if (inId) inId.value = p.id;
-        if (inCod) inCod.value = p.codigo || ('PROY-' + p.id);
-        if (inTick) inTick.value = p.ticket || '';
-        if (inTipo) inTipo.value = p.tipologia || 'PROYECTO';
-        if (inPrio) inPrio.value = p.prioridad || 'MEDIA';
-        if (inReq) inReq.value = p.requerimiento || p.descripcion || '';
-        if (inUni) inUni.value = p.unidad || '';
-        if (inSol) inSol.value = p.solicitante || '';
-        if (inPiso) inPiso.value = p.piso || '';
-        if (inUbi) inUbi.value = p.ubicacion || '';
-        if (inPMA) inPMA.value = p.pma || '';
-        if (inEst) inEst.value = p.estado || 'PENDIENTE';
-        if (inFI) inFI.value = p.fecha_ingreso || '';
-        if (inFA) inFA.value = p.fecha_actualizacion || '';
-        if (inPend) inPend.value = p.pendiente || '';
-        if (inDesc) inDesc.value = p.descripcion || '';
-
-        const title = document.getElementById('modalProjectTitle');
-        if (title) title.innerText = 'Ficha Técnica: ' + (p.codigo || ('PROY-' + p.id));
-        
-        document.getElementById('btnDeleteProject')?.classList.remove('hidden');
-        document.getElementById('btnConvertToOt')?.classList.remove('hidden');
-        document.getElementById('projectModal')?.classList.remove('hidden');
-      }
-
-      closeProjectModal() { document.getElementById('projectModal')?.classList.add('hidden'); }
-
-      saveProject(e) {
-        e.preventDefault();
-        const id = document.getElementById('formProjectId')?.value;
-        const today = new Date().toISOString().split('T')[0];
-
-        const projectData = {
-          codigo: document.getElementById('formProjCodigo')?.value.trim() || 'PROY-000',
-          ticket: document.getElementById('formProjTicket')?.value.trim() || '',
-          tipologia: document.getElementById('formProjTipologia')?.value || 'PROYECTO',
-          prioridad: document.getElementById('formProjPrioridad')?.value || 'MEDIA',
-          requerimiento: document.getElementById('formProjRequerimiento')?.value.trim() || '',
-          unidad: document.getElementById('formProjUnidad')?.value.trim() || '',
-          solicitante: document.getElementById('formProjSolicitante')?.value.trim() || '',
-          piso: document.getElementById('formProjPiso')?.value.trim() || '',
-          ubicacion: document.getElementById('formProjUbicacion')?.value.trim() || '',
-          pma: document.getElementById('formProjPMA')?.value.trim() || '',
-          estado: document.getElementById('formProjEstado')?.value || 'PENDIENTE',
-          fecha_ingreso: document.getElementById('formProjFechaIngreso')?.value || today,
-          fecha_actualizacion: today,
-          pendiente: document.getElementById('formProjPendiente')?.value.trim() || '',
-          descripcion: document.getElementById('formProjDescripcion')?.value.trim() || ''
-        };
-
-        if (id) {
-          const idx = this.projects.findIndex(p => p.id == id);
-          if (idx !== -1) {
-            this.projects[idx] = { ...this.projects[idx], ...projectData };
-            this.syncProject(this.projects[idx]);
-            this.showToast('Proyecto ' + projectData.codigo + ' actualizado');
-          }
-        } else {
-          const newId = this.projects.length > 0 ? Math.max(...this.projects.map(p => Number(p.id) || 0)) + 1 : 1;
-          const newProj = { id: newId, ...projectData };
-          this.projects.unshift(newProj);
-          this.syncProject(newProj);
-          this.showToast('Nuevo proyecto ' + projectData.codigo + ' creado');
-        }
-
-        this.closeProjectModal();
-        this.renderProjects();
-      }
-
-      deleteProject() {
-        const id = document.getElementById('formProjectId')?.value;
-        if (!id) return;
-        this.customConfirm("Eliminar Proyecto", "¿Estás seguro de eliminar este proyecto del sistema?", async () => {
-          this.projects = this.projects.filter(p => p.id != id);
-          if (this.supabase) {
-            try { await this.supabase.from('projects_hbqp').delete().eq('id', String(id)); } catch(e) {}
-          }
-          localStorage.setItem('hbqp_projects_store_v6', JSON.stringify(this.projects));
-          this.closeProjectModal();
-          this.renderProjects();
-          this.showToast('Proyecto eliminado');
-        });
-      }
-
-      // --- DERIVAR PROYECTO A OT ---
-      convertCurrentProjectToOT() {
-        if (!this.currentProjectInModal) return;
-        const p = this.currentProjectInModal;
-        this.closeProjectModal();
-
-        const form = document.getElementById('createOtForm');
-        if (form) form.reset();
-
-        const inSrc = document.getElementById('newOtSourceProjectId');
-        const inRec = document.getElementById('newOtRecinto');
-        const inTick = document.getElementById('newOtTicket');
-        const inSol = document.getElementById('newOtSolicitante');
-        const inDesc = document.getElementById('newOtDescripcion');
-
-        if (inSrc) inSrc.value = p.id;
-        if (inRec) inRec.value = 'Piso ' + (p.piso || '-') + ' - ' + (p.ubicacion || p.unidad);
-        if (inTick) inTick.value = p.pma || p.ticket || p.codigo;
-        if (inSol) inSol.value = p.solicitante || p.unidad || 'Subdirección de Operaciones';
-        if (inDesc) inDesc.value = '[' + p.codigo + '] ' + p.requerimiento + '\n\n' + (p.descripcion || '');
-
-        document.getElementById('createModal')?.classList.remove('hidden');
-      }
-
-      exportProjectsCSV() {
-        const headers = ["Código", "N° Ticket", "Tipología", "Unidad Solicitante", "Solicitante", "Piso", "Recinto", "PMA", "Requerimiento", "Estado", "Hito Pendiente", "Prioridad"];
-        const rows = this.projects.map(p => [
-          p.codigo,
-          `"${(p.ticket || '').replace(/"/g, '""')}"`,
-          p.tipologia || '',
-          `"${(p.unidad || '').replace(/"/g, '""')}"`,
-          `"${(p.solicitante || '').replace(/"/g, '""')}"`,
-          p.piso || '',
-          `"${(p.ubicacion || '').replace(/"/g, '""')}"`,
-          p.pma || '',
-          `"${(p.requerimiento || p.descripcion || '').replace(/"/g, '""')}"`,
-          p.estado || '',
-          `"${(p.pendiente || '').replace(/"/g, '""')}"`,
-          p.prioridad || ''
-        ]);
-        const csv = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
-        const a = document.createElement("a");
-        a.href = encodeURI(csv);
-        a.download = `Proyectos_HBQP_${new Date().toISOString().split('T')[0]}.csv`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      }
-
-      // ==========================================================
-      // GESTIÓN DE ÓRDENES DE TRABAJO (OTs)
-      // ==========================================================
       setViewMode(mode) {
         this.viewMode = mode;
         const btnCards = document.getElementById('viewCardsBtn');
         const btnTable = document.getElementById('viewTableBtn');
         if (mode === 'cards') {
-          if (btnCards) btnCards.className = "px-3 py-1.5 text-xs font-bold rounded-md bg-white text-slate-800 shadow-sm transition";
-          if (btnTable) btnTable.className = "px-3 py-1.5 text-xs font-bold rounded-md text-slate-600 hover:text-slate-900 transition";
+          btnCards.className = "px-3 py-1.5 text-xs font-bold rounded-md bg-white text-slate-800 shadow-sm transition";
+          btnTable.className = "px-3 py-1.5 text-xs font-bold rounded-md text-slate-600 hover:text-slate-900 transition";
         } else {
-          if (btnTable) btnTable.className = "px-3 py-1.5 text-xs font-bold rounded-md bg-white text-slate-800 shadow-sm transition";
-          if (btnCards) btnCards.className = "px-3 py-1.5 text-xs font-bold rounded-md text-slate-600 hover:text-slate-900 transition";
+          btnTable.className = "px-3 py-1.5 text-xs font-bold rounded-md bg-white text-slate-800 shadow-sm transition";
+          btnCards.className = "px-3 py-1.5 text-xs font-bold rounded-md text-slate-600 hover:text-slate-900 transition";
         }
         this.renderOrdersList();
       }
@@ -1940,11 +1225,12 @@
       setFilterStatus(status) {
         this.filterStatus = status;
         document.querySelectorAll('.status-filter-btn').forEach(btn => {
-          btn.className = btn.dataset.status === status ? "status-filter-btn px-2.5 sm:px-3 py-1 text-[11px] font-bold rounded-full bg-slate-800 text-white whitespace-nowrap" : "status-filter-btn px-2.5 sm:px-3 py-1 text-[11px] font-bold rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap";
+          btn.className = btn.dataset.status === status ? "status-filter-btn px-3 py-1 text-xs font-bold rounded-full bg-slate-800 text-white whitespace-nowrap" : "status-filter-btn px-3 py-1 text-xs font-bold rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap";
         });
         this.renderOrdersList();
       }
 
+      // Elapsed Time continuously calculated. No SLA.
       calculateElapsedTimeInfo(order) {
         const created = new Date(order.fechaCreacion || Date.now());
         const endRef = order.fechaTermino ? new Date(order.fechaTermino) : new Date();
@@ -1956,33 +1242,19 @@
         const elapsedString = elapsedDays > 0 ? `${elapsedDays}d ${remHours}h` : `${remHours}h`;
         
         let colorClass = "text-slate-700";
-        if (elapsedDays >= 5) colorClass = "text-rose-700 font-bold";
-        else if (elapsedDays >= 2) colorClass = "text-amber-700 font-bold";
+        if (elapsedDays >= 5) colorClass = "text-rose-700";
+        else if (elapsedDays >= 2) colorClass = "text-amber-700";
 
         return { elapsedString, textClass: colorClass };
       }
-
+      
       updateTimeElapsedElements() { this.renderOrdersList(); }
 
       updateKpis() {
-        const p = this.orders.filter(o => o.estado === 'Pendiente').length;
-        const e = this.orders.filter(o => o.estado === 'En Ejecución').length;
-        const r = this.orders.filter(o => o.estado === 'Solicitud Cierre').length;
-        const t = this.orders.filter(o => o.estado === 'Terminada').length;
-
-        const kP = document.getElementById('kpiPendientes');
-        const kE = document.getElementById('kpiEjecucion');
-        const kR = document.getElementById('kpiSolicitudCierre');
-        const kT = document.getElementById('kpiTerminadas');
-
-        if (kP) kP.textContent = p;
-        if (kE) kE.textContent = e;
-        if (kR) kR.textContent = r;
-        if (kT) kT.textContent = t;
-
-        if (this.activeModule === 'orders') {
-          this.updateHeaderContext();
-        }
+        document.getElementById('kpiPendientes').textContent = this.orders.filter(o => o.estado === 'Pendiente').length;
+        document.getElementById('kpiEjecucion').textContent = this.orders.filter(o => o.estado === 'En Ejecución').length;
+        document.getElementById('kpiSolicitudCierre').textContent = this.orders.filter(o => o.estado === 'Solicitud Cierre').length;
+        document.getElementById('kpiTerminadas').textContent = this.orders.filter(o => o.estado === 'Terminada').length;
       }
 
       hasUnreadMessages(o) {
@@ -1996,61 +1268,35 @@
 
       renderOrdersList() {
         const container = document.getElementById('ordersContainer');
-        if (!container) return;
-
-        const query = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
+        const query = (document.getElementById('searchInput').value || '').toLowerCase().trim();
 
         const filtered = this.orders.filter(o => {
-          const match = !query || o.folio?.toLowerCase().includes(query) || o.recinto?.toLowerCase().includes(query) || (o.ticket && o.ticket.toLowerCase().includes(query)) || (o.solicitante && o.solicitante.toLowerCase().includes(query));
+          const match = !query || o.folio.toLowerCase().includes(query) || o.recinto.toLowerCase().includes(query) || (o.ticket && o.ticket.toLowerCase().includes(query));
           const matchStatus = this.filterStatus === 'TODOS' || o.estado === this.filterStatus;
           return match && matchStatus;
         });
 
         if (filtered.length === 0) {
-          container.innerHTML = '<div class="bg-white p-8 rounded-2xl border border-slate-200 text-center text-slate-400"><span class="text-3xl mb-2 block" aria-hidden="true">📋</span><p class="text-sm font-semibold">No se encontraron órdenes de trabajo</p></div>';
+          container.innerHTML = `<div class="bg-white p-8 rounded-2xl border text-center text-slate-400"><span class="text-3xl mb-2 block" aria-hidden="true">📋</span><p class="text-sm font-semibold">No se encontraron órdenes</p></div>`;
           return;
         }
 
         if (this.viewMode === 'cards') {
-          container.innerHTML = '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">' + filtered.map(o => this.renderOrderCard(o)).join('') + '</div>';
+          container.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">${filtered.map(o => this.renderOrderCard(o)).join('')}</div>`;
         } else {
-          container.innerHTML = `
-            <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
-              <div class="md:hidden px-3 py-2 bg-slate-50 border-b border-slate-200 flex items-center justify-between text-xs text-slate-500 font-medium">
-                <span><i class="fa-solid fa-arrows-left-right text-blue-500 mr-1"></i> Desliza para ver más detalles</span>
-                <span class="font-bold text-blue-700 text-[11px]">${filtered.length} órdenes</span>
-              </div>
-              <div class="overflow-x-auto custom-scroll w-full">
-                <table class="w-full text-left text-xs min-w-[720px]">
-                  <thead class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200 whitespace-nowrap">
-                    <tr>
-                      <th class="p-3 sticky left-0 bg-slate-50 z-10 shadow-[1px_0_0_#e2e8f0]">Folio</th>
-                      <th class="p-3">Recinto / PMA</th>
-                      <th class="p-3 min-w-[200px]">Prioridad / Descripción</th>
-                      <th class="p-3">Estado</th>
-                      <th class="p-3 whitespace-nowrap">Tiempo Corrido</th>
-                      <th class="p-3 text-right">Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody class="divide-y divide-slate-100">
-                    ${filtered.map(o => this.renderOrderRow(o)).join('')}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          `;
+          container.innerHTML = `<div class="bg-white rounded-xl border overflow-hidden"><div class="overflow-x-auto custom-scroll"><table class="w-full text-left text-xs"><thead class="bg-slate-50 text-slate-700 font-bold border-b"><tr><th class="p-3">Folio</th><th class="p-3">Recinto / PMA</th><th class="p-3">Prioridad / Descripción</th><th class="p-3">Estado</th><th class="p-3">Tiempo Corrido</th><th class="p-3 text-right">Acciones</th></tr></thead><tbody class="divide-y divide-slate-100">${filtered.map(o => this.renderOrderRow(o)).join('')}</tbody></table></div></div>`;
         }
       }
 
       renderOrderCard(o) {
         const timeInfo = this.calculateElapsedTimeInfo(o);
         const bg = o.estado === 'Terminada' ? 'bg-emerald-100 text-emerald-800' : (o.estado === 'Solicitud Cierre' ? 'bg-indigo-100 text-indigo-800' : (o.estado === 'En Ejecución' ? 'bg-blue-100 text-blue-800' : 'bg-amber-100 text-amber-800'));
-        const unreadBadge = this.hasUnreadMessages(o) ? '<span class="bg-rose-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full ml-2 badge-pulse">🔔 NUEVO</span>' : '';
+        const unreadBadge = this.hasUnreadMessages(o) ? `<span class="bg-rose-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full ml-2 badge-pulse">🔔 NUEVO</span>` : '';
         const btnText = (this.currentRole === 'supervisor' && o.estado !== 'Terminada') ? '⚙️ Gestionar' : '📋 Ver Ficha';
         const emojis = { Urgente: '🚨', Alta: '🟠', Media: '🟡', Baja: '🟢' };
         
         return `
-          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between space-y-3 cursor-pointer hover:border-slate-300 transition" onclick="window.app.openOperativeView('${o.id}')">
+          <div class="bg-white p-4 rounded-xl border shadow-sm flex flex-col justify-between space-y-3 cursor-pointer hover:border-slate-300" onclick="window.app.openOperativeView('${o.id}')">
             <div>
               <div class="flex justify-between items-center mb-1">
                 <span class="font-black text-xs flex items-center">${escapeHtml(o.folio)} ${unreadBadge}</span>
@@ -2059,11 +1305,12 @@
               <h4 class="font-bold text-sm truncate">${escapeHtml(o.recinto)}</h4>
               <p class="text-[11px] text-slate-500 font-medium truncate mb-1">PMA: ${escapeHtml(o.ticket)} • Prioridad: ${emojis[o.prioridad]||''} ${escapeHtml(o.prioridad)}</p>
               <p class="text-[11px] text-slate-600 leading-tight line-clamp-2">${escapeHtml(o.descripcion)}</p>
-              <div class="mt-2 bg-slate-50 p-2 rounded-lg border border-slate-100">
-                <div class="flex justify-between text-[11px] font-semibold"><span>Tiempo transcurrido:</span><span class="${timeInfo.textClass}">${timeInfo.elapsedString}</span></div>
+              <div class="mt-2 bg-slate-50 p-2 rounded-lg border">
+                <div class="flex justify-between text-[11px] font-semibold mb-1"><span>Tiempo transcurrido</span><span class="${timeInfo.textClass}">${timeInfo.elapsedString}</span></div>
+                <div class="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden"><div class="h-full ${timeInfo.colorClass}" style="width:${timeInfo.percent}%"></div></div>
               </div>
             </div>
-            <div class="pt-2 border-t border-slate-100 flex items-center justify-between gap-1.5">
+            <div class="pt-2 border-t flex items-center justify-between gap-1.5">
               <button class="flex-1 py-2 bg-slate-800 text-white text-xs font-bold rounded-lg pointer-events-none">${btnText}</button>
               <button type="button" onclick="event.stopPropagation(); window.app.shareWhatsApp('${o.id}')" class="pointer-events-auto cursor-pointer px-3 py-2 bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-lg transition-transform active:scale-95 shadow-sm" title="Compartir por WhatsApp">
                  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
@@ -2075,20 +1322,20 @@
       renderOrderRow(o) {
         const timeInfo = this.calculateElapsedTimeInfo(o);
         const bg = o.estado === 'Terminada' ? 'bg-emerald-100 text-emerald-800' : (o.estado === 'Solicitud Cierre' ? 'bg-indigo-100 text-indigo-800' : (o.estado === 'En Ejecución' ? 'bg-blue-100 text-blue-800' : 'bg-amber-100 text-amber-800'));
-        const unreadBadge = this.hasUnreadMessages(o) ? '<span class="bg-rose-500 text-white text-[9px] px-1 rounded-full ml-1 badge-pulse" title="Mensaje Nuevo">🔔</span>' : '';
+        const unreadBadge = this.hasUnreadMessages(o) ? `<span class="bg-rose-500 text-white text-[9px] px-1 rounded-full ml-1 badge-pulse" title="Mensaje Nuevo">🔔</span>` : '';
         const btnText = (this.currentRole === 'supervisor' && o.estado !== 'Terminada') ? '⚙️ Gestionar' : 'Ficha';
         const emojis = { Urgente: '🚨', Alta: '🟠', Media: '🟡', Baja: '🟢' };
         
         return `
           <tr class="hover:bg-slate-50 cursor-pointer" onclick="window.app.openOperativeView('${o.id}')">
-            <td class="p-3 font-black text-indigo-900 whitespace-nowrap sticky left-0 bg-white shadow-[1px_0_0_#e2e8f0]">${escapeHtml(o.folio)} ${unreadBadge}</td>
+            <td class="p-3 font-bold">${escapeHtml(o.folio)} ${unreadBadge}</td>
             <td class="p-3"><span class="font-bold block">${escapeHtml(o.recinto)}</span><span class="text-[10px] text-slate-400">PMA: ${escapeHtml(o.ticket)}</span></td>
             <td class="p-3">
                <div class="mb-0.5"><span class="text-[10px] font-bold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">${emojis[o.prioridad]||''} ${escapeHtml(o.prioridad)}</span></div>
                <div class="text-[11px] text-slate-600 truncate max-w-[150px] sm:max-w-[200px] lg:max-w-[280px]" title="${escapeHtml(o.descripcion)}">${escapeHtml(o.descripcion)}</div>
             </td>
             <td class="p-3"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${bg}">${escapeHtml(o.estado)}</span></td>
-            <td class="p-3"><div class="text-[11px] font-semibold ${timeInfo.textClass}">${timeInfo.elapsedString}</div></td>
+            <td class="p-3"><div class="text-[11px] font-semibold ${timeInfo.textClass} mb-1">${timeInfo.elapsedString}</div><div class="w-24 bg-slate-200 h-1.5 rounded-full overflow-hidden"><div class="h-full ${timeInfo.colorClass}" style="width:${timeInfo.percent}%"></div></div></td>
             <td class="p-3 text-right whitespace-nowrap">
               <div class="flex items-center justify-end space-x-1.5">
                   <button type="button" onclick="event.stopPropagation(); window.app.shareWhatsApp('${o.id}')" class="pointer-events-auto cursor-pointer px-2 py-1.5 bg-[#25D366] hover:bg-[#20bd5a] text-white rounded text-xs font-bold transition-transform active:scale-95" title="Compartir">
@@ -2100,32 +1347,30 @@
           </tr>`;
       }
 
-      openCreateOtModal() {
+      openCreateModal() {
         if (this.currentRole !== 'supervisor') return;
-        document.getElementById('createOtForm')?.reset();
-        const inSrc = document.getElementById('newOtSourceProjectId');
-        if (inSrc) inSrc.value = '';
-        document.getElementById('createModal')?.classList.remove('hidden');
+        document.getElementById('createOtForm').reset();
+        document.getElementById('createModal').classList.remove('hidden');
       }
-      closeCreateModal() { document.getElementById('createModal')?.classList.add('hidden'); }
+      closeCreateModal() { document.getElementById('createModal').classList.add('hidden'); }
 
       formatDateLocal(iso) {
-        if (!iso) return '';
-        const d = new Date(iso);
-        return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+          if (!iso) return '';
+          const d = new Date(iso);
+          return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
       }
 
       logActivity(order, detail, type = 'Sistema') {
-        if (!order.solicitudes_terreno) order.solicitudes_terreno = [];
-        order.solicitudes_terreno.push({
-          tipo: type,
-          detalle: detail,
-          fecha: new Date().toISOString(),
-          respuesta: null,
-          visto_supervisor: true,
-          visto_tecnico: false,
-          isSystem: true
-        });
+          if (!order.solicitudes_terreno) order.solicitudes_terreno = [];
+          order.solicitudes_terreno.push({
+              tipo: type,
+              detalle: detail,
+              fecha: new Date().toISOString(),
+              respuesta: null,
+              visto_supervisor: true,
+              visto_tecnico: false,
+              isSystem: true
+          });
       }
 
       handleCreateOT(event) {
@@ -2143,7 +1388,7 @@
         });
         
         const folio = `${this.folioPrefix}-${String(maxCorrelative + 1).padStart(3, '0')}-${year}`;
-        const uuid = `id_${Date.now()}`;
+        const uuid = crypto.randomUUID ? crypto.randomUUID() : `id_${Date.now()}`;
         const nowIso = new Date().toISOString();
 
         const newOrder = {
@@ -2165,22 +1410,9 @@
 
         this.orders.unshift(newOrder);
         this.syncOrderToCloud(newOrder);
-
-        const srcId = document.getElementById('newOtSourceProjectId')?.value;
-        if (srcId) {
-          const p = this.projects.find(item => item.id == srcId);
-          if (p) {
-            p.estado = 'EN PROCESO';
-            p.pendiente = `Derivado a OT: ${folio}`;
-            this.syncProject(p);
-          }
-        }
-
         this.closeCreateModal();
         this.updateKpis();
         this.renderOrdersList();
-        this.showToast(`OT ${folio} emitida con éxito`);
-        this.switchModule('orders');
       }
 
       // --- FICHA OPERATIVA UNIFICADA ---
@@ -2188,13 +1420,14 @@
         const o = this.orders.find(item => item.id === id);
         if (!o) return;
 
+        // Clear Unread flags based on role
         let changed = false;
         if (o.solicitudes_terreno) {
-          o.solicitudes_terreno.forEach(r => { 
-            if (this.currentRole === 'tecnico' && r.respuesta && r.visto_tecnico === false) { r.visto_tecnico = true; changed = true; }
-            if (this.currentRole === 'supervisor' && r.visto_supervisor === false) { r.visto_supervisor = true; changed = true; }
-          });
-          if (changed) this.syncOrderToCloud(o);
+            o.solicitudes_terreno.forEach(r => { 
+                if (this.currentRole === 'tecnico' && r.respuesta && r.visto_tecnico === false) { r.visto_tecnico = true; changed = true; }
+                if (this.currentRole === 'supervisor' && r.visto_supervisor === false) { r.visto_supervisor = true; changed = true; }
+            });
+            if (changed) this.syncOrderToCloud(o);
         }
 
         this.activeOperativeOt = o;
@@ -2203,15 +1436,18 @@
         const isClosed = o.estado === 'Terminada';
         const isLocked = isReview || isClosed;
 
+        // Populating DOM structure
         document.getElementById('uovId').value = o.id;
         document.getElementById('uovFolio').textContent = o.folio;
         document.getElementById('uovRecintoHeader').textContent = o.recinto;
         document.getElementById('uovStatusBadge').textContent = o.estado;
         document.getElementById('uovStatusBadgeMobile').textContent = o.estado;
         
+        // Dynamic Banners
         document.getElementById('uovLockBanner').classList.toggle('hidden', !isClosed);
         document.getElementById('uovReviewSection').classList.toggle('hidden', !(isSupervisor && isReview));
         
+        // Setup Inputs Sec 1
         document.getElementById('uovEspecialidad').value = o.especialidad;
         document.getElementById('uovPrioridad').value = o.prioridad;
         document.getElementById('uovRecinto').value = o.recinto;
@@ -2222,56 +1458,66 @@
         document.getElementById('uovInstrucciones').value = o.instrucciones || '';
         document.getElementById('uovFechaInicio').value = this.formatDateLocal(o.fechaCreacion);
         
+        // Disable fields for Sec 1 depending on role & lock status
         const disableSec1 = !isSupervisor || isClosed || isReview;
         document.querySelectorAll('.uov-editable').forEach(el => {
-          el.querySelectorAll('input, select, textarea').forEach(input => {
-            if (input.id === 'uovEstado') {
-              input.disabled = (!isSupervisor || isClosed);
-            } else {
-              input.disabled = disableSec1;
-            }
-            
-            if(input.disabled) {
-              input.classList.remove('bg-white', 'border-slate-200');
-              input.classList.add('bg-slate-50', 'border-transparent', 'text-slate-700');
-            } else {
-              input.classList.add('bg-white', 'border-slate-200');
-              input.classList.remove('bg-slate-50', 'border-transparent', 'text-slate-700');
-            }
-          });
+            el.querySelectorAll('input, select, textarea').forEach(input => {
+                // Exception: The state dropdown should be editable by supervisor if not closed
+                if (input.id === 'uovEstado') {
+                     input.disabled = (!isSupervisor || isClosed);
+                } else {
+                     input.disabled = disableSec1;
+                }
+                
+                // Visual cue for disabled fields
+                if(input.disabled) {
+                    input.classList.remove('bg-white', 'border-slate-200');
+                    input.classList.add('bg-slate-50', 'border-transparent', 'text-slate-700');
+                } else {
+                    input.classList.add('bg-white', 'border-slate-200');
+                    input.classList.remove('bg-slate-50', 'border-transparent', 'text-slate-700');
+                }
+            });
         });
         
+        // Top action buttons
         document.getElementById('uovWhatsappBtnTop').onclick = () => this.shareWhatsApp(o.id);
         document.getElementById('uovWhatsappBtnMobile').onclick = () => this.shareWhatsApp(o.id);
         
+        // Informative fields (Estado y Tiempos)
         document.getElementById('uovEstado').value = o.estado;
         const timeInfo = this.calculateElapsedTimeInfo(o);
         document.getElementById('uovElapsedText').textContent = timeInfo.elapsedString + " corridas";
         const dateRef = o.fechaUltimoEstado || o.fechaCreacion;
         document.getElementById('uovLastModText').textContent = new Date(dateRef).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' });
 
+        // Consultas History
         this.renderOperativeHistory(o);
         document.getElementById('uovRequestForm').style.display = (isLocked || isSupervisor) ? 'none' : 'block';
 
+        // Informe y Cierre
         document.getElementById('uovDiagnosticoSolucion').value = o.diagnostico || '';
         
         const disableTechFields = isClosed || isReview || isSupervisor;
         document.getElementById('uovDiagnosticoSolucion').disabled = disableTechFields;
         if(disableTechFields) {
-          document.getElementById('uovDiagnosticoSolucion').classList.add('bg-slate-50', 'border-transparent');
+            document.getElementById('uovDiagnosticoSolucion').classList.add('bg-slate-50', 'border-transparent');
         } else {
-          document.getElementById('uovDiagnosticoSolucion').classList.remove('bg-slate-50', 'border-transparent');
+            document.getElementById('uovDiagnosticoSolucion').classList.remove('bg-slate-50', 'border-transparent');
         }
         
         document.getElementById('uovTechActions').style.display = (isLocked || isSupervisor) ? 'none' : 'flex';
         document.getElementById('uovEstadoContainer').style.display = isSupervisor ? 'block' : 'none';
 
+        // Bottom Actions (Supervisor Only)
         document.getElementById('uovBottomBar').classList.toggle('hidden', !isSupervisor || isClosed);
         
+        // Reset scroll position and nav
         window.scrollTo(0,0);
         document.querySelectorAll('.uov-nav-link').forEach(l => l.classList.remove('active'));
         document.querySelector('.uov-nav-link[href="#sec-info"]')?.classList.add('active');
 
+        // Registrar estado en el historial del navegador (para botón Atrás)
         if (window.location.hash !== `#ot=${id}`) {
           history.pushState({ modalOpen: true }, "", `#ot=${id}`);
         }
@@ -2280,12 +1526,13 @@
       }
       
       closeOperativeView(fromPopState = false) { 
-        document.getElementById('unifiedOperativeView').classList.add('hidden'); 
-        this.activeOperativeOt = null; 
-        
-        if (!fromPopState && window.location.hash.startsWith('#ot=')) {
-          history.pushState("", document.title, window.location.pathname + window.location.search);
-        }
+          document.getElementById('unifiedOperativeView').classList.add('hidden'); 
+          this.activeOperativeOt = null; 
+          
+          // Limpiar el historial si el cierre NO provino del botón "Atrás" del navegador
+          if (!fromPopState && window.location.hash.startsWith('#ot=')) {
+              history.pushState("", document.title, window.location.pathname + window.location.search);
+          }
       }
 
       renderOperativeHistory(o) {
@@ -2296,13 +1543,13 @@
         if (o.solicitudes_terreno && o.solicitudes_terreno.length) {
           hist.innerHTML = o.solicitudes_terreno.map((r, i) => {
             if (r.tipo === 'Sistema' || r.isSystem) {
-              const f = new Date(r.fecha).toLocaleString([], {dateStyle:'short', timeStyle:'short'});
-              return `<div class="bg-slate-100 p-2 rounded-lg border border-slate-200 flex justify-between items-center text-slate-500">
-                         <span class="text-[11px] font-bold">⚙️ ${escapeHtml(r.detalle)}</span>
-                         <span class="text-[9px]">${f}</span>
-                      </div>`;
+                const f = new Date(r.fecha).toLocaleString([], {dateStyle:'short', timeStyle:'short'});
+                return `<div class="bg-slate-100 p-2 rounded-lg border border-slate-200 flex justify-between items-center text-slate-500">
+                           <span class="text-[11px] font-bold">⚙️ ${escapeHtml(r.detalle)}</span>
+                           <span class="text-[9px]">${f}</span>
+                        </div>`;
             } else {
-              return `
+                return `
                 <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
                   <span class="font-bold text-slate-700 text-[10px] block mb-1">${escapeHtml(r.tipo)}</span>
                   <p class="font-medium text-slate-800">"${escapeHtml(r.detalle)}"</p>
@@ -2315,7 +1562,7 @@
             }
           }).join('');
         } else {
-          hist.innerHTML = '<p class="text-slate-400 italic">No hay registros de actividad.</p>';
+          hist.innerHTML = `<p class="text-slate-400 italic">No hay registros de actividad.</p>`;
         }
       }
 
@@ -2359,60 +1606,62 @@
         if (!o || o.estado === 'Terminada') return;
 
         if (this.currentRole === 'supervisor') {
-          if(o.estado !== 'Solicitud Cierre') {
-            o.especialidad = document.getElementById('uovEspecialidad').value;
-            o.prioridad = document.getElementById('uovPrioridad').value;
-            o.recinto = document.getElementById('uovRecinto').value.trim();
-            o.ticket = document.getElementById('uovTicket').value.trim();
-            o.solicitante = document.getElementById('uovSolicitante').value.trim();
-            o.encargado = document.getElementById('uovEncargado').value;
-            o.descripcion = document.getElementById('uovDescripcion').value.trim();
-            o.instrucciones = document.getElementById('uovInstrucciones').value.trim();
+            // Flow for Supervisor (Save All unless under review)
+            if(o.estado !== 'Solicitud Cierre') {
+                o.especialidad = document.getElementById('uovEspecialidad').value;
+                o.prioridad = document.getElementById('uovPrioridad').value;
+                o.recinto = document.getElementById('uovRecinto').value.trim();
+                o.ticket = document.getElementById('uovTicket').value.trim();
+                o.solicitante = document.getElementById('uovSolicitante').value.trim();
+                o.encargado = document.getElementById('uovEncargado').value;
+                o.descripcion = document.getElementById('uovDescripcion').value.trim();
+                o.instrucciones = document.getElementById('uovInstrucciones').value.trim();
+                
+                const newDate = document.getElementById('uovFechaInicio').value;
+                if (newDate) {
+                    const newIso = new Date(newDate).toISOString();
+                    if (o.fechaCreacion !== newIso) {
+                        this.logActivity(o, `Fecha de inicio modificada a: ${new Date(newDate).toLocaleString()}`);
+                        o.fechaCreacion = newIso;
+                    }
+                }
+            }
             
-            const newDate = document.getElementById('uovFechaInicio').value;
-            if (newDate) {
-              const newIso = new Date(newDate).toISOString();
-              if (o.fechaCreacion !== newIso) {
-                this.logActivity(o, `Fecha de inicio modificada a: ${new Date(newDate).toLocaleString()}`);
-                o.fechaCreacion = newIso;
-              }
+            const newState = document.getElementById('uovEstado').value;
+            if (o.estado !== newState) {
+                this.logActivity(o, `Estado actualizado a: ${newState}`);
+                o.fechaUltimoEstado = new Date().toISOString();
+                if (newState === 'Terminada' && !o.fechaTermino) o.fechaTermino = new Date().toISOString();
+                if (newState !== 'Terminada' && newState !== 'Solicitud Cierre') o.fechaTermino = null; 
             }
-          }
-          
-          const newState = document.getElementById('uovEstado').value;
-          if (o.estado !== newState) {
-            this.logActivity(o, `Estado actualizado a: ${newState}`);
-            o.fechaUltimoEstado = new Date().toISOString();
-            if (newState === 'Terminada' && !o.fechaTermino) o.fechaTermino = new Date().toISOString();
-            if (newState !== 'Terminada' && newState !== 'Solicitud Cierre') o.fechaTermino = null; 
-          }
-          o.estado = newState;
-          
-          this.showToast('Cambios Guardados', '💾');
-          this.syncOrderToCloud(o);
-          this.closeOperativeView();
-          
+            o.estado = newState;
+            
+            this.showToast('Cambios Guardados', '💾');
+            this.syncOrderToCloud(o);
+            this.closeOperativeView();
+            
         } else if (this.currentRole === 'tecnico') {
-          if(o.estado === 'Solicitud Cierre') return;
-          
-          o.diagnostico = document.getElementById('uovDiagnosticoSolucion').value.trim();
-          
-          if (isTechRequestClose) {
-            o.estado = 'Solicitud Cierre';
-            o.fechaUltimoEstado = new Date().toISOString();
-            if (!o.fechaTermino) o.fechaTermino = new Date().toISOString();
-            this.logActivity(o, 'El técnico solicitó el cierre de la OT');
-            this.showToast('Cierre solicitado a Jefatura', '⚡');
-          } else {
-            if (o.estado === 'Pendiente') {
-              o.estado = 'En Ejecución';
+            // Flow for Technician (Save Diagnostics and Progress)
+            if(o.estado === 'Solicitud Cierre') return; // Security lock
+            
+            o.diagnostico = document.getElementById('uovDiagnosticoSolucion').value.trim();
+            
+            if (isTechRequestClose) {
+              o.estado = 'Solicitud Cierre';
               o.fechaUltimoEstado = new Date().toISOString();
-              this.logActivity(o, 'El técnico inició la ejecución (Pendiente -> En Ejecución)');
+              if (!o.fechaTermino) o.fechaTermino = new Date().toISOString();
+              this.logActivity(o, 'El técnico solicitó el cierre de la OT');
+              this.showToast('Cierre solicitado a Jefatura', '⚡');
+            } else {
+              if (o.estado === 'Pendiente') {
+                  o.estado = 'En Ejecución';
+                  o.fechaUltimoEstado = new Date().toISOString();
+                  this.logActivity(o, 'El técnico inició la ejecución (Pendiente -> En Ejecución)');
+              }
+              this.showToast('Progreso guardado', '💾');
             }
-            this.showToast('Progreso guardado', '💾');
-          }
-          this.syncOrderToCloud(o);
-          this.closeOperativeView();
+            this.syncOrderToCloud(o);
+            this.closeOperativeView();
         }
 
         this.updateKpis();
@@ -2469,7 +1718,7 @@
               const { error } = await this.supabase.from('orders').delete().eq('id', id);
               if (error) throw error;
               this.orders = this.orders.filter(o => o.id !== id);
-              localStorage.setItem('sdo_orders_cache_v6', JSON.stringify(this.orders));
+              localStorage.setItem('sdo_orders_cache', JSON.stringify(this.orders));
               this.closeOperativeView();
               this.updateKpis();
               this.renderOrdersList();
@@ -2478,17 +1727,17 @@
               this.showToast('La nube bloqueó el borrado (Faltan permisos)', '⚠️');
             }
           } else {
-            this.orders = this.orders.filter(o => o.id !== id);
-            localStorage.setItem('sdo_orders_cache_v6', JSON.stringify(this.orders));
-            this.closeOperativeView();
-            this.updateKpis();
-            this.renderOrdersList();
-            this.showToast('OT Eliminada localmente');
+             this.orders = this.orders.filter(o => o.id !== id);
+             localStorage.setItem('sdo_orders_cache', JSON.stringify(this.orders));
+             this.closeOperativeView();
+             this.updateKpis();
+             this.renderOrdersList();
+             this.showToast('OT Eliminada localmente');
           }
         });
       }
 
-      // --- CONFIGURACIÓN GLOBAL & REPORTES ---
+      // --- SETTINGS AND REPORTS ---
       openSettingsModal() {
         if (this.currentRole !== 'supervisor') return;
         document.getElementById('cfgHospitalName').value = this.hospitalName;
@@ -2511,7 +1760,7 @@
             const maxW = 300, maxH = 300;
             let w = img.width, h = img.height;
             if (w > maxW) { h *= maxW / w; w = maxW; }
-            if (h > maxH) { h *= maxH / h; h = maxH; }
+            if (h > maxH) { w *= maxH / h; h = maxH; }
             canvas.width = w; canvas.height = h;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, w, h);
@@ -2570,7 +1819,7 @@
               const { error } = await this.supabase.from('orders').delete().neq('id', '0');
               if (error) throw error;
               this.orders = [];
-              localStorage.removeItem('sdo_orders_cache_v6');
+              localStorage.removeItem('sdo_orders_cache');
               this.showToast('Base de datos reiniciada');
               this.closeSettingsModal();
               this.updateKpis();
@@ -2652,18 +1901,22 @@
           return;
         }
 
+        // 1. Definir las cabeceras de la tabla
         const headers = [
           'Folio', 'Recinto', 'PMA', 'Especialidad', 'Prioridad', 'Solicitante', 
           'Técnico Asignado', 'Estado', 'Fecha Creación', 'Fecha Término', 
           'Descripción del Trabajo', 'Instrucciones Jefatura', 'Diagnóstico y Solución'
         ];
 
+        // Función para limpiar texto y que Excel no se rompa con comas, puntos y comas o saltos de línea
         const escapeCSV = (str) => {
           if (str === null || str === undefined) return '""';
           const stringified = String(str);
+          // Reemplaza comillas dobles por doble comilla y envuelve en comillas
           return `"${stringified.replace(/"/g, '""')}"`;
         };
 
+        // 2. Extraer los datos de cada OT mapeados a las cabeceras
         const rows = this.orders.map(o => {
           return [
             o.folio,
@@ -2679,10 +1932,13 @@
             o.descripcion,
             o.instrucciones,
             o.diagnostico
-          ].map(escapeCSV).join(';');
+          ].map(escapeCSV).join(';'); // Usamos punto y coma (;) para compatibilidad nativa de Excel en español
         });
 
+        // 3. Unir todo en formato CSV
         const csvContent = headers.map(escapeCSV).join(';') + '\n' + rows.join('\n');
+
+        // 4. Crear el archivo Blob agregando BOM (\uFEFF) para que Excel reconozca tildes y eñes (UTF-8)
         const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
@@ -2718,8 +1974,7 @@
       closeConfirmModal() { document.getElementById('customConfirmModal').classList.add('hidden'); }
     }
 
-    window.addEventListener('DOMContentLoaded', () => { window.app = new UnifiedPlatformApp(); });
+    window.addEventListener('DOMContentLoaded', () => { window.app = new HospitalApp(); });
   </script>
 </body>
 </html>
-
