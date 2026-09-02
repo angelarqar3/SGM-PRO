@@ -48,53 +48,6 @@
       border-bottom: 1px solid rgba(255,255,255,0.08);
     }
 
-    /* Mobile Bottom Navigation Bar */
-    .mobile-bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: rgba(15, 23, 42, 0.98);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      z-index: 35;
-      padding-bottom: env(safe-area-inset-bottom, 0px);
-    }
-
-    .mobile-nav-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 8px 12px;
-      font-size: 11px;
-      font-weight: 700;
-      color: #94a3b8;
-      transition: all 0.15s ease;
-    }
-
-    .mobile-nav-item.active {
-      color: #ffffff;
-    }
-
-    .mobile-nav-item.active .nav-icon-wrapper {
-      background: rgba(79, 70, 229, 0.3);
-      color: #818cf8;
-      border: 1px solid rgba(129, 140, 248, 0.4);
-    }
-
-    .nav-icon-wrapper {
-      width: 34px;
-      height: 34px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 2px;
-      font-size: 14px;
-    }
-
     /* Kanban Columns */
     .kanban-col-container {
       min-height: calc(100vh - 300px);
@@ -143,8 +96,8 @@
     .uov-action-btn { min-height: 42px; border-radius: 11px; font-weight: 700; padding: 0 1.25rem; }
   </style>
 </head>
-<body class="min-h-screen flex flex-col font-sans pb-24 md:pb-12">
-  <div id="toastContainer" class="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-[70] flex flex-col gap-2 pointer-events-none max-w-[90vw]"></div>
+<body class="min-h-screen flex flex-col font-sans pb-10">
+  <div id="toastContainer" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[70] flex flex-col gap-2 pointer-events-none max-w-[90vw]"></div>
 
   <!-- Header Principal Optimizado para Móvil y Desktop -->
   <header class="app-header text-white sticky top-0 z-30 shadow-md">
@@ -167,13 +120,13 @@
         </div>
       </div>
 
-      <!-- Selector de Módulos (En Desktop se ve aquí, en móvil va en la barra inferior) -->
-      <nav id="moduleSwitcherDesktop" class="hidden md:flex items-center bg-slate-800/90 p-1 rounded-xl border border-slate-700 text-xs font-bold">
-        <button id="navBtnProjects" onclick="window.app.switchModule('projects')" class="px-3.5 py-1.5 rounded-lg bg-indigo-600 text-white shadow transition flex items-center gap-1.5">
-          <i class="fa-solid fa-diagram-project"></i> <span>Módulo Proyectos</span>
+      <!-- Selector de Módulos (Adaptativo: compacto en móvil, amplio en desktop) -->
+      <nav id="moduleSwitcher" class="flex items-center bg-slate-800/90 p-0.5 sm:p-1 rounded-xl border border-slate-700 text-[11px] sm:text-xs font-bold">
+        <button id="navBtnProjects" onclick="window.app.switchModule('projects')" class="px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg bg-indigo-600 text-white shadow transition flex items-center gap-1">
+          <i class="fa-solid fa-diagram-project"></i> <span class="hidden xs:inline">Proyectos</span>
         </button>
-        <button id="navBtnOrders" onclick="window.app.switchModule('orders')" class="px-3.5 py-1.5 rounded-lg text-slate-300 hover:text-white transition flex items-center gap-1.5">
-          <i class="fa-solid fa-wrench"></i> <span>Módulo OTs</span>
+        <button id="navBtnOrders" onclick="window.app.switchModule('orders')" class="px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-slate-300 hover:text-white transition flex items-center gap-1">
+          <i class="fa-solid fa-wrench"></i> <span class="hidden xs:inline">OTs</span>
         </button>
       </nav>
 
@@ -242,21 +195,7 @@
     </div>
   </header>
 
-  <!-- Barra de Navegación Inferior Móvil (Bottom Tab Bar) -->
-  <nav id="mobileBottomBar" class="mobile-bottom-nav md:hidden grid grid-cols-2 shadow-2xl">
-    <button id="mobileTabProjects" onclick="window.app.switchModule('projects')" class="mobile-nav-item active">
-      <div class="nav-icon-wrapper">
-        <i class="fa-solid fa-diagram-project"></i>
-      </div>
-      <span>Proyectos</span>
-    </button>
-    <button id="mobileTabOrders" onclick="window.app.switchModule('orders')" class="mobile-nav-item">
-      <div class="nav-icon-wrapper">
-        <i class="fa-solid fa-wrench"></i>
-      </div>
-      <span>Órdenes (OTs)</span>
-    </button>
-  </nav>
+
 
   <!-- ==========================================================
        VISTA 1: MÓDULO DE PROYECTOS (SUPERVISOR)
@@ -378,10 +317,6 @@
 
     <div id="ordersContainer"></div>
   </section>
-
-  <!-- ==========================================================
-       MODALES
-       ========================================================== -->
 
   <!-- Modal Auth (PIN Pad) -->
   <div id="authModal" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
@@ -994,54 +929,7 @@
       defaultPins: { supervisor: "1234", tecnico: "5678" }
     };
 
-    const INITIAL_PROJECTS = [
-      { id: 1, codigo: "PROY-001", ticket: "", tipologia: "APOYO TECNICO", unidad: "Jefatura Unidad Traumatología (TMT)", solicitante: "", ubicacion: "Oficina Traumatología", piso: "1", pma: "", requerimiento: "Implementación de mobiliario para oficina (escritorio, sillas y mueble)", estado: "TERMINADO", fecha_ingreso: "2026-05-20", fecha_actualizacion: "2026-05-26", descripcion: "Implementación de mobiliario para oficina", pendiente: "", prioridad: "MEDIA" },
-      { id: 2, codigo: "PROY-002", ticket: "OC N° 1704-673-AG26", tipologia: "PROYECTO", unidad: "Unidad de Ingeniería Operacional", solicitante: "", ubicacion: "Terrazas de piso 1 y 3", piso: "1 y 3", pma: "", requerimiento: "Servicio de instalación de malla de seguridad anticaídas en terrazas de piso 1 y 3", estado: "TERMINADO", fecha_ingreso: "2026-01-29", fecha_actualizacion: "2026-01-29", descripcion: "Instalación de mallas anticaídas", pendiente: "", prioridad: "ALTA" },
-      { id: 3, codigo: "PROY-003", ticket: "", tipologia: "PROYECTO", unidad: "Subdepartamento de Infraestructura", solicitante: "", ubicacion: "Anatomía Patológica", piso: "1", pma: "", requerimiento: "Readecuación estructural para habilitar sala de macroscopía #2 en Anatomía Patológica", estado: "TERMINADO", fecha_ingreso: "2026-02-27", fecha_actualizacion: "2026-02-27", descripcion: "Readecuación estructural sala macroscopía", pendiente: "", prioridad: "MEDIA" },
-      { id: 4, codigo: "PROY-004", ticket: "Solicitud de Compra N° 606", tipologia: "PROYECTO", unidad: "GESCAS (Asistentes Sociales)", solicitante: "", ubicacion: "Sector de espera de Pensionados", piso: "6", pma: "", requerimiento: "Habilitación de oficinas en sector de espera de Pensionados en 6to piso", estado: "TERMINADO", fecha_ingreso: "2026-02-24", fecha_actualizacion: "2026-02-24", descripcion: "Habilitación de oficinas", pendiente: "", prioridad: "MEDIA" },
-      { id: 5, codigo: "PROY-005", ticket: "OC N° 1704-766-TD26", tipologia: "APOYO TECNICO", unidad: "Subdirección Administrativa", solicitante: "", ubicacion: "Edificio energético HBQP", piso: "1", pma: "", requerimiento: "Servicio de estudio de cálculo de losa de edificio energético HBQP", estado: "TERMINADO", fecha_ingreso: "2026-02-04", fecha_actualizacion: "2026-02-04", descripcion: "Estudio de cálculo de losa", pendiente: "", prioridad: "ALTA" },
-      { id: 6, codigo: "PROY-006", ticket: "OC N° 1704-765-TD26", tipologia: "REPARACION", unidad: "Unidad de Ingeniería Operacional", solicitante: "", ubicacion: "Entrada principal tercer piso", piso: "3", pma: "", requerimiento: "Reparación de cielorraso para losa de tercer piso en entrada principal", estado: "TERMINADO", fecha_ingreso: "2026-02-04", fecha_actualizacion: "2026-02-04", descripcion: "Reparación cielorraso losa", pendiente: "", prioridad: "ALTA" },
-      { id: 7, codigo: "PROY-007", ticket: "D-3-40", tipologia: "PROYECTO", unidad: "Subdirección de Operaciones", solicitante: "Hospitalización Domiciliaria", ubicacion: "HD (Hospitalización Domiciliaria)", piso: "3", pma: "D-3-40", requerimiento: "Conclusión de trabajos de infraestructura en oficinas, kitchenette y bodega", estado: "PENDIENTE", fecha_ingreso: "2026-02-02", fecha_actualizacion: "2026-06-16", descripcion: "Solicitud de modificación de proyecto", pendiente: "Reunión Programada 07/JULIO", prioridad: "ALTA" },
-      { id: 8, codigo: "PROY-008", ticket: "5-58", tipologia: "REPARACION", unidad: "Médico Quirúrgico (5to piso)", solicitante: "", ubicacion: "Sala de aislamiento 5-58", piso: "5", pma: "5-58", requerimiento: "Bloqueo, mitigación y reparación de filtración activa de agua en sala de aislamiento 5-58", estado: "TERMINADO", fecha_ingreso: "2026-01-29", fecha_actualizacion: "2026-01-29", descripcion: "Reparación de filtración activa", pendiente: "", prioridad: "MUY ALTA" },
-      { id: 9, codigo: "PROY-009", ticket: "Salas 37-38", tipologia: "REPARACION", unidad: "Consultorio de Especialidades", solicitante: "", ubicacion: "Salas de preparación 37 y 38", piso: "1", pma: "", requerimiento: "Readecuación de estaciones de trabajo y traslado de soportes en salas de preparación 37 y 38", estado: "TERMINADO", fecha_ingreso: "2026-01-29", fecha_actualizacion: "2026-01-29", descripcion: "Readecuación puestos de trabajo", pendiente: "", prioridad: "MEDIA" },
-      { id: 10, codigo: "PROY-010", ticket: "", tipologia: "PROYECTO", unidad: "Unidad de Desarrollo Organizacional", solicitante: "", ubicacion: "Recinto de oficinas", piso: "2", pma: "", requerimiento: "Layout y propuesta de distribución de oficinas en recinto", estado: "TERMINADO", fecha_ingreso: "2026-01-28", fecha_actualizacion: "2026-01-28", descripcion: "Propuesta distribución de oficinas", pendiente: "", prioridad: "MEDIA" },
-      { id: 11, codigo: "PROY-011", ticket: "", tipologia: "REPARACION", unidad: "Sala Cuna y Jardín Infantil", solicitante: "", ubicacion: "Puerta principal de ingreso", piso: "1", pma: "", requerimiento: "Reparación urgente de puerta principal de ingreso descuadrada con riesgo de desprendimiento", estado: "TERMINADO", fecha_ingreso: "2026-01-27", fecha_actualizacion: "2026-01-27", descripcion: "Reparación urgente puerta", pendiente: "", prioridad: "MUY ALTA" },
-      { id: 12, codigo: "PROY-012", ticket: "G-S1-45", tipologia: "PROYECTO", unidad: "Farmacia CRD / Especialidades", solicitante: "Camila Aedo Jiménez", ubicacion: "Oficina farmacéuticos", piso: "-1", pma: "G-S1-45", requerimiento: "Propuestas de remodelación para oficina QF G-S1-45 y oficinas QF del Consultorio de Especialidades", estado: "PENDIENTE", fecha_ingreso: "2026-01-19", fecha_actualizacion: "2026-01-19", descripcion: "Remodelación oficina farmacéuticos", pendiente: "", prioridad: "MEDIA" },
-      { id: 13, codigo: "PROY-013", ticket: "", tipologia: "APOYO TECNICO", unidad: "Subdirección de Operaciones", solicitante: "Rafael", ubicacion: "Sala Infantil 4to piso", piso: "4", pma: "", requerimiento: "RETIRO DE MACETEROS SALA INFANTIL (4TO PISO)", estado: "PENDIENTE", fecha_ingreso: "2026-05-15", fecha_actualizacion: "2026-05-15", descripcion: "Retiro maceteros sala infantil", pendiente: "Coordinación con Logística", prioridad: "MEDIA" },
-      { id: 14, codigo: "PROY-014", ticket: "", tipologia: "APOYO TECNICO", unidad: "Subdirección de Operaciones", solicitante: "Rafael", ubicacion: "SALA TICS", piso: "3", pma: "", requerimiento: "MALLA MOSQUITERA TICS, Roberto Schiaffino", estado: "Propuesta enviada", fecha_ingreso: "2026-05-20", fecha_actualizacion: "2026-05-27", descripcion: "Instalación malla mosquitera TICS", pendiente: "", prioridad: "MEDIA" },
-      { id: 15, codigo: "PROY-015", ticket: "", tipologia: "PROYECTO", unidad: "Servicio de Medicina Física", solicitante: "Klga. Claudia Franceschi Á.", ubicacion: "Sector ascensor", piso: "1", pma: "", requerimiento: "Evaluar y desarrollar la construcción de una bodega para ayudas físicas", estado: "PENDIENTE", fecha_ingreso: "2026-04-08", fecha_actualizacion: "2026-04-08", descripcion: "Anteproyecto bodega ayudas físicas", pendiente: "", prioridad: "MEDIA" },
-      { id: 16, codigo: "PROY-016", ticket: "#66458", tipologia: "REPARACION", unidad: "UMQ", solicitante: "José Rocabado Jefe UMQ", ubicacion: "Terrazas 5to Piso", piso: "5", pma: "N-5-23", requerimiento: "Solicita instalación de Mallas en terrazas para el 5to Piso", estado: "PENDIENTE", fecha_ingreso: "2026-05-01", fecha_actualizacion: "2026-05-01", descripcion: "Mallas de seguridad en terrazas", pendiente: "Planos y EE.TT", prioridad: "ALTA" },
-      { id: 17, codigo: "PROY-017", ticket: "", tipologia: "PROYECTO", unidad: "URGENCIA", solicitante: "", ubicacion: "Mamparas Urgencia", piso: "1", pma: "", requerimiento: "PUERTA PARA URGENCIA Y CONTROL ACCESO EN MAMPARAS", estado: "PENDIENTE", fecha_ingreso: "2026-05-11", fecha_actualizacion: "2026-05-11", descripcion: "Control Centralizado envía EE.TT.", pendiente: "TERMINAR PROYECTO", prioridad: "ALTA" },
-      { id: 18, codigo: "PROY-018", ticket: "", tipologia: "PROYECTO", unidad: "UHYS", solicitante: "", ubicacion: "Bodega UHYS", piso: "-1", pma: "", requerimiento: "BODEGA UHYS", estado: "EN PROCESO", fecha_ingreso: "2026-04-27", fecha_actualizacion: "2026-05-27", descripcion: "Terminados tabiquería y terminaciones interiores", pendiente: "PUERTA Y CELOSIA", prioridad: "ALTA" },
-      { id: 19, codigo: "PROY-019", ticket: "", tipologia: "PROYECTO", unidad: "CONTROL CENTRALIZADO", solicitante: "", ubicacion: "Taller y Oficinas Piso 3", piso: "3", pma: "", requerimiento: "CONSTRUCCION TALLER Y OFICINAS", estado: "TERMINADO", fecha_ingreso: "2026-05-01", fecha_actualizacion: "2026-05-27", descripcion: "Construcción taller y oficinas", pendiente: "ASEO FINAL", prioridad: "MEDIA" },
-      { id: 20, codigo: "PROY-020", ticket: "", tipologia: "REPARACION", unidad: "MQ 4TO PISO", solicitante: "Eugenia Rojas Avilés", ubicacion: "Lavamanos MQ Piso 4", piso: "4", pma: "", requerimiento: "REPARACION FILTRACION LAVAMANOS", estado: "PENDIENTE", fecha_ingreso: "2026-05-15", fecha_actualizacion: "2026-05-15", descripcion: "Reparación filtración lavamanos", pendiente: "Solicitud de Bloqueo y coordinación", prioridad: "ALTA" },
-      { id: 21, codigo: "PROY-021", ticket: "", tipologia: "PROYECTO", unidad: "SDO", solicitante: "", ubicacion: "Terraza Piso 2", piso: "2", pma: "", requerimiento: "IMPERMEABILIZACION TERRAZA", estado: "TERMINADO", fecha_ingreso: "2026-05-20", fecha_actualizacion: "2026-06-09", descripcion: "Impermeabilización de terraza", pendiente: "", prioridad: "MEDIA" },
-      { id: 22, codigo: "PROY-022", ticket: "", tipologia: "PROYECTO", unidad: "Subdirección de Operaciones", solicitante: "", ubicacion: "Ascensor Piso 7", piso: "7", pma: "", requerimiento: "PINTURA PISO PISO 7 ASCENSOR", estado: "PENDIENTE", fecha_ingreso: "2026-05-22", fecha_actualizacion: "2026-05-22", descripcion: "Pintura piso alto tráfico", pendiente: "", prioridad: "BAJA" },
-      { id: 23, codigo: "PROY-023", ticket: "", tipologia: "PROYECTO", unidad: "FARMACIA", solicitante: "", ubicacion: "Farmacia Urgencia", piso: "1", pma: "", requerimiento: "FARMACIA URGENCIA", estado: "PENDIENTE", fecha_ingreso: "2026-05-25", fecha_actualizacion: "2026-05-25", descripcion: "Adecuación Farmacia Urgencia", pendiente: "", prioridad: "ALTA" },
-      { id: 24, codigo: "PROY-024", ticket: "", tipologia: "PROYECTO", unidad: "IMAGENOLOGIA", solicitante: "", ubicacion: "Kitchenette Imagenología", piso: "1", pma: "", requerimiento: "RESTRUCTURACION KITCHENETTE", estado: "PENDIENTE", fecha_ingreso: "2026-05-25", fecha_actualizacion: "2026-05-25", descripcion: "Restructuración de kitchenette", pendiente: "", prioridad: "MEDIA" },
-      { id: 25, codigo: "PROY-025", ticket: "", tipologia: "PROYECTO", unidad: "IMAGENOLOGIA / SALA DE RADIOLOGOS", solicitante: "", ubicacion: "Sala de informes médicos", piso: "1", pma: "", requerimiento: "AUMENTO DE PUESTOS DE TRABAJO", estado: "PENDIENTE", fecha_ingreso: "2026-05-25", fecha_actualizacion: "2026-05-25", descripcion: "Puestos de trabajo médicos radiólogos", pendiente: "", prioridad: "MEDIA" },
-      { id: 26, codigo: "PROY-026", ticket: "", tipologia: "PROYECTO", unidad: "LABORATORIO CLINICO VDLR", solicitante: "TM. Dobrana Torres Rojas", ubicacion: "Autoinmunidad y Biología Molecular", piso: "2", pma: "", requerimiento: "CAMBIO DE MOBILIARIO (Inmunología/VDRL y Biología Molecular)", estado: "TERMINADO", fecha_ingreso: "2026-05-25", fecha_actualizacion: "2026-05-25", descripcion: "Cambio de mesones y mobiliario clínico", pendiente: "", prioridad: "MEDIA" },
-      { id: 27, codigo: "PROY-027", ticket: "", tipologia: "PROYECTO", unidad: "SEDILE", solicitante: "", ubicacion: "Oficina nutricionistas", piso: "-1", pma: "", requerimiento: "Instalación de mesones y mobiliario para nutricionistas", estado: "PENDIENTE", fecha_ingreso: "2026-05-26", fecha_actualizacion: "2026-05-26", descripcion: "Mobiliario y mesones para nutricionistas", pendiente: "", prioridad: "MEDIA" },
-      { id: 28, codigo: "PROY-028", ticket: "P-5-40", tipologia: "PROYECTO", unidad: "SALA PRE ALTA GO", solicitante: "Roxana Montino Bahamondes", ubicacion: "Sala de espera de familiares", piso: "5", pma: "P-5-40", requerimiento: "HABILITACION SALA DE PRE ALTA GINECO OBSTETRA", estado: "Propuesta enviada", fecha_ingreso: "2026-03-25", fecha_actualizacion: "2026-05-18", descripcion: "Habilitación sala de pre alta GO", pendiente: "", prioridad: "ALTA" },
-      { id: 29, codigo: "PROY-029", ticket: "N-5-4", tipologia: "PROYECTO", unidad: "PATOLOGIA MAMARIA", solicitante: "Antonia Ávila Toro", ubicacion: "TERRAZA BLOQUE C", piso: "5", pma: "N-5-4", requerimiento: "CONSTRUCCION DE BOX Y POOL PROFESIONALES", estado: "Propuesta enviada", fecha_ingreso: "2026-02-20", fecha_actualizacion: "2026-02-20", descripcion: "Construcción box y pool profesionales", pendiente: "", prioridad: "ALTA" },
-      { id: 30, codigo: "PROY-030", ticket: "", tipologia: "PROYECTO", unidad: "IMAGENOLOGIA", solicitante: "", ubicacion: "TERRAZA PISO 1", piso: "1", pma: "", requerimiento: "ANGIOGRAFO, CONSTRUCCION DE RECINTOS", estado: "PENDIENTE", fecha_ingreso: "2026-05-26", fecha_actualizacion: "2026-05-26", descripcion: "Construcción recintos para Angiógrafo", pendiente: "", prioridad: "ALTA" },
-      { id: 31, codigo: "PROY-031", ticket: "G-1-43", tipologia: "REPARACION", unidad: "HOSPITALIZACION", solicitante: "", ubicacion: "Duchas en Baños", piso: "1", pma: "G-1-43", requerimiento: "REPARACION DUCHAS EN BAÑOS", estado: "PENDIENTE", fecha_ingreso: "2026-05-26", fecha_actualizacion: "2026-05-26", descripcion: "Reparación duchas y desagües", pendiente: "", prioridad: "ALTA" },
-      { id: 32, codigo: "PROY-032", ticket: "MEMO N°162", tipologia: "PROYECTO", unidad: "ESTERILIZACION", solicitante: "", ubicacion: "Central de Esterilización", piso: "-1", pma: "", requerimiento: "ADECUACIONES VARIAS MEMO N°162", estado: "Propuesta enviada", fecha_ingreso: "2026-05-26", fecha_actualizacion: "2026-05-26", descripcion: "Adecuaciones según Memo 162", pendiente: "", prioridad: "MEDIA" },
-      { id: 33, codigo: "PROY-033", ticket: "", tipologia: "PROYECTO", unidad: "OFICINA PERSONAL", solicitante: "", ubicacion: "OFICINA PERSONAL", piso: "1", pma: "", requerimiento: "ALMACENAMIENTO PARA OFICINA DE PERSONAL", estado: "PENDIENTE", fecha_ingreso: "2026-05-26", fecha_actualizacion: "2026-05-26", descripcion: "Muebles de archivo y almacenamiento", pendiente: "", prioridad: "BAJA" },
-      { id: 34, codigo: "PROY-034", ticket: "P-6-5", tipologia: "PROYECTO", unidad: "UROLOGIA", solicitante: "", ubicacion: "Biblioteca Urólogos", piso: "6", pma: "P-6-5", requerimiento: "BIBLIOTECA UROLOGOS", estado: "PENDIENTE", fecha_ingreso: "2026-05-26", fecha_actualizacion: "2026-05-26", descripcion: "Habilitación biblioteca Urología", pendiente: "", prioridad: "BAJA" },
-      { id: 35, codigo: "PROY-035", ticket: "", tipologia: "REPARACION", unidad: "Subdirección de Operaciones", solicitante: "Rafael", ubicacion: "UHCIP", piso: "1", pma: "", requerimiento: "FILTRACION UHCIP", estado: "TERMINADO", fecha_ingreso: "2026-05-26", fecha_actualizacion: "2026-05-26", descripcion: "Reparación filtración UHCIP", pendiente: "", prioridad: "ALTA" },
-      { id: 36, codigo: "PROY-036", ticket: "", tipologia: "REPARACION", unidad: "Subdirección de Operaciones", solicitante: "Rafael", ubicacion: "PASILLO ESTERILIZACION", piso: "-1", pma: "", requerimiento: "FILTRACION ESTERILIZACION", estado: "TERMINADO", fecha_ingreso: "2026-05-26", fecha_actualizacion: "2026-05-26", descripcion: "Reparación filtración esterilización", pendiente: "CON OBSERVACIONES", prioridad: "MEDIA" },
-      { id: 37, codigo: "PROY-037", ticket: "", tipologia: "REPARACION", unidad: "Subdirección de Operaciones", solicitante: "Rafael", ubicacion: "PASILLO OPERACIONES / ORIENTADORES", piso: "-1", pma: "", requerimiento: "FILTRACION ORIENTADORES", estado: "PENDIENTE", fecha_ingreso: "2026-05-26", fecha_actualizacion: "2026-05-26", descripcion: "Reparación filtración pasillo orientadores", pendiente: "", prioridad: "ALTA" },
-      { id: 38, codigo: "PROY-038", ticket: "", tipologia: "REPARACION", unidad: "Subdirección de Operaciones", solicitante: "Rafael", ubicacion: "ACCESO URGENCIA ADULTO", piso: "1", pma: "", requerimiento: "FILTRACION URGENCIA ADULTO", estado: "TERMINADO", fecha_ingreso: "2026-05-10", fecha_actualizacion: "2026-05-12", descripcion: "Reparación urgente filtración marquesina", pendiente: "", prioridad: "MUY ALTA" },
-      { id: 39, codigo: "PROY-039", ticket: "", tipologia: "REPARACION", unidad: "Subdirección de Operaciones", solicitante: "Rafael", ubicacion: "CAJA ESCALA E5", piso: "1", pma: "", requerimiento: "FILTRACION -1 CAJA ESCALA", estado: "TERMINADO", fecha_ingreso: "2026-05-26", fecha_actualizacion: "2026-05-26", descripcion: "Sellado filtración caja escala", pendiente: "", prioridad: "MEDIA" },
-      { id: 40, codigo: "PROY-040", ticket: "", tipologia: "PROYECTO", unidad: "HOSPITAL AMIGO", solicitante: "", ubicacion: "Sector Hospital Amigo", piso: "1", pma: "", requerimiento: "DUCHA HOSPITAL AMIGO", estado: "Propuesta enviada", fecha_ingreso: "2026-05-26", fecha_actualizacion: "2026-06-04", descripcion: "Propuesta ducha accesible Hospital Amigo", pendiente: "", prioridad: "MEDIA" },
-      { id: 41, codigo: "PROY-041", ticket: "", tipologia: "PROYECTO", unidad: "Subdirección de Operaciones", solicitante: "", ubicacion: "Terraza Choferes", piso: "1", pma: "", requerimiento: "HABILITACION TERRAZA CHOFERES", estado: "Propuesta enviada", fecha_ingreso: "2026-05-26", fecha_actualizacion: "2026-06-16", descripcion: "Propuesta cierre terraza choferes", pendiente: "", prioridad: "MEDIA" },
-      { id: 42, codigo: "PROY-042", ticket: "", tipologia: "PROYECTO", unidad: "COORDINACION CLINICA", solicitante: "", ubicacion: "Oficina Coordinadoras", piso: "1", pma: "", requerimiento: "OFICINA COORDINADORAS", estado: "PENDIENTE", fecha_ingreso: "2026-05-26", fecha_actualizacion: "2026-05-26", descripcion: "Puestos de trabajo coordinadoras", pendiente: "", prioridad: "MEDIA" },
-      { id: 43, codigo: "PROY-043", ticket: "#61819", tipologia: "REPARACION", unidad: "SUPERVISION UHCIP", solicitante: "ANA ROJAS BRIONES", ubicacion: "PATIO INTERIOR UHCIP", piso: "1", pma: "", requerimiento: "RETIRO DE MACETEROS UHCIP PATIO", estado: "PENDIENTE", fecha_ingreso: "2026-02-18", fecha_actualizacion: "2026-02-18", descripcion: "Retiro maceteros patio UHCIP", pendiente: "", prioridad: "BAJA" },
-      { id: 44, codigo: "PROY-044", ticket: "#61820", tipologia: "PROYECTO", unidad: "SUPERVISION UHCIP", solicitante: "ANA ROJAS BRIONES", ubicacion: "CONSULTA UHCIP", piso: "1", pma: "", requerimiento: "CIELO BOX CONSULTA", estado: "PENDIENTE", fecha_ingreso: "2026-05-26", fecha_actualizacion: "2026-05-26", descripcion: "Cielo modular box consulta", pendiente: "", prioridad: "MEDIA" },
-      { id: 45, codigo: "PROY-045", ticket: "", tipologia: "REPARACION", unidad: "Subdirección de Operaciones", solicitante: "Rafael", ubicacion: "PATIO ABASTECIMIENTO", piso: "-1", pma: "", requerimiento: "REPARACION FACHADA ALUCOBOND", estado: "PENDIENTE", fecha_ingreso: "2026-05-26", fecha_actualizacion: "2026-05-26", descripcion: "Fijación paneles fachada Alucobond", pendiente: "", prioridad: "MEDIA" },
-      { id: 46, codigo: "PROY-046", ticket: "", tipologia: "REPARACION", unidad: "Subdirección de Operaciones", solicitante: "", ubicacion: "SALA DE RECUPERACION", piso: "2", pma: "", requerimiento: "MEJORA LAVAMANOS / INCORPORA CERAMICA", estado: "PENDIENTE", fecha_ingreso: "2026-05-26", fecha_actualizacion: "2026-05-26", descripcion: "Revestimiento cerámico lavamanos", pendiente: "", prioridad: "MEDIA" }
-    ];
+    const INITIAL_PROJECTS = [{"id": 1, "codigo": "PROY-001", "ticket": "", "tipologia": "APOYO TECNICO", "unidad": "Jefatura Unidad Traumatología (TMT)", "solicitante": "", "ubicacion": "Oficina Traumatología", "piso": "1", "pma": "", "requerimiento": "Implementación de mobiliario para oficina (escritorio, sillas y mueble)", "estado": "TERMINADO", "fecha_ingreso": "2026-05-20", "fecha_actualizacion": "2026-05-26", "descripcion": "Implementación de mobiliario para oficina (escritorio, sillas y mueble institucional)", "pendiente": "", "prioridad": "MEDIA"}, {"id": 2, "codigo": "PROY-002", "ticket": "OC N° 1704-673-AG26", "tipologia": "PROYECTO", "unidad": "Unidad de Ingeniería Operacional", "solicitante": "", "ubicacion": "Terrazas de piso 1 y 3", "piso": "1 y 3", "pma": "", "requerimiento": "Servicio de instalación de malla de seguridad anticaídas en terrazas de piso 1 y 3", "estado": "TERMINADO", "fecha_ingreso": "2026-01-29", "fecha_actualizacion": "2026-01-29", "descripcion": "Servicio de instalación de malla de seguridad anticaídas en terrazas de piso 1 y 3 (OC N° 1704-673-AG26)", "pendiente": "", "prioridad": "ALTA"}, {"id": 3, "codigo": "PROY-003", "ticket": "", "tipologia": "PROYECTO", "unidad": "Subdepartamento de Infraestructura", "solicitante": "", "ubicacion": "Anatomía Patológica", "piso": "1", "pma": "", "requerimiento": "Readecuación estructural para habilitar sala de macroscopía #2 en Anatomía Patológica", "estado": "TERMINADO", "fecha_ingreso": "2026-02-27", "fecha_actualizacion": "2026-02-27", "descripcion": "Readecuación estructural para habilitar sala de macroscopía #2 en Anatomía Patológica", "pendiente": "", "prioridad": "MEDIA"}, {"id": 4, "codigo": "PROY-004", "ticket": "Solicitud de Compra N° 606", "tipologia": "PROYECTO", "unidad": "GESCAS (Asistentes Sociales)", "solicitante": "", "ubicacion": "Sector de espera de Pensionados", "piso": "6", "pma": "", "requerimiento": "Habilitación de oficinas en sector de espera de Pensionados en 6to piso", "estado": "TERMINADO", "fecha_ingreso": "2026-02-24", "fecha_actualizacion": "2026-02-24", "descripcion": "Habilitación de oficinas en sector de espera de Pensionados en 6to piso (Solicitud de Compra N° 606)", "pendiente": "", "prioridad": "MEDIA"}, {"id": 5, "codigo": "PROY-005", "ticket": "OC N° 1704-766-TD26", "tipologia": "APOYO TECNICO", "unidad": "Subdirección Administrativa", "solicitante": "", "ubicacion": "Edificio energético HBQP", "piso": "1", "pma": "", "requerimiento": "Servicio de estudio de cálculo de losa de edificio energético HBQP", "estado": "TERMINADO", "fecha_ingreso": "2026-02-04", "fecha_actualizacion": "2026-02-04", "descripcion": "Servicio de estudio de cálculo de losa de edificio energético HBQP (OC N° 1704-766-TD26)", "pendiente": "", "prioridad": "ALTA"}, {"id": 6, "codigo": "PROY-006", "ticket": "OC N° 1704-765-TD26", "tipologia": "REPARACION", "unidad": "Unidad de Ingeniería Operacional", "solicitante": "", "ubicacion": "Entrada principal tercer piso", "piso": "3", "pma": "", "requerimiento": "Reparación de cielorraso para losa de tercer piso en entrada principal", "estado": "TERMINADO", "fecha_ingreso": "2026-02-04", "fecha_actualizacion": "2026-02-04", "descripcion": "Reparación de cielorraso para losa de tercer piso en entrada principal (OC N° 1704-765-TD26)", "pendiente": "", "prioridad": "ALTA"}, {"id": 7, "codigo": "PROY-007", "ticket": "D-3-40", "tipologia": "PROYECTO", "unidad": "Subdirección de Operaciones", "solicitante": "Hospitalización Domiciliaria", "ubicacion": "HD (Hospitalización Domiciliaria)", "piso": "3", "pma": "D-3-40", "requerimiento": "Conclusión de trabajos de infraestructura en oficinas, kitchenette y bodega", "estado": "PENDIENTE", "fecha_ingreso": "2026-02-02", "fecha_actualizacion": "2026-06-16", "descripcion": "Solicitud de modificación de proyecto en recintos de oficinas, kitchenette y bodega", "pendiente": "Reunión Programada 07/JULIO", "prioridad": "ALTA"}, {"id": 8, "codigo": "PROY-008", "ticket": "5-58", "tipologia": "REPARACION", "unidad": "Médico Quirúrgico (5to piso)", "solicitante": "", "ubicacion": "Sala de aislamiento 5-58", "piso": "5", "pma": "5-58", "requerimiento": "Bloqueo, mitigación y reparación de filtración activa de agua en sala de aislamiento 5-58", "estado": "TERMINADO", "fecha_ingreso": "2026-01-29", "fecha_actualizacion": "2026-01-29", "descripcion": "Bloqueo mitigación y reparación de filtración activa de agua en sala de aislamiento 5-58", "pendiente": "", "prioridad": "MUY ALTA"}, {"id": 9, "codigo": "PROY-009", "ticket": "Salas 37-38", "tipologia": "REPARACION", "unidad": "Consultorio de Especialidades", "solicitante": "", "ubicacion": "Salas de preparación 37 y 38", "piso": "1", "pma": "", "requerimiento": "Readecuación de estaciones de trabajo y traslado de soportes en salas de preparación 37 y 38", "estado": "TERMINADO", "fecha_ingreso": "2026-01-29", "fecha_actualizacion": "2026-01-29", "descripcion": "Readecuación de estaciones de trabajo y traslado de soportes en salas de preparación 37 y 38", "pendiente": "", "prioridad": "MEDIA"}, {"id": 10, "codigo": "PROY-010", "ticket": "", "tipologia": "PROYECTO", "unidad": "Unidad de Desarrollo Organizacional", "solicitante": "", "ubicacion": "Recinto de oficinas", "piso": "2", "pma": "", "requerimiento": "Layout y propuesta de distribución de oficinas en recinto", "estado": "TERMINADO", "fecha_ingreso": "2026-01-28", "fecha_actualizacion": "2026-01-28", "descripcion": "Layout y propuesta arquitectónica de distribución de oficinas en recinto", "pendiente": "", "prioridad": "MEDIA"}, {"id": 11, "codigo": "PROY-011", "ticket": "", "tipologia": "REPARACION", "unidad": "Sala Cuna y Jardín Infantil", "solicitante": "", "ubicacion": "Puerta principal de ingreso", "piso": "1", "pma": "", "requerimiento": "Reparación urgente de puerta principal de ingreso descuadrada con riesgo de desprendimiento", "estado": "TERMINADO", "fecha_ingreso": "2026-01-27", "fecha_actualizacion": "2026-01-27", "descripcion": "Reparación urgente de puerta principal de ingreso descuadrada con riesgo de desprendimiento", "pendiente": "", "prioridad": "MUY ALTA"}, {"id": 12, "codigo": "PROY-012", "ticket": "G-S1-45", "tipologia": "PROYECTO", "unidad": "Farmacia CRD / Especialidades", "solicitante": "Camila Aedo Jiménez", "ubicacion": "Oficina farmacéuticos", "piso": "-1", "pma": "G-S1-45", "requerimiento": "Propuestas de remodelación para oficina QF G-S1-45 y oficinas QF del Consultorio de Especialidades", "estado": "PENDIENTE", "fecha_ingreso": "2026-01-19", "fecha_actualizacion": "2026-01-19", "descripcion": "Propuestas de remodelación para oficina QF G-S1-45 y oficinas QF del Consultorio de Especialidades", "pendiente": "", "prioridad": "MEDIA"}, {"id": 13, "codigo": "PROY-013", "ticket": "", "tipologia": "APOYO TECNICO", "unidad": "Subdirección de Operaciones", "solicitante": "Rafael", "ubicacion": "Sala Infantil 4to piso", "piso": "4", "pma": "", "requerimiento": "RETIRO DE MACETEROS SALA INFANTIL (4TO PISO)", "estado": "PENDIENTE", "fecha_ingreso": "2026-05-15", "fecha_actualizacion": "2026-05-15", "descripcion": "Maceteros anclados a piso en sala infantil", "pendiente": "Coordinación con Logística", "prioridad": "MEDIA"}, {"id": 14, "codigo": "PROY-014", "ticket": "", "tipologia": "APOYO TECNICO", "unidad": "Subdirección de Operaciones", "solicitante": "Rafael", "ubicacion": "SALA TICS", "piso": "3", "pma": "", "requerimiento": "MALLA MOSQUITERA TICS, Roberto Schiaffino", "estado": "Propuesta enviada", "fecha_ingreso": "2026-05-20", "fecha_actualizacion": "2026-05-27", "descripcion": "Propuesta técnica enviada para malla mosquitera en Sala TICS", "pendiente": "", "prioridad": "MEDIA"}, {"id": 15, "codigo": "PROY-015", "ticket": "", "tipologia": "PROYECTO", "unidad": "Servicio de Medicina Física", "solicitante": "Klga. Claudia Franceschi Á.", "ubicacion": "Sector ascensor", "piso": "1", "pma": "", "requerimiento": "Evaluar y desarrollar la construcción de una bodega para ayudas físicas", "estado": "PENDIENTE", "fecha_ingreso": "2026-04-08", "fecha_actualizacion": "2026-04-08", "descripcion": "Evaluar y desarrollar anteproyecto para la construcción de una bodega de ayudas físicas", "pendiente": "", "prioridad": "MEDIA"}, {"id": 16, "codigo": "PROY-016", "ticket": "#66458", "tipologia": "REPARACION", "unidad": "UMQ", "solicitante": "José Rocabado Jefe UMQ", "ubicacion": "Terrazas 5to Piso", "piso": "5", "pma": "N-5-23", "requerimiento": "Solicita instalación de Mallas en terrazas para el 5to Piso", "estado": "PENDIENTE", "fecha_ingreso": "2026-05-01", "fecha_actualizacion": "2026-05-01", "descripcion": "Instalación de mallas de protección en terrazas de 5to piso", "pendiente": "Planos y EE.TT", "prioridad": "ALTA"}, {"id": 17, "codigo": "PROY-017", "ticket": "", "tipologia": "PROYECTO", "unidad": "URGENCIA", "solicitante": "", "ubicacion": "Mamparas Urgencia", "piso": "1", "pma": "", "requerimiento": "PUERTA PARA URGENCIA Y CONTROL ACCESO EN MAMPARAS", "estado": "PENDIENTE", "fecha_ingreso": "2026-05-11", "fecha_actualizacion": "2026-05-11", "descripcion": "Control Centralizado envía EE.TT. para puerta y mamparas de acceso", "pendiente": "TERMINAR PROYECTO", "prioridad": "ALTA"}, {"id": 18, "codigo": "PROY-018", "ticket": "", "tipologia": "PROYECTO", "unidad": "UHYS", "solicitante": "", "ubicacion": "Bodega UHYS", "piso": "-1", "pma": "", "requerimiento": "BODEGA UHYS", "estado": "EN PROCESO", "fecha_ingreso": "2026-04-27", "fecha_actualizacion": "2026-05-27", "descripcion": "Terminados tabiquería y terminaciones interiores en bodega UHYS", "pendiente": "PUERTA Y CELOSIA", "prioridad": "ALTA"}, {"id": 19, "codigo": "PROY-019", "ticket": "", "tipologia": "PROYECTO", "unidad": "CONTROL CENTRALIZADO", "solicitante": "", "ubicacion": "Taller y Oficinas Piso 3", "piso": "3", "pma": "", "requerimiento": "CONSTRUCCION TALLER Y OFICINAS", "estado": "TERMINADO", "fecha_ingreso": "2026-05-01", "fecha_actualizacion": "2026-05-27", "descripcion": "Construcción y habilitación de taller y oficinas de control centralizado", "pendiente": "ASEO FINAL", "prioridad": "MEDIA"}, {"id": 20, "codigo": "PROY-020", "ticket": "", "tipologia": "REPARACION", "unidad": "MQ 4TO PISO", "solicitante": "Eugenia Rojas Avilés", "ubicacion": "Lavamanos MQ Piso 4", "piso": "4", "pma": "", "requerimiento": "REPARACION FILTRACION LAVAMANOS", "estado": "PENDIENTE", "fecha_ingreso": "2026-05-15", "fecha_actualizacion": "2026-05-15", "descripcion": "Reparación de filtración activa en lavamanos", "pendiente": "Solicitud de Bloqueo y coordinación", "prioridad": "ALTA"}, {"id": 21, "codigo": "PROY-021", "ticket": "", "tipologia": "PROYECTO", "unidad": "SDO", "solicitante": "", "ubicacion": "Terraza Piso 2", "piso": "2", "pma": "", "requerimiento": "IMPERMEABILIZACION TERRAZA", "estado": "TERMINADO", "fecha_ingreso": "2026-05-20", "fecha_actualizacion": "2026-06-09", "descripcion": "Impermeabilización técnica de losa y terraza en segundo piso", "pendiente": "", "prioridad": "MEDIA"}, {"id": 22, "codigo": "PROY-022", "ticket": "", "tipologia": "PROYECTO", "unidad": "Subdirección de Operaciones", "solicitante": "", "ubicacion": "Ascensor Piso 7", "piso": "7", "pma": "", "requerimiento": "PINTURA PISO PISO 7 ASCENSOR", "estado": "PENDIENTE", "fecha_ingreso": "2026-05-22", "fecha_actualizacion": "2026-05-22", "descripcion": "Pintura de alto tráfico y demarcación en piso 7 área ascensores", "pendiente": "", "prioridad": "BAJA"}, {"id": 23, "codigo": "PROY-023", "ticket": "", "tipologia": "PROYECTO", "unidad": "FARMACIA", "solicitante": "", "ubicacion": "Farmacia Urgencia", "piso": "1", "pma": "", "requerimiento": "FARMACIA URGENCIA", "estado": "PENDIENTE", "fecha_ingreso": "2026-05-25", "fecha_actualizacion": "2026-05-25", "descripcion": "Adecuación y reestructuración de recintos para Farmacia de Urgencia", "pendiente": "", "prioridad": "ALTA"}, {"id": 24, "codigo": "PROY-024", "ticket": "", "tipologia": "PROYECTO", "unidad": "IMAGENOLOGIA", "solicitante": "", "ubicacion": "Kitchenette Imagenología", "piso": "1", "pma": "", "requerimiento": "RESTRUCTURACION KITCHENETTE", "estado": "PENDIENTE", "fecha_ingreso": "2026-05-25", "fecha_actualizacion": "2026-05-25", "descripcion": "Reestructuración y rediseño de kitchenette en servicio de Imagenología", "pendiente": "", "prioridad": "MEDIA"}, {"id": 25, "codigo": "PROY-025", "ticket": "", "tipologia": "PROYECTO", "unidad": "IMAGENOLOGIA / SALA DE RADIOLOGOS", "solicitante": "", "ubicacion": "Sala de informes médicos", "piso": "1", "pma": "", "requerimiento": "AUMENTO DE PUESTOS DE TRABAJO", "estado": "PENDIENTE", "fecha_ingreso": "2026-05-25", "fecha_actualizacion": "2026-05-25", "descripcion": "Ampliación y habilitación de nuevos puestos de trabajo para médicos radiólogos", "pendiente": "", "prioridad": "MEDIA"}, {"id": 26, "codigo": "PROY-026", "ticket": "", "tipologia": "PROYECTO", "unidad": "LABORATORIO CLINICO VDLR", "solicitante": "TM. Dobrana Torres Rojas", "ubicacion": "Autoinmunidad y Biología Molecular", "piso": "2", "pma": "", "requerimiento": "CAMBIO DE MOBILIARIO (Inmunología/VDRL y Biología Molecular)", "estado": "TERMINADO", "fecha_ingreso": "2026-05-25", "fecha_actualizacion": "2026-05-25", "descripcion": "Cambio y adaptación de mesones y mobiliario clínico", "pendiente": "", "prioridad": "MEDIA"}, {"id": 27, "codigo": "PROY-027", "ticket": "", "tipologia": "PROYECTO", "unidad": "SEDILE", "solicitante": "", "ubicacion": "Oficina nutricionistas", "piso": "-1", "pma": "", "requerimiento": "Instalación de mesones y mobiliario para nutricionistas", "estado": "PENDIENTE", "fecha_ingreso": "2026-05-26", "fecha_actualizacion": "2026-05-26", "descripcion": "Fabricación e instalación de mesones de trabajo en SEDILE", "pendiente": "", "prioridad": "MEDIA"}, {"id": 28, "codigo": "PROY-028", "ticket": "P-5-40", "tipologia": "PROYECTO", "unidad": "SALA PRE ALTA GO", "solicitante": "Roxana Montino Bahamondes", "ubicacion": "Sala de espera de familiares", "piso": "5", "pma": "P-5-40", "requerimiento": "HABILITACION SALA DE PRE ALTA GINECO OBSTETRA", "estado": "Propuesta enviada", "fecha_ingreso": "2026-03-25", "fecha_actualizacion": "2026-05-18", "descripcion": "Habilitación arquitectónica y tabiquería para sala de pre alta gineco obstétrica", "pendiente": "", "prioridad": "ALTA"}, {"id": 29, "codigo": "PROY-029", "ticket": "N-5-4", "tipologia": "PROYECTO", "unidad": "PATOLOGIA MAMARIA", "solicitante": "Antonia Ávila Toro", "ubicacion": "TERRAZA BLOQUE C", "piso": "5", "pma": "N-5-4", "requerimiento": "CONSTRUCCION DE BOX Y POOL PROFESIONALES", "estado": "Propuesta enviada", "fecha_ingreso": "2026-02-20", "fecha_actualizacion": "2026-02-20", "descripcion": "Construcción y cierre de terraza para box clínico y pool de profesionales", "pendiente": "", "prioridad": "ALTA"}, {"id": 30, "codigo": "PROY-030", "ticket": "", "tipologia": "PROYECTO", "unidad": "IMAGENOLOGIA", "solicitante": "", "ubicacion": "TERRAZA PISO 1", "piso": "1", "pma": "", "requerimiento": "ANGIOGRAFO, CONSTRUCCION DE RECINTOS", "estado": "PENDIENTE", "fecha_ingreso": "2026-05-26", "fecha_actualizacion": "2026-05-26", "descripcion": "Proyecto de infraestructura para instalación de equipo Angiógrafo", "pendiente": "", "prioridad": "ALTA"}, {"id": 31, "codigo": "PROY-031", "ticket": "G-1-43", "tipologia": "REPARACION", "unidad": "HOSPITALIZACION", "solicitante": "", "ubicacion": "Duchas en Baños", "piso": "1", "pma": "G-1-43", "requerimiento": "REPARACION DUCHAS EN BAÑOS", "estado": "PENDIENTE", "fecha_ingreso": "2026-05-26", "fecha_actualizacion": "2026-05-26", "descripcion": "Reparación y reposición de sellos, griferías y desagües de duchas", "pendiente": "", "prioridad": "ALTA"}, {"id": 32, "codigo": "PROY-032", "ticket": "MEMO N°162", "tipologia": "PROYECTO", "unidad": "ESTERILIZACION", "solicitante": "", "ubicacion": "Central de Esterilización", "piso": "-1", "pma": "", "requerimiento": "ADECUACIONES VARIAS MEMO N°162", "estado": "Propuesta enviada", "fecha_ingreso": "2026-05-26", "fecha_actualizacion": "2026-05-26", "descripcion": "Adecuaciones de infraestructura según requerimientos formalizados en Memo 162", "pendiente": "", "prioridad": "MEDIA"}, {"id": 33, "codigo": "PROY-033", "ticket": "", "tipologia": "PROYECTO", "unidad": "OFICINA PERSONAL", "solicitante": "", "ubicacion": "OFICINA PERSONAL", "piso": "1", "pma": "", "requerimiento": "ALMACENAMIENTO PARA OFICINA DE PERSONAL", "estado": "PENDIENTE", "fecha_ingreso": "2026-05-26", "fecha_actualizacion": "2026-05-26", "descripcion": "Habilitación de estanterías y muebles de almacenamiento para legajos de personal", "pendiente": "", "prioridad": "BAJA"}, {"id": 34, "codigo": "PROY-034", "ticket": "P-6-5", "tipologia": "PROYECTO", "unidad": "UROLOGIA", "solicitante": "", "ubicacion": "Biblioteca Urólogos", "piso": "6", "pma": "P-6-5", "requerimiento": "BIBLIOTECA UROLOGOS", "estado": "PENDIENTE", "fecha_ingreso": "2026-05-26", "fecha_actualizacion": "2026-05-26", "descripcion": "Habilitación de espacio de estudio y biblioteca médica de Urología", "pendiente": "", "prioridad": "BAJA"}, {"id": 35, "codigo": "PROY-035", "ticket": "", "tipologia": "REPARACION", "unidad": "Subdirección de Operaciones", "solicitante": "Rafael", "ubicacion": "UHCIP", "piso": "1", "pma": "", "requerimiento": "FILTRACION UHCIP", "estado": "TERMINADO", "fecha_ingreso": "2026-05-26", "fecha_actualizacion": "2026-05-26", "descripcion": "Detección y reparación de filtración en sector UHCIP", "pendiente": "", "prioridad": "ALTA"}, {"id": 36, "codigo": "PROY-036", "ticket": "", "tipologia": "REPARACION", "unidad": "Subdirección de Operaciones", "solicitante": "Rafael", "ubicacion": "PASILLO ESTERILIZACION", "piso": "-1", "pma": "", "requerimiento": "FILTRACION ESTERILIZACION", "estado": "TERMINADO", "fecha_ingreso": "2026-05-26", "fecha_actualizacion": "2026-05-26", "descripcion": "Reparación de filtración en cielo pasillo esterilización", "pendiente": "CON OBSERVACIONES", "prioridad": "MEDIA"}, {"id": 37, "codigo": "PROY-037", "ticket": "", "tipologia": "REPARACION", "unidad": "Subdirección de Operaciones", "solicitante": "Rafael", "ubicacion": "PASILLO OPERACIONES / ORIENTADORES", "piso": "-1", "pma": "", "requerimiento": "FILTRACION ORIENTADORES", "estado": "PENDIENTE", "fecha_ingreso": "2026-05-26", "fecha_actualizacion": "2026-05-26", "descripcion": "Reparación de filtración en sector pasillo orientadores", "pendiente": "", "prioridad": "ALTA"}, {"id": 38, "codigo": "PROY-038", "ticket": "", "tipologia": "REPARACION", "unidad": "Subdirección de Operaciones", "solicitante": "Rafael", "ubicacion": "ACCESO URGENCIA ADULTO", "piso": "1", "pma": "", "requerimiento": "FILTRACION URGENCIA ADULTO", "estado": "TERMINADO", "fecha_ingreso": "2026-05-10", "fecha_actualizacion": "2026-05-12", "descripcion": "Reparación urgente de filtración en marquesina y acceso urgencia adulto", "pendiente": "", "prioridad": "MUY ALTA"}, {"id": 39, "codigo": "PROY-039", "ticket": "", "tipologia": "REPARACION", "unidad": "Subdirección de Operaciones", "solicitante": "Rafael", "ubicacion": "CAJA ESCALA E5", "piso": "1", "pma": "", "requerimiento": "FILTRACION -1 CAJA ESCALA", "estado": "TERMINADO", "fecha_ingreso": "2026-05-26", "fecha_actualizacion": "2026-05-26", "descripcion": "Sellado e impermeabilización en caja escala E5", "pendiente": "", "prioridad": "MEDIA"}, {"id": 40, "codigo": "PROY-040", "ticket": "", "tipologia": "PROYECTO", "unidad": "HOSPITAL AMIGO", "solicitante": "", "ubicacion": "Sector Hospital Amigo", "piso": "1", "pma": "", "requerimiento": "DUCHA HOSPITAL AMIGO", "estado": "Propuesta enviada", "fecha_ingreso": "2026-05-26", "fecha_actualizacion": "2026-06-04", "descripcion": "Propuesta técnica para habilitación de ducha accesible en sector Hospital Amigo", "pendiente": "", "prioridad": "MEDIA"}, {"id": 41, "codigo": "PROY-041", "ticket": "", "tipologia": "PROYECTO", "unidad": "Subdirección de Operaciones", "solicitante": "", "ubicacion": "Terraza Choferes", "piso": "1", "pma": "", "requerimiento": "HABILITACION TERRAZA CHOFERES", "estado": "Propuesta enviada", "fecha_ingreso": "2026-05-26", "fecha_actualizacion": "2026-06-16", "descripcion": "Propuesta de cierre y techumbre para terraza de choferes", "pendiente": "", "prioridad": "MEDIA"}, {"id": 42, "codigo": "PROY-042", "ticket": "", "tipologia": "PROYECTO", "unidad": "COORDINACION CLINICA", "solicitante": "", "ubicacion": "Oficina Coordinadoras", "piso": "1", "pma": "", "requerimiento": "OFICINA COORDINADORAS", "estado": "PENDIENTE", "fecha_ingreso": "2026-05-26", "fecha_actualizacion": "2026-05-26", "descripcion": "Adecuación de puestos y tabiquería para oficinas de coordinadoras clínicas", "pendiente": "", "prioridad": "MEDIA"}, {"id": 43, "codigo": "PROY-043", "ticket": "#61819", "tipologia": "REPARACION", "unidad": "SUPERVISION UHCIP", "solicitante": "ANA ROJAS BRIONES", "ubicacion": "PATIO INTERIOR UHCIP", "piso": "1", "pma": "", "requerimiento": "RETIRO DE MACETEROS UHCIP PATIO", "estado": "PENDIENTE", "fecha_ingreso": "2026-02-18", "fecha_actualizacion": "2026-02-18", "descripcion": "Retiro y despeje de maceteros en patio interior UHCIP", "pendiente": "", "prioridad": "BAJA"}, {"id": 44, "codigo": "PROY-044", "ticket": "#61820", "tipologia": "PROYECTO", "unidad": "SUPERVISION UHCIP", "solicitante": "ANA ROJAS BRIONES", "ubicacion": "CONSULTA UHCIP", "piso": "1", "pma": "", "requerimiento": "CIELO BOX CONSULTA", "estado": "PENDIENTE", "fecha_ingreso": "2026-05-26", "fecha_actualizacion": "2026-05-26", "descripcion": "Reinstalación y terminación de cielo modular en Box de Consulta UHCIP", "pendiente": "", "prioridad": "MEDIA"}, {"id": 45, "codigo": "PROY-045", "ticket": "", "tipologia": "REPARACION", "unidad": "Subdirección de Operaciones", "solicitante": "Rafael", "ubicacion": "PATIO ABASTECIMIENTO", "piso": "-1", "pma": "", "requerimiento": "REPARACION FACHADA ALUCOBOND", "estado": "PENDIENTE", "fecha_ingreso": "2026-05-26", "fecha_actualizacion": "2026-05-26", "descripcion": "Fijación y reposición de paneles de revestimiento Alucobond en fachada patio", "pendiente": "", "prioridad": "MEDIA"}, {"id": 46, "codigo": "PROY-046", "ticket": "", "tipologia": "REPARACION", "unidad": "Subdirección de Operaciones", "solicitante": "", "ubicacion": "SALA DE RECUPERACION", "piso": "2", "pma": "", "requerimiento": "MEJORA LAVAMANOS / INCORPORA CERAMICA", "estado": "PENDIENTE", "fecha_ingreso": "2026-05-26", "fecha_actualizacion": "2026-05-26", "descripcion": "Instalación de revestimiento cerámico lavable en zona de lavamanos", "pendiente": "", "prioridad": "MEDIA"}];
 
     function escapeHtml(unsafe) {
       if (!unsafe) return '';
@@ -1476,8 +1364,7 @@
       applyRoleRestrictions() {
         if (!this.currentRole) return;
         const badge = document.getElementById('roleBadge');
-        const switcherDesk = document.getElementById('moduleSwitcherDesktop');
-        const bottomNav = document.getElementById('mobileBottomBar');
+        const switcher = document.getElementById('moduleSwitcher');
         const mob = document.getElementById('mobileModuleOptions');
         const sup = document.getElementById('supervisorMenuOptions');
 
@@ -1486,8 +1373,7 @@
             badge.textContent = 'SUPERVISOR';
             badge.className = 'text-[9px] sm:text-[10px] uppercase font-black tracking-wider px-1.5 py-0.5 rounded bg-indigo-600 text-white shrink-0';
           }
-          switcherDesk?.classList.remove('hidden');
-          bottomNav?.classList.remove('hidden');
+          switcher?.classList.remove('hidden');
           mob?.classList.remove('hidden');
           sup?.classList.remove('hidden');
           this.switchModule('projects');
@@ -1496,8 +1382,7 @@
             badge.textContent = 'TÉCNICO';
             badge.className = 'text-[9px] sm:text-[10px] uppercase font-black tracking-wider px-1.5 py-0.5 rounded bg-amber-600 text-white shrink-0';
           }
-          switcherDesk?.classList.add('hidden');
-          bottomNav?.classList.add('hidden');
+          switcher?.classList.add('hidden');
           mob?.classList.add('hidden');
           sup?.classList.add('hidden');
           this.switchModule('orders');
@@ -1508,40 +1393,111 @@
         if (m === 'projects' && this.currentRole !== 'supervisor') return;
         this.activeModule = m;
         
-        // Desktop Tabs
         const navP = document.getElementById('navBtnProjects');
         const navO = document.getElementById('navBtnOrders');
-        
-        // Mobile Tabs
-        const mobP = document.getElementById('mobileTabProjects');
-        const mobO = document.getElementById('mobileTabOrders');
-
         const viewP = document.getElementById('moduleProjectsView');
         const viewO = document.getElementById('moduleOrdersView');
-        const btnText = document.getElementById('btnHeaderActionText');
 
         if (m === 'projects') {
-          if (navP) navP.className = "px-3.5 py-1.5 rounded-lg bg-indigo-600 text-white shadow transition flex items-center gap-1.5";
-          if (navO) navO.className = "px-3.5 py-1.5 rounded-lg text-slate-300 hover:text-white transition flex items-center gap-1.5";
-          if (mobP) mobP.className = "mobile-nav-item active";
-          if (mobO) mobO.className = "mobile-nav-item";
-          
+          if (navP) navP.className = "px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg bg-indigo-600 text-white shadow transition flex items-center gap-1";
+          if (navO) navO.className = "px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-slate-300 hover:text-white transition flex items-center gap-1";
           viewP?.classList.remove('hidden');
           viewO?.classList.add('hidden');
-          if (btnText) btnText.textContent = "Nuevo Proyecto";
           this.renderProjects();
         } else {
-          if (navO) navO.className = "px-3.5 py-1.5 rounded-lg bg-blue-600 text-white shadow transition flex items-center gap-1.5";
-          if (navP) navP.className = "px-3.5 py-1.5 rounded-lg text-slate-300 hover:text-white transition flex items-center gap-1.5";
-          if (mobO) mobO.className = "mobile-nav-item active";
-          if (mobP) mobP.className = "mobile-nav-item";
-          
+          if (navO) navO.className = "px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg bg-blue-600 text-white shadow transition flex items-center gap-1";
+          if (navP) navP.className = "px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-slate-300 hover:text-white transition flex items-center gap-1";
           viewO?.classList.remove('hidden');
           viewP?.classList.add('hidden');
-          if (btnText) btnText.textContent = "Nueva OT";
+          this.updateKpis();
           this.renderOrdersList();
         }
+        this.updateHeaderContext();
       }
+
+      updateHeaderContext() {
+        const sum = document.getElementById('moduleStatsSummary');
+        const accessLabel = document.getElementById('moduleAccessLabel');
+        const btnHeader = document.getElementById('btnHeaderAction');
+        const btnText = document.getElementById('btnHeaderActionText');
+        const btnIcon = document.getElementById('btnHeaderActionIcon');
+
+        if (this.activeModule === 'orders') {
+          const p = this.orders.filter(o => o.estado === 'Pendiente').length;
+          const e = this.orders.filter(o => o.estado === 'En Ejecución').length;
+          const r = this.orders.filter(o => o.estado === 'Solicitud Cierre').length;
+          const t = this.orders.filter(o => o.estado === 'Terminada').length;
+
+          if (sum) {
+            sum.innerHTML = `
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="px-2 py-0.5 rounded bg-blue-600 text-white font-black text-[10px] uppercase flex items-center gap-1 shadow-sm">
+                  <i class="fa-solid fa-wrench"></i> ÓRDENES DE TRABAJO
+                </span>
+                <span class="text-slate-600 hidden sm:inline">|</span>
+                <span>Total OTs: <strong class="text-white font-bold">${this.orders.length}</strong></span>
+                <span class="cursor-pointer hover:underline" onclick="window.app.setFilterStatus('Pendiente')">
+                  <span class="w-2 h-2 rounded-full bg-amber-400 inline-block mr-1"></span>En Curso: <strong class="text-amber-300 font-bold">${p}</strong>
+                </span>
+                <span class="cursor-pointer hover:underline" onclick="window.app.setFilterStatus('En Ejecución')">
+                  <span class="w-2 h-2 rounded-full bg-blue-400 inline-block mr-1"></span>Ejecución: <strong class="text-blue-300 font-bold">${e}</strong>
+                </span>
+                <span class="cursor-pointer hover:underline" onclick="window.app.setFilterStatus('Solicitud Cierre')">
+                  <span class="w-2 h-2 rounded-full bg-indigo-400 inline-block mr-1"></span>Cierre: <strong class="text-indigo-300 font-bold">${r}</strong>
+                </span>
+                <span class="cursor-pointer hover:underline" onclick="window.app.setFilterStatus('Terminada')">
+                  <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block mr-1"></span>Terminadas: <strong class="text-emerald-300 font-bold">${t}</strong>
+                </span>
+              </div>
+            `;
+          }
+
+          if (accessLabel) accessLabel.innerHTML = '<i class="fa-solid fa-wrench text-blue-400 mr-1"></i> Base de Datos OTs Conectada';
+          if (btnHeader) {
+            btnHeader.className = "px-2.5 sm:px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 active:scale-95 text-white text-xs font-bold transition flex items-center gap-1 shadow-sm";
+          }
+          if (btnIcon) btnIcon.innerHTML = '<i class="fa-solid fa-plus mr-0.5"></i>';
+          if (btnText) btnText.textContent = "Nueva OT";
+
+        } else {
+          const pCount = this.projects.filter(p => this.normalizeProjectStatus(p.estado) === 'PENDIENTE').length;
+          const propCount = this.projects.filter(p => this.normalizeProjectStatus(p.estado) === 'Propuesta enviada').length;
+          const procCount = this.projects.filter(p => this.normalizeProjectStatus(p.estado) === 'EN PROCESO').length;
+          const doneCount = this.projects.filter(p => this.normalizeProjectStatus(p.estado) === 'TERMINADO').length;
+
+          if (sum) {
+            sum.innerHTML = `
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="px-2 py-0.5 rounded bg-indigo-600 text-white font-black text-[10px] uppercase flex items-center gap-1 shadow-sm">
+                  <i class="fa-solid fa-diagram-project"></i> PROYECTOS
+                </span>
+                <span class="text-slate-600 hidden sm:inline">|</span>
+                <span>Total Proyectos: <strong class="text-white font-bold">${this.projects.length}</strong></span>
+                <span class="cursor-pointer hover:underline" onclick="window.app.setProjectStatusFilter('PENDIENTE')">
+                  <span class="w-2 h-2 rounded-full bg-amber-400 inline-block mr-1"></span>Pend: <strong class="text-amber-300 font-bold">${pCount}</strong>
+                </span>
+                <span class="cursor-pointer hover:underline" onclick="window.app.setProjectStatusFilter('Propuesta enviada')">
+                  <span class="w-2 h-2 rounded-full bg-blue-400 inline-block mr-1"></span>Prop: <strong class="text-blue-300 font-bold">${propCount}</strong>
+                </span>
+                <span class="cursor-pointer hover:underline" onclick="window.app.setProjectStatusFilter('EN PROCESO')">
+                  <span class="w-2 h-2 rounded-full bg-indigo-400 inline-block mr-1"></span>Obras: <strong class="text-indigo-300 font-bold">${procCount}</strong>
+                </span>
+                <span class="cursor-pointer hover:underline" onclick="window.app.setProjectStatusFilter('TERMINADO')">
+                  <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block mr-1"></span>Concluidos: <strong class="text-emerald-300 font-bold">${doneCount}</strong>
+                </span>
+              </div>
+            `;
+          }
+
+          if (accessLabel) accessLabel.innerHTML = '<i class="fa-solid fa-diagram-project text-indigo-400 mr-1"></i> Catálogo Proyectos Conectado';
+          if (btnHeader) {
+            btnHeader.className = "px-2.5 sm:px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white text-xs font-bold transition flex items-center gap-1 shadow-sm";
+          }
+          if (btnIcon) btnIcon.innerHTML = '<i class="fa-solid fa-plus mr-0.5"></i>';
+          if (btnText) btnText.textContent = "Nuevo Proyecto";
+        }
+      }
+
 
       handleHeaderPrimaryAction() {
         if (this.activeModule === 'projects') this.openCreateProjectModal();
@@ -1564,7 +1520,6 @@
 
       renderProjects() {
         const c = document.getElementById('projectsContainer');
-        const sum = document.getElementById('moduleStatsSummary');
         if (!c) return;
 
         const q = (document.getElementById('searchProjectsInput')?.value || '').toLowerCase().trim();
@@ -1576,15 +1531,8 @@
         const procCount = this.projects.filter(p => this.normalizeProjectStatus(p.estado) === 'EN PROCESO').length;
         const doneCount = this.projects.filter(p => this.normalizeProjectStatus(p.estado) === 'TERMINADO').length;
 
-        if (sum && this.activeModule === 'projects') {
-          sum.innerHTML = `
-            <span>Total: <strong class="text-white font-bold">${this.projects.length}</strong></span>
-            <span class="text-slate-600">|</span>
-            <span class="cursor-pointer" onclick="window.app.setProjectStatusFilter('PENDIENTE')"><span class="w-2 h-2 rounded-full bg-amber-400 inline-block mr-1"></span>Pend: <strong class="text-amber-300 font-bold">${pCount}</strong></span>
-            <span class="cursor-pointer" onclick="window.app.setProjectStatusFilter('Propuesta enviada')"><span class="w-2 h-2 rounded-full bg-blue-400 inline-block mr-1"></span>Prop: <strong class="text-blue-300 font-bold">${propCount}</strong></span>
-            <span class="cursor-pointer" onclick="window.app.setProjectStatusFilter('EN PROCESO')"><span class="w-2 h-2 rounded-full bg-indigo-400 inline-block mr-1"></span>Obras: <strong class="text-indigo-300 font-bold">${procCount}</strong></span>
-            <span class="cursor-pointer" onclick="window.app.setProjectStatusFilter('TERMINADO')"><span class="w-2 h-2 rounded-full bg-emerald-400 inline-block mr-1"></span>Concluidos: <strong class="text-emerald-300 font-bold">${doneCount}</strong></span>
-          `;
+        if (this.activeModule === 'projects') {
+          this.updateHeaderContext();
         }
 
         const filtered = this.projects.filter(p => {
@@ -1598,41 +1546,78 @@
 
         if (this.projectsViewMode === 'kanban') {
           const cols = [
-            { key: 'PENDIENTE', title: 'En Evaluación / Pendientes', color: 'bg-amber-500', badge: 'bg-amber-100 text-amber-900' },
-            { key: 'Propuesta enviada', title: 'Propuesta Enviada', color: 'bg-blue-500', badge: 'bg-blue-100 text-blue-900' },
-            { key: 'EN PROCESO', title: 'En Ejecución / Obras', color: 'bg-indigo-500', badge: 'bg-indigo-100 text-indigo-900' },
-            { key: 'TERMINADO', title: 'Concluidos / Entregados', color: 'bg-emerald-500', badge: 'bg-emerald-100 text-emerald-900' }
+            { key: 'PENDIENTE', id: 'kanban_PENDIENTE', title: 'En Evaluación / Pendientes', color: 'bg-amber-500', badge: 'bg-amber-100 text-amber-900', count: pCount },
+            { key: 'Propuesta enviada', id: 'kanban_PROPUESTA', title: 'Propuesta Enviada', color: 'bg-blue-500', badge: 'bg-blue-100 text-blue-900', count: propCount },
+            { key: 'EN PROCESO', id: 'kanban_PROCESO', title: 'En Obras / Ejecución', color: 'bg-indigo-500', badge: 'bg-indigo-100 text-indigo-900', count: procCount },
+            { key: 'TERMINADO', id: 'kanban_TERMINADO', title: 'Concluidos / Entregados', color: 'bg-emerald-500', badge: 'bg-emerald-100 text-emerald-900', count: doneCount }
           ];
 
-          c.innerHTML = '<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 items-start">' + cols.map(col => `
-            <div class="kanban-col-container shadow-sm">
-              <div class="flex justify-between items-center pb-2 mb-2.5 border-b border-slate-300">
-                <span class="font-bold text-xs flex items-center gap-1.5 uppercase text-slate-800"><span class="w-2.5 h-2.5 rounded-full ${col.color}"></span> ${col.title}</span>
-                <span class="text-xs font-bold px-2 py-0.5 rounded-full ${col.badge}">${filtered.filter(p => this.normalizeProjectStatus(p.estado) === col.key).length}</span>
-              </div>
-              <div class="kanban-cards-wrapper custom-scroll" ondragover="event.preventDefault(); this.classList.add('drag-over');" ondragleave="this.classList.remove('drag-over');" ondrop="window.app.handleProjectDrop(event, '${col.key}')">
-                ${filtered.filter(p => this.normalizeProjectStatus(p.estado) === col.key).map(p => `
-                  <div class="project-card group" draggable="true" ondragstart="window.app.draggedProjectId=${p.id}" onclick="window.app.openEditProjectModal(${p.id})">
-                    <div class="flex justify-between items-center text-xs mb-1.5">
-                      <span class="font-black text-slate-900">${escapeHtml(p.codigo || 'PROY-' + p.id)}</span>
-                      <span class="px-2 py-0.5 rounded text-[10px] font-bold ${p.tipologia === 'REPARACION' ? 'badge-reparacion' : (p.tipologia === 'APOYO TECNICO' ? 'badge-apoyo' : 'badge-proyecto')}">${p.tipologia || 'PROYECTO'}</span>
-                    </div>
-                    <h4 class="text-xs font-bold text-slate-900 mb-1.5 group-hover:text-indigo-600 transition line-clamp-2">${escapeHtml(p.requerimiento || p.descripcion)}</h4>
-                    ${p.unidad ? `<p class="text-[11px] text-slate-600 mb-1 truncate">🏢 ${escapeHtml(p.unidad)}</p>` : ''}
-                    <div class="flex items-center gap-1 flex-wrap mb-2 text-[10px] text-slate-500">
-                      ${p.piso ? `<span class="bg-slate-100 px-1.5 py-0.5 rounded">Piso ${escapeHtml(p.piso)}</span>` : ''}
-                      ${p.pma ? `<span class="bg-cyan-50 text-cyan-800 px-1.5 py-0.5 rounded border border-cyan-200 font-bold">PMA: ${escapeHtml(p.pma)}</span>` : ''}
-                    </div>
-                    ${p.pendiente ? `<div class="p-1.5 bg-amber-50 rounded text-amber-900 text-[10px] font-bold mb-2">⚠️ ${escapeHtml(p.pendiente)}</div>` : ''}
-                    <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400">
-                      <span>${p.fecha_ingreso || ''}</span>
-                      <span class="text-indigo-600 font-bold opacity-0 group-hover:opacity-100 transition">Ver Ficha →</span>
-                    </div>
-                  </div>
-                `).join('')}
-              </div>
+          // Mobile fast stage switcher tabs + Snap carousel board
+          c.innerHTML = `
+            <!-- Barra de navegación rápida móvil entre fases del Kanban -->
+            <div class="md:hidden flex items-center gap-1.5 overflow-x-auto custom-scroll pb-2 mb-2 whitespace-nowrap">
+              ${cols.map(col => `
+                <button type="button" onclick="window.app.scrollToKanbanCol('${col.id}')" 
+                        class="px-2.5 py-1 rounded-full text-xs font-bold ${col.badge} border border-slate-200/60 shadow-sm shrink-0 flex items-center gap-1">
+                  <span class="w-2 h-2 rounded-full ${col.color}"></span>
+                  <span>${col.title.split('/')[0].trim()}</span>
+                  <span class="ml-0.5 opacity-80">(${col.count})</span>
+                </button>
+              `).join('')}
             </div>
-          `).join('') + '</div>';
+
+            <!-- Tablero Kanban (Deslizable tipo carrusel en móvil con snap, Grid en desktop) -->
+            <div id="kanbanBoardWrapper" class="flex md:grid md:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 items-start overflow-x-auto snap-x snap-mandatory pb-4 custom-scroll">
+              ${cols.map(col => `
+                <div id="${col.id}" class="kanban-col-container w-[88vw] sm:w-[330px] md:w-auto shrink-0 snap-center shadow-sm">
+                  <div class="flex justify-between items-center pb-2 mb-2.5 border-b border-slate-300">
+                    <span class="font-bold text-xs flex items-center gap-1.5 uppercase text-slate-800">
+                      <span class="w-2.5 h-2.5 rounded-full ${col.color}"></span> ${col.title}
+                    </span>
+                    <span class="text-xs font-bold px-2 py-0.5 rounded-full ${col.badge}">
+                      ${filtered.filter(p => this.normalizeProjectStatus(p.estado) === col.key).length}
+                    </span>
+                  </div>
+                  
+                  <div class="kanban-cards-wrapper custom-scroll" 
+                       ondragover="event.preventDefault(); this.classList.add('drag-over');" 
+                       ondragleave="this.classList.remove('drag-over');" 
+                       ondrop="window.app.handleProjectDrop(event, '${col.key}')">
+                    ${filtered.filter(p => this.normalizeProjectStatus(p.estado) === col.key).map(p => `
+                      <div class="project-card group hover:border-indigo-400" draggable="true" ondragstart="window.app.draggedProjectId=${p.id}" onclick="window.app.openEditProjectModal(${p.id})">
+                        <div class="flex justify-between items-center text-xs mb-1.5">
+                          <span class="font-black text-indigo-900">${escapeHtml(p.codigo || 'PROY-' + p.id)}</span>
+                          <span class="px-2 py-0.5 rounded text-[10px] font-bold ${p.tipologia === 'REPARACION' ? 'badge-reparacion' : (p.tipologia === 'APOYO TECNICO' ? 'badge-apoyo' : 'badge-proyecto')}">
+                            ${p.tipologia || 'PROYECTO'}
+                          </span>
+                        </div>
+                        <h4 class="text-xs font-bold text-slate-900 mb-1.5 group-hover:text-indigo-600 transition line-clamp-2">
+                          ${escapeHtml(p.requerimiento || p.descripcion)}
+                        </h4>
+                        ${p.unidad ? `<p class="text-[11px] text-slate-600 mb-1 truncate">🏢 ${escapeHtml(p.unidad)}</p>` : ''}
+                        <div class="flex items-center gap-1 flex-wrap mb-2 text-[10px] text-slate-500">
+                          ${p.piso ? `<span class="bg-slate-100 px-1.5 py-0.5 rounded font-medium">Piso ${escapeHtml(p.piso)}</span>` : ''}
+                          ${p.pma ? `<span class="bg-cyan-50 text-cyan-800 px-1.5 py-0.5 rounded border border-cyan-200 font-bold">PMA: ${escapeHtml(p.pma)}</span>` : ''}
+                        </div>
+                        ${p.pendiente ? `<div class="p-1.5 bg-amber-50 rounded text-amber-900 text-[10px] font-bold mb-2 border border-amber-200/60">⚠️ ${escapeHtml(p.pendiente)}</div>` : ''}
+                        <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400">
+                          <span>${p.fecha_ingreso || ''}</span>
+                          <span class="text-indigo-600 font-bold group-hover:translate-x-0.5 transition-transform flex items-center gap-1">
+                            Ficha <i class="fa-solid fa-arrow-right text-[9px]"></i>
+                          </span>
+                        </div>
+                      </div>
+                    `).join('')}
+                    ${filtered.filter(p => this.normalizeProjectStatus(p.estado) === col.key).length === 0 ? `
+                      <div class="p-6 text-center text-slate-400 text-xs italic border border-dashed border-slate-300 rounded-xl">
+                        Sin proyectos en esta fase
+                      </div>
+                    ` : ''}
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          `;
         } else if (this.projectsViewMode === 'cards') {
           c.innerHTML = '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">' + filtered.map(p => `
             <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-slate-300 transition" onclick="window.app.openEditProjectModal(${p.id})">
@@ -1646,29 +1631,66 @@
             </div>
           `).join('') + '</div>';
         } else {
+          // Modo Matriz (Tabla) con Scroll Horizontal Suave, Columna Sticky y Hint Móvil
           c.innerHTML = `
-            <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
-              <table class="w-full text-left text-xs">
-                <thead class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
-                  <tr><th class="p-3">Código</th><th class="p-3">Tipología</th><th class="p-3">Requerimiento</th><th class="p-3">Unidad</th><th class="p-3">Piso / Recinto</th><th class="p-3">PMA</th><th class="p-3">Hito Pendiente</th><th class="p-3">Fase</th></tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100">
-                  ${filtered.map(p => `
-                    <tr class="hover:bg-slate-50 cursor-pointer" onclick="window.app.openEditProjectModal(${p.id})">
-                      <td class="p-3 font-bold text-indigo-700">${escapeHtml(p.codigo || 'PROY-' + p.id)}</td>
-                      <td class="p-3">${p.tipologia}</td>
-                      <td class="p-3 font-medium max-w-xs truncate">${escapeHtml(p.requerimiento || p.descripcion)}</td>
-                      <td class="p-3 text-slate-600">${escapeHtml(p.unidad || '-')}</td>
-                      <td class="p-3">Piso ${escapeHtml(p.piso || '-')} · ${escapeHtml(p.ubicacion || '')}</td>
-                      <td class="p-3 font-mono">${escapeHtml(p.pma || '-')}</td>
-                      <td class="p-3 font-bold text-amber-700">${escapeHtml(p.pendiente || '-')}</td>
-                      <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100">${p.estado}</span></td>
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+              <div class="md:hidden px-3 py-2 bg-slate-50 border-b border-slate-200 flex items-center justify-between text-xs text-slate-500 font-medium">
+                <span><i class="fa-solid fa-arrows-left-right text-indigo-500 mr-1"></i> Desliza para ver todas las columnas</span>
+                <span class="font-bold text-indigo-700 text-[11px]">${filtered.length} proyectos</span>
+              </div>
+              <div class="overflow-x-auto custom-scroll w-full">
+                <table class="w-full text-left text-xs min-w-[850px]">
+                  <thead class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200 whitespace-nowrap">
+                    <tr>
+                      <th class="p-3 sticky left-0 bg-slate-50 z-10 shadow-[1px_0_0_#e2e8f0]">Código</th>
+                      <th class="p-3">Tipología</th>
+                      <th class="p-3 min-w-[240px]">Requerimiento</th>
+                      <th class="p-3">Unidad Solicitante</th>
+                      <th class="p-3">Piso / Recinto</th>
+                      <th class="p-3">PMA</th>
+                      <th class="p-3 min-w-[180px]">Hito Pendiente</th>
+                      <th class="p-3 text-right">Fase</th>
                     </tr>
-                  `).join('')}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody class="divide-y divide-slate-100">
+                    ${filtered.map(p => `
+                      <tr class="hover:bg-slate-50 cursor-pointer transition" onclick="window.app.openEditProjectModal(${p.id})">
+                        <td class="p-3 font-black text-indigo-700 whitespace-nowrap sticky left-0 bg-white shadow-[1px_0_0_#e2e8f0]">
+                          ${escapeHtml(p.codigo || 'PROY-' + p.id)}
+                        </td>
+                        <td class="p-3 whitespace-nowrap">
+                          <span class="px-2 py-0.5 rounded text-[10px] font-bold ${p.tipologia === 'REPARACION' ? 'badge-reparacion' : (p.tipologia === 'APOYO TECNICO' ? 'badge-apoyo' : 'badge-proyecto')}">
+                            ${p.tipologia || 'PROYECTO'}
+                          </span>
+                        </td>
+                        <td class="p-3 font-semibold text-slate-900 leading-tight">
+                          ${escapeHtml(p.requerimiento || p.descripcion)}
+                        </td>
+                        <td class="p-3 text-slate-600 whitespace-nowrap">${escapeHtml(p.unidad || '-')}</td>
+                        <td class="p-3 whitespace-nowrap">Piso ${escapeHtml(p.piso || '-')} ${p.ubicacion ? '· ' + escapeHtml(p.ubicacion) : ''}</td>
+                        <td class="p-3 font-mono font-bold text-slate-700 whitespace-nowrap">${escapeHtml(p.pma || '-')}</td>
+                        <td class="p-3">
+                          ${p.pendiente ? `<span class="text-amber-800 bg-amber-50 px-2 py-1 rounded border border-amber-200 font-bold block text-[11px] leading-tight">⚠️ ${escapeHtml(p.pendiente)}</span>` : '<span class="text-slate-400">-</span>'}
+                        </td>
+                        <td class="p-3 text-right whitespace-nowrap">
+                          <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${this.normalizeProjectStatus(p.estado) === 'TERMINADO' ? 'bg-emerald-100 text-emerald-800' : (this.normalizeProjectStatus(p.estado) === 'EN PROCESO' ? 'bg-indigo-100 text-indigo-800' : (this.normalizeProjectStatus(p.estado) === 'Propuesta enviada' ? 'bg-blue-100 text-blue-800' : 'bg-amber-100 text-amber-800'))}">
+                            ${p.estado}
+                          </span>
+                        </td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
             </div>
           `;
+        }
+      }
+
+      scrollToKanbanCol(colId) {
+        const el = document.getElementById(colId);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
         }
       }
 
@@ -1952,22 +1974,14 @@
         const kE = document.getElementById('kpiEjecucion');
         const kR = document.getElementById('kpiSolicitudCierre');
         const kT = document.getElementById('kpiTerminadas');
-        const sum = document.getElementById('moduleStatsSummary');
 
         if (kP) kP.textContent = p;
         if (kE) kE.textContent = e;
         if (kR) kR.textContent = r;
         if (kT) kT.textContent = t;
 
-        if (sum && this.activeModule === 'orders') {
-          sum.innerHTML = `
-            <span>Total OTs: <strong class="text-white font-bold">${this.orders.length}</strong></span>
-            <span class="text-slate-600">|</span>
-            <span>En Curso: <strong class="text-amber-300 font-bold">${p}</strong></span>
-            <span>En Ejecución: <strong class="text-blue-300 font-bold">${e}</strong></span>
-            <span>Solicitud Cierre: <strong class="text-indigo-300 font-bold">${r}</strong></span>
-            <span>Terminadas: <strong class="text-emerald-300 font-bold">${t}</strong></span>
-          `;
+        if (this.activeModule === 'orders') {
+          this.updateHeaderContext();
         }
       }
 
@@ -2000,7 +2014,31 @@
         if (this.viewMode === 'cards') {
           container.innerHTML = '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">' + filtered.map(o => this.renderOrderCard(o)).join('') + '</div>';
         } else {
-          container.innerHTML = '<div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm"><div class="overflow-x-auto custom-scroll"><table class="w-full text-left text-xs"><thead class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200"><tr><th class="p-3">Folio</th><th class="p-3">Recinto / PMA</th><th class="p-3">Prioridad / Descripción</th><th class="p-3">Estado</th><th class="p-3">Tiempo Corrido</th><th class="p-3 text-right">Acciones</th></tr></thead><tbody class="divide-y divide-slate-100">' + filtered.map(o => this.renderOrderRow(o)).join('') + '</tbody></table></div></div>';
+          container.innerHTML = `
+            <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+              <div class="md:hidden px-3 py-2 bg-slate-50 border-b border-slate-200 flex items-center justify-between text-xs text-slate-500 font-medium">
+                <span><i class="fa-solid fa-arrows-left-right text-blue-500 mr-1"></i> Desliza para ver más detalles</span>
+                <span class="font-bold text-blue-700 text-[11px]">${filtered.length} órdenes</span>
+              </div>
+              <div class="overflow-x-auto custom-scroll w-full">
+                <table class="w-full text-left text-xs min-w-[720px]">
+                  <thead class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200 whitespace-nowrap">
+                    <tr>
+                      <th class="p-3 sticky left-0 bg-slate-50 z-10 shadow-[1px_0_0_#e2e8f0]">Folio</th>
+                      <th class="p-3">Recinto / PMA</th>
+                      <th class="p-3 min-w-[200px]">Prioridad / Descripción</th>
+                      <th class="p-3">Estado</th>
+                      <th class="p-3 whitespace-nowrap">Tiempo Corrido</th>
+                      <th class="p-3 text-right">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-100">
+                    ${filtered.map(o => this.renderOrderRow(o)).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          `;
         }
       }
 
@@ -2043,7 +2081,7 @@
         
         return `
           <tr class="hover:bg-slate-50 cursor-pointer" onclick="window.app.openOperativeView('${o.id}')">
-            <td class="p-3 font-bold">${escapeHtml(o.folio)} ${unreadBadge}</td>
+            <td class="p-3 font-black text-indigo-900 whitespace-nowrap sticky left-0 bg-white shadow-[1px_0_0_#e2e8f0]">${escapeHtml(o.folio)} ${unreadBadge}</td>
             <td class="p-3"><span class="font-bold block">${escapeHtml(o.recinto)}</span><span class="text-[10px] text-slate-400">PMA: ${escapeHtml(o.ticket)}</span></td>
             <td class="p-3">
                <div class="mb-0.5"><span class="text-[10px] font-bold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">${emojis[o.prioridad]||''} ${escapeHtml(o.prioridad)}</span></div>
@@ -2684,3 +2722,4 @@
   </script>
 </body>
 </html>
+
