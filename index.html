@@ -237,7 +237,33 @@
             <option value="6">Piso 6</option>
             <option value="7">Piso 7</option>
           </select>
-          <button onclick="window.app.clearProjectFilters()" class="text-slate-400 hover:text-slate-700 px-2 py-1 bg-slate-100 rounded text-[11px] font-semibold">✕</button>
+          <button onclick="window.app.clearProjectFilters()" class="text-slate-400 hover:text-slate-700 px-2 py-1 bg-slate-100 rounded text-[11px] font-semibold" title="Limpiar filtros">✕</button>
+
+          <!-- Selector de Columnas (Ocultar / Agregar columnas en Modo Matriz) -->
+          <div class="relative inline-block text-left" id="columnSelectorWrapper">
+            <button type="button" id="btnColumnSelector" onclick="window.app.toggleColumnSelector(event)" 
+                    class="px-2.5 sm:px-3 py-1 bg-white hover:bg-slate-50 active:bg-slate-100 border border-slate-200 rounded-lg text-[11px] sm:text-xs font-bold text-slate-700 flex items-center gap-1.5 shadow-sm transition">
+              <i class="fa-solid fa-table-columns text-indigo-600"></i>
+              <span>Columnas</span>
+              <span id="badgeActiveColumns" class="w-4 h-4 rounded-full bg-indigo-100 text-indigo-700 text-[10px] flex items-center justify-center font-black">9</span>
+              <i class="fa-solid fa-chevron-down text-[9px] text-slate-400"></i>
+            </button>
+
+            <!-- Menú Desplegable con Checkboxes de Columnas -->
+            <div id="columnSelectorDropdown" class="hidden absolute left-0 sm:left-auto sm:right-0 top-9 w-64 bg-white rounded-xl shadow-2xl border border-slate-200 z-50 p-3 text-xs space-y-2.5">
+              <div class="flex items-center justify-between border-b border-slate-100 pb-1.5">
+                <span class="font-black text-slate-800 text-[11px] uppercase tracking-wide">Columnas Visibles</span>
+                <button type="button" onclick="window.app.resetColumnsToDefault()" class="text-[10px] text-indigo-600 hover:underline font-bold">Por defecto</button>
+              </div>
+              <div class="max-h-64 overflow-y-auto custom-scroll space-y-1" id="columnsCheckboxList">
+                <!-- Checkboxes generados dinámicamente -->
+              </div>
+              <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px]">
+                <button type="button" onclick="window.app.selectAllColumns(true)" class="text-indigo-600 font-bold hover:underline">Marcar todas</button>
+                <button type="button" onclick="window.app.toggleColumnSelector()" class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 rounded font-bold text-slate-600">Cerrar</button>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="flex items-center space-x-1.5 overflow-x-auto custom-scroll pb-1">
@@ -971,9 +997,27 @@
         this.draggedProjectId = null;
         this.reportFilteredList = [];
 
-        // Estado de ordenamiento de proyectos
+        // Estado de ordenamiento y columnas visibles de proyectos
         this.projectSortCol = 'codigo';
         this.projectSortDir = 'asc';
+
+        this.availableColumns = [
+          { key: 'codigo', label: 'Código', default: true, required: true },
+          { key: 'fecha_ingreso', label: 'Fecha', default: true },
+          { key: 'tipologia', label: 'Tipología', default: true },
+          { key: 'requerimiento', label: 'Requerimiento', default: true },
+          { key: 'unidad', label: 'Unidad Solicitante', default: true },
+          { key: 'piso', label: 'Piso / Recinto', default: true },
+          { key: 'pma', label: 'PMA', default: true },
+          { key: 'pendiente', label: 'Hito Pendiente', default: true },
+          { key: 'estado', label: 'Fase / Estado', default: true },
+          { key: 'ticket', label: 'Ticket / N° OC', default: false },
+          { key: 'solicitante', label: 'Solicitante', default: false },
+          { key: 'prioridad', label: 'Prioridad', default: false },
+          { key: 'fecha_actualizacion', label: 'Últ. Actualización', default: false }
+        ];
+
+        this.visibleColumns = this.loadVisibleColumns();
 
         this.hospitalName = SGM_CONFIG.defaultHospital;
         this.folioPrefix = SGM_CONFIG.defaultPrefix;
@@ -986,6 +1030,14 @@
 
         this.initAuth();
         this.initScrollSpy();
+
+        window.addEventListener('click', (e) => {
+          const wrapper = document.getElementById('columnSelectorWrapper');
+          const dd = document.getElementById('columnSelectorDropdown');
+          if (dd && !dd.classList.contains('hidden') && wrapper && !wrapper.contains(e.target)) {
+            dd.classList.add('hidden');
+          }
+        });
 
         window.addEventListener('popstate', () => {
           if (!document.getElementById('unifiedOperativeView').classList.contains('hidden')) {
@@ -1011,6 +1063,94 @@
         return this.projectSortDir === 'asc'
           ? '<i class="fa-solid fa-arrow-up-wide-short text-indigo-600 ml-1 text-xs"></i>'
           : '<i class="fa-solid fa-arrow-down-short-wide text-indigo-600 ml-1 text-xs"></i>';
+      }
+
+      loadVisibleColumns() {
+        try {
+          const saved = localStorage.getItem('hbqp_matriz_visible_columns');
+          if (saved) {
+            const parsed = JSON.parse(saved);
+            if (parsed && typeof parsed === 'object') {
+              parsed.codigo = true;
+              return parsed;
+            }
+          }
+        } catch(e) {}
+        const defaults = {};
+        this.availableColumns.forEach(col => { defaults[col.key] = !!col.default; });
+        return defaults;
+      }
+
+      saveVisibleColumns() {
+        try {
+          localStorage.setItem('hbqp_matriz_visible_columns', JSON.stringify(this.visibleColumns));
+        } catch(e) {}
+      }
+
+      toggleColumnSelector(event) {
+        if (event) event.stopPropagation();
+        const dd = document.getElementById('columnSelectorDropdown');
+        if (!dd) return;
+        const isHidden = dd.classList.contains('hidden');
+        if (isHidden) {
+          this.renderColumnSelectorCheckboxes();
+          dd.classList.remove('hidden');
+        } else {
+          dd.classList.add('hidden');
+        }
+      }
+
+      renderColumnSelectorCheckboxes() {
+        const container = document.getElementById('columnsCheckboxList');
+        if (!container) return;
+
+        container.innerHTML = this.availableColumns.map(col => {
+          const isChecked = !!this.visibleColumns[col.key];
+          const isRequired = col.required;
+          return `
+            <label class="flex items-center justify-between p-1.5 rounded-lg hover:bg-slate-50 cursor-pointer select-none transition">
+              <span class="flex items-center gap-2 text-xs font-semibold text-slate-700">
+                <input type="checkbox" ${isChecked ? 'checked' : ''} ${isRequired ? 'disabled' : ''} 
+                       onchange="window.app.toggleColumnVisibility('${col.key}', this.checked)"
+                       class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 w-3.5 h-3.5 cursor-pointer">
+                <span>${escapeHtml(col.label)}</span>
+              </span>
+              ${isRequired ? '<span class="text-[9px] uppercase font-bold text-slate-400 bg-slate-100 px-1 py-0.5 rounded">Fija</span>' : ''}
+            </label>
+          `;
+        }).join('');
+
+        const count = Object.values(this.visibleColumns).filter(Boolean).length;
+        const badge = document.getElementById('badgeActiveColumns');
+        if (badge) badge.textContent = count;
+      }
+
+      toggleColumnVisibility(colKey, isVisible) {
+        if (colKey === 'codigo') return;
+        this.visibleColumns[colKey] = isVisible;
+        this.saveVisibleColumns();
+        this.renderColumnSelectorCheckboxes();
+        this.renderProjects();
+      }
+
+      resetColumnsToDefault() {
+        const defaults = {};
+        this.availableColumns.forEach(col => { defaults[col.key] = !!col.default; });
+        this.visibleColumns = defaults;
+        this.saveVisibleColumns();
+        this.renderColumnSelectorCheckboxes();
+        this.renderProjects();
+        this.showToast('Columnas restablecidas por defecto');
+      }
+
+      selectAllColumns(enableAll = true) {
+        this.availableColumns.forEach(col => {
+          this.visibleColumns[col.key] = enableAll;
+        });
+        this.visibleColumns.codigo = true;
+        this.saveVisibleColumns();
+        this.renderColumnSelectorCheckboxes();
+        this.renderProjects();
       }
 
       async initAuth() {
@@ -1836,15 +1976,30 @@
             `;
           }).join('') + '</div>';
         } else {
-          // Modo Matriz (Tabla) con Scroll Horizontal Suave, Columna Sticky, Columna Fecha y Ordenamiento en todas las cabeceras
+          // Modo Matriz (Tabla) con Scroll Horizontal Suave, Columnas Dinámicas Configurables, Sticky y Ordenamiento
+          const isCol = (key) => !!this.visibleColumns[key];
+          const activeColsCount = Object.values(this.visibleColumns).filter(Boolean).length;
+          const badgeEl = document.getElementById('badgeActiveColumns');
+          if (badgeEl) badgeEl.textContent = activeColsCount;
+
           c.innerHTML = `
             <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-              <div class="md:hidden px-3 py-2 bg-slate-50 border-b border-slate-200 flex items-center justify-between text-xs text-slate-500 font-medium">
-                <span><i class="fa-solid fa-arrows-left-right text-indigo-500 mr-1"></i> Desliza para ver todas las columnas</span>
-                <span class="font-bold text-indigo-700 text-[11px]">${filtered.length} proyectos</span>
+              <div class="px-3 py-2 bg-slate-50 border-b border-slate-200 flex items-center justify-between text-xs text-slate-500 font-medium">
+                <span class="flex items-center gap-1.5">
+                  <i class="fa-solid fa-arrows-left-right text-indigo-500 text-xs"></i> 
+                  <span>Desliza para ver columnas</span>
+                  <span class="hidden sm:inline text-slate-400 font-normal">(Haz clic en cada cabecera para ordenar)</span>
+                </span>
+                <div class="flex items-center gap-2">
+                  <span class="font-bold text-indigo-700 text-[11px]">${filtered.length} proyectos</span>
+                  <span class="text-slate-300">|</span>
+                  <button type="button" onclick="window.app.toggleColumnSelector(event)" class="text-[11px] font-bold text-slate-600 hover:text-indigo-600 flex items-center gap-1">
+                    <i class="fa-solid fa-sliders text-[10px] text-indigo-500"></i> Configurar Columnas
+                  </button>
+                </div>
               </div>
               <div class="overflow-x-auto custom-scroll w-full">
-                <table class="w-full text-left text-xs min-w-[950px]">
+                <table class="w-full text-left text-xs min-w-[850px]">
                   <thead class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200 whitespace-nowrap">
                     <tr>
                       <th onclick="window.app.toggleProjectSort('codigo')" class="p-3 sticky left-0 bg-slate-50 z-10 shadow-[1px_0_0_#e2e8f0] cursor-pointer select-none hover:bg-slate-100 group transition" title="Ordenar por Código">
@@ -1853,54 +2008,102 @@
                           ${this.getProjectSortIcon('codigo')}
                         </div>
                       </th>
-                      <th onclick="window.app.toggleProjectSort('fecha_ingreso')" class="p-3 cursor-pointer select-none hover:bg-slate-100 group transition whitespace-nowrap" title="Ordenar por Fecha de Ingreso">
-                        <div class="flex items-center gap-1">
-                          <span>Fecha</span>
-                          ${this.getProjectSortIcon('fecha_ingreso')}
-                        </div>
-                      </th>
-                      <th onclick="window.app.toggleProjectSort('tipologia')" class="p-3 cursor-pointer select-none hover:bg-slate-100 group transition whitespace-nowrap" title="Ordenar por Tipología">
-                        <div class="flex items-center gap-1">
-                          <span>Tipología</span>
-                          ${this.getProjectSortIcon('tipologia')}
-                        </div>
-                      </th>
-                      <th onclick="window.app.toggleProjectSort('requerimiento')" class="p-3 min-w-[240px] cursor-pointer select-none hover:bg-slate-100 group transition" title="Ordenar por Requerimiento">
-                        <div class="flex items-center gap-1">
-                          <span>Requerimiento</span>
-                          ${this.getProjectSortIcon('requerimiento')}
-                        </div>
-                      </th>
-                      <th onclick="window.app.toggleProjectSort('unidad')" class="p-3 cursor-pointer select-none hover:bg-slate-100 group transition whitespace-nowrap" title="Ordenar por Unidad Solicitante">
-                        <div class="flex items-center gap-1">
-                          <span>Unidad Solicitante</span>
-                          ${this.getProjectSortIcon('unidad')}
-                        </div>
-                      </th>
-                      <th onclick="window.app.toggleProjectSort('piso')" class="p-3 cursor-pointer select-none hover:bg-slate-100 group transition whitespace-nowrap" title="Ordenar por Piso / Recinto">
-                        <div class="flex items-center gap-1">
-                          <span>Piso / Recinto</span>
-                          ${this.getProjectSortIcon('piso')}
-                        </div>
-                      </th>
-                      <th onclick="window.app.toggleProjectSort('pma')" class="p-3 cursor-pointer select-none hover:bg-slate-100 group transition whitespace-nowrap" title="Ordenar por PMA">
-                        <div class="flex items-center gap-1">
-                          <span>PMA</span>
-                          ${this.getProjectSortIcon('pma')}
-                        </div>
-                      </th>
-                      <th onclick="window.app.toggleProjectSort('pendiente')" class="p-3 min-w-[180px] cursor-pointer select-none hover:bg-slate-100 group transition whitespace-nowrap" title="Ordenar por Hito Pendiente">
-                        <div class="flex items-center gap-1">
-                          <span>Hito Pendiente</span>
-                          ${this.getProjectSortIcon('pendiente')}
-                        </div>
-                      </th>
-                      <th onclick="window.app.toggleProjectSort('estado')" class="p-3 text-right cursor-pointer select-none hover:bg-slate-100 group transition whitespace-nowrap" title="Ordenar por Fase">
-                        <div class="flex items-center justify-end gap-1">
-                          <span>Fase</span>
-                          ${this.getProjectSortIcon('estado')}
-                        </div>
-                      </th>
+                      ${isCol('fecha_ingreso') ? `
+                        <th onclick="window.app.toggleProjectSort('fecha_ingreso')" class="p-3 cursor-pointer select-none hover:bg-slate-100 group transition whitespace-nowrap" title="Ordenar por Fecha de Ingreso">
+                          <div class="flex items-center gap-1">
+                            <span>Fecha</span>
+                            ${this.getProjectSortIcon('fecha_ingreso')}
+                          </div>
+                        </th>
+                      ` : ''}
+                      ${isCol('tipologia') ? `
+                        <th onclick="window.app.toggleProjectSort('tipologia')" class="p-3 cursor-pointer select-none hover:bg-slate-100 group transition whitespace-nowrap" title="Ordenar por Tipología">
+                          <div class="flex items-center gap-1">
+                            <span>Tipología</span>
+                            ${this.getProjectSortIcon('tipologia')}
+                          </div>
+                        </th>
+                      ` : ''}
+                      ${isCol('ticket') ? `
+                        <th onclick="window.app.toggleProjectSort('ticket')" class="p-3 cursor-pointer select-none hover:bg-slate-100 group transition whitespace-nowrap" title="Ordenar por Ticket / N° OC">
+                          <div class="flex items-center gap-1">
+                            <span>Ticket / OC</span>
+                            ${this.getProjectSortIcon('ticket')}
+                          </div>
+                        </th>
+                      ` : ''}
+                      ${isCol('prioridad') ? `
+                        <th onclick="window.app.toggleProjectSort('prioridad')" class="p-3 cursor-pointer select-none hover:bg-slate-100 group transition whitespace-nowrap" title="Ordenar por Prioridad">
+                          <div class="flex items-center gap-1">
+                            <span>Prioridad</span>
+                            ${this.getProjectSortIcon('prioridad')}
+                          </div>
+                        </th>
+                      ` : ''}
+                      ${isCol('requerimiento') ? `
+                        <th onclick="window.app.toggleProjectSort('requerimiento')" class="p-3 min-w-[240px] cursor-pointer select-none hover:bg-slate-100 group transition" title="Ordenar por Requerimiento">
+                          <div class="flex items-center gap-1">
+                            <span>Requerimiento</span>
+                            ${this.getProjectSortIcon('requerimiento')}
+                          </div>
+                        </th>
+                      ` : ''}
+                      ${isCol('unidad') ? `
+                        <th onclick="window.app.toggleProjectSort('unidad')" class="p-3 cursor-pointer select-none hover:bg-slate-100 group transition whitespace-nowrap" title="Ordenar por Unidad Solicitante">
+                          <div class="flex items-center gap-1">
+                            <span>Unidad Solicitante</span>
+                            ${this.getProjectSortIcon('unidad')}
+                          </div>
+                        </th>
+                      ` : ''}
+                      ${isCol('solicitante') ? `
+                        <th onclick="window.app.toggleProjectSort('solicitante')" class="p-3 cursor-pointer select-none hover:bg-slate-100 group transition whitespace-nowrap" title="Ordenar por Solicitante">
+                          <div class="flex items-center gap-1">
+                            <span>Solicitante</span>
+                            ${this.getProjectSortIcon('solicitante')}
+                          </div>
+                        </th>
+                      ` : ''}
+                      ${isCol('piso') ? `
+                        <th onclick="window.app.toggleProjectSort('piso')" class="p-3 cursor-pointer select-none hover:bg-slate-100 group transition whitespace-nowrap" title="Ordenar por Piso / Recinto">
+                          <div class="flex items-center gap-1">
+                            <span>Piso / Recinto</span>
+                            ${this.getProjectSortIcon('piso')}
+                          </div>
+                        </th>
+                      ` : ''}
+                      ${isCol('pma') ? `
+                        <th onclick="window.app.toggleProjectSort('pma')" class="p-3 cursor-pointer select-none hover:bg-slate-100 group transition whitespace-nowrap" title="Ordenar por PMA">
+                          <div class="flex items-center gap-1">
+                            <span>PMA</span>
+                            ${this.getProjectSortIcon('pma')}
+                          </div>
+                        </th>
+                      ` : ''}
+                      ${isCol('pendiente') ? `
+                        <th onclick="window.app.toggleProjectSort('pendiente')" class="p-3 min-w-[180px] cursor-pointer select-none hover:bg-slate-100 group transition whitespace-nowrap" title="Ordenar por Hito Pendiente">
+                          <div class="flex items-center gap-1">
+                            <span>Hito Pendiente</span>
+                            ${this.getProjectSortIcon('pendiente')}
+                          </div>
+                        </th>
+                      ` : ''}
+                      ${isCol('fecha_actualizacion') ? `
+                        <th onclick="window.app.toggleProjectSort('fecha_actualizacion')" class="p-3 cursor-pointer select-none hover:bg-slate-100 group transition whitespace-nowrap" title="Ordenar por Última Actualización">
+                          <div class="flex items-center gap-1">
+                            <span>Actualizado</span>
+                            ${this.getProjectSortIcon('fecha_actualizacion')}
+                          </div>
+                        </th>
+                      ` : ''}
+                      ${isCol('estado') ? `
+                        <th onclick="window.app.toggleProjectSort('estado')" class="p-3 text-right cursor-pointer select-none hover:bg-slate-100 group transition whitespace-nowrap" title="Ordenar por Fase">
+                          <div class="flex items-center justify-end gap-1">
+                            <span>Fase</span>
+                            ${this.getProjectSortIcon('estado')}
+                          </div>
+                        </th>
+                      ` : ''}
                     </tr>
                   </thead>
                   <tbody class="divide-y divide-slate-100">
@@ -1909,28 +2112,64 @@
                         <td class="p-3 font-black text-indigo-700 whitespace-nowrap sticky left-0 bg-white shadow-[1px_0_0_#e2e8f0]">
                           ${escapeHtml(p.codigo || 'PROY-' + p.id)}
                         </td>
-                        <td class="p-3 whitespace-nowrap font-mono text-[11px] text-slate-600">
-                          ${p.fecha_ingreso ? `<span class="bg-slate-100 px-2 py-0.5 rounded border border-slate-200 font-semibold">${escapeHtml(p.fecha_ingreso)}</span>` : '<span class="text-slate-400">-</span>'}
-                        </td>
-                        <td class="p-3 whitespace-nowrap">
-                          <span class="px-2 py-0.5 rounded text-[10px] font-bold ${p.tipologia === 'REPARACION' ? 'badge-reparacion' : (p.tipologia === 'APOYO TECNICO' ? 'badge-apoyo' : 'badge-proyecto')}">
-                            ${p.tipologia || 'PROYECTO'}
-                          </span>
-                        </td>
-                        <td class="p-3 font-semibold text-slate-900 leading-tight">
-                          ${escapeHtml(p.requerimiento || p.descripcion)}
-                        </td>
-                        <td class="p-3 text-slate-600 whitespace-nowrap">${escapeHtml(p.unidad || '-')}</td>
-                        <td class="p-3 whitespace-nowrap">Piso ${escapeHtml(p.piso || '-')} ${p.ubicacion ? '· ' + escapeHtml(p.ubicacion) : ''}</td>
-                        <td class="p-3 font-mono font-bold text-slate-700 whitespace-nowrap">${escapeHtml(p.pma || '-')}</td>
-                        <td class="p-3">
-                          ${p.pendiente ? `<span class="text-amber-800 bg-amber-50 px-2 py-1 rounded border border-amber-200 font-bold block text-[11px] leading-tight">⚠️ ${escapeHtml(p.pendiente)}</span>` : '<span class="text-slate-400">-</span>'}
-                        </td>
-                        <td class="p-3 text-right whitespace-nowrap">
-                          <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${this.normalizeProjectStatus(p.estado) === 'TERMINADO' ? 'bg-emerald-100 text-emerald-800' : (this.normalizeProjectStatus(p.estado) === 'EN PROCESO' ? 'bg-indigo-100 text-indigo-800' : (this.normalizeProjectStatus(p.estado) === 'Propuesta enviada' ? 'bg-blue-100 text-blue-800' : 'bg-amber-100 text-amber-800'))}">
-                            ${p.estado}
-                          </span>
-                        </td>
+                        ${isCol('fecha_ingreso') ? `
+                          <td class="p-3 whitespace-nowrap font-mono text-[11px] text-slate-600">
+                            ${p.fecha_ingreso ? `<span class="bg-slate-100 px-2 py-0.5 rounded border border-slate-200 font-semibold">${escapeHtml(p.fecha_ingreso)}</span>` : '<span class="text-slate-400">-</span>'}
+                          </td>
+                        ` : ''}
+                        ${isCol('tipologia') ? `
+                          <td class="p-3 whitespace-nowrap">
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${p.tipologia === 'REPARACION' ? 'badge-reparacion' : (p.tipologia === 'APOYO TECNICO' ? 'badge-apoyo' : 'badge-proyecto')}">
+                              ${p.tipologia || 'PROYECTO'}
+                            </span>
+                          </td>
+                        ` : ''}
+                        ${isCol('ticket') ? `
+                          <td class="p-3 whitespace-nowrap font-mono text-slate-600 text-xs">
+                            ${escapeHtml(p.ticket || '-')}
+                          </td>
+                        ` : ''}
+                        ${isCol('prioridad') ? `
+                          <td class="p-3 whitespace-nowrap text-xs">
+                            <span class="font-bold ${p.prioridad === 'MUY ALTA' ? 'text-rose-600' : (p.prioridad === 'ALTA' ? 'text-orange-600' : 'text-slate-700')}">
+                              ${p.prioridad === 'MUY ALTA' ? '🚨' : (p.prioridad === 'ALTA' ? '🟠' : '🟡')} ${escapeHtml(p.prioridad || 'MEDIA')}
+                            </span>
+                          </td>
+                        ` : ''}
+                        ${isCol('requerimiento') ? `
+                          <td class="p-3 font-semibold text-slate-900 leading-tight">
+                            ${escapeHtml(p.requerimiento || p.descripcion)}
+                          </td>
+                        ` : ''}
+                        ${isCol('unidad') ? `
+                          <td class="p-3 text-slate-600 whitespace-nowrap">${escapeHtml(p.unidad || '-')}</td>
+                        ` : ''}
+                        ${isCol('solicitante') ? `
+                          <td class="p-3 text-slate-600 whitespace-nowrap">${escapeHtml(p.solicitante || '-')}</td>
+                        ` : ''}
+                        ${isCol('piso') ? `
+                          <td class="p-3 whitespace-nowrap">Piso ${escapeHtml(p.piso || '-')} ${p.ubicacion ? '· ' + escapeHtml(p.ubicacion) : ''}</td>
+                        ` : ''}
+                        ${isCol('pma') ? `
+                          <td class="p-3 font-mono font-bold text-slate-700 whitespace-nowrap">${escapeHtml(p.pma || '-')}</td>
+                        ` : ''}
+                        ${isCol('pendiente') ? `
+                          <td class="p-3">
+                            ${p.pendiente ? `<span class="text-amber-800 bg-amber-50 px-2 py-1 rounded border border-amber-200 font-bold block text-[11px] leading-tight">⚠️ ${escapeHtml(p.pendiente)}</span>` : '<span class="text-slate-400">-</span>'}
+                          </td>
+                        ` : ''}
+                        ${isCol('fecha_actualizacion') ? `
+                          <td class="p-3 whitespace-nowrap font-mono text-[11px] text-slate-500">
+                            ${escapeHtml(p.fecha_actualizacion || '-')}
+                          </td>
+                        ` : ''}
+                        ${isCol('estado') ? `
+                          <td class="p-3 text-right whitespace-nowrap">
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${this.normalizeProjectStatus(p.estado) === 'TERMINADO' ? 'bg-emerald-100 text-emerald-800' : (this.normalizeProjectStatus(p.estado) === 'EN PROCESO' ? 'bg-indigo-100 text-indigo-800' : (this.normalizeProjectStatus(p.estado) === 'Propuesta enviada' ? 'bg-blue-100 text-blue-800' : 'bg-amber-100 text-amber-800'))}">
+                              ${p.estado}
+                            </span>
+                          </td>
+                        ` : ''}
                       </tr>
                     `).join('')}
                   </tbody>
