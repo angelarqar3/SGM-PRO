@@ -971,6 +971,10 @@
         this.draggedProjectId = null;
         this.reportFilteredList = [];
 
+        // Estado de ordenamiento de proyectos
+        this.projectSortCol = 'codigo';
+        this.projectSortDir = 'asc';
+
         this.hospitalName = SGM_CONFIG.defaultHospital;
         this.folioPrefix = SGM_CONFIG.defaultPrefix;
         this.customLogo = null;
@@ -988,6 +992,25 @@
             this.closeOperativeView(true);
           }
         });
+      }
+
+      toggleProjectSort(colKey) {
+        if (this.projectSortCol === colKey) {
+          this.projectSortDir = this.projectSortDir === 'asc' ? 'desc' : 'asc';
+        } else {
+          this.projectSortCol = colKey;
+          this.projectSortDir = (colKey === 'fecha_ingreso') ? 'desc' : 'asc';
+        }
+        this.renderProjects();
+      }
+
+      getProjectSortIcon(colKey) {
+        if (this.projectSortCol !== colKey) {
+          return '<i class="fa-solid fa-sort text-slate-300 ml-1 text-[10px] opacity-60 group-hover:opacity-100 transition"></i>';
+        }
+        return this.projectSortDir === 'asc'
+          ? '<i class="fa-solid fa-arrow-up-wide-short text-indigo-600 ml-1 text-xs"></i>'
+          : '<i class="fa-solid fa-arrow-down-short-wide text-indigo-600 ml-1 text-xs"></i>';
       }
 
       async initAuth() {
@@ -1536,7 +1559,6 @@
         }
       }
 
-
       handleHeaderPrimaryAction() {
         if (this.activeModule === 'projects') this.openCreateProjectModal();
         else this.openCreateOtModal();
@@ -1545,7 +1567,7 @@
       toggleMenu() { document.getElementById('appMenuDropdown')?.classList.toggle('hidden'); }
       renderActiveModule() { this.switchModule(this.activeModule); }
 
-      // --- PROYECTOS (KANBAN) ---
+      // --- PROYECTOS (KANBAN & MATRIZ) ---
       normalizeProjectStatus(s) {
         if (!s) return 'PENDIENTE';
         const u = s.toUpperCase();
@@ -1575,12 +1597,91 @@
 
         const filtered = this.projects.filter(p => {
           const norm = this.normalizeProjectStatus(p.estado);
-          const matchQ = !q || p.codigo?.toLowerCase().includes(q) || p.requerimiento?.toLowerCase().includes(q) || p.unidad?.toLowerCase().includes(q) || p.pma?.toLowerCase().includes(q);
+          const matchQ = !q || p.codigo?.toLowerCase().includes(q) || p.requerimiento?.toLowerCase().includes(q) || p.unidad?.toLowerCase().includes(q) || p.pma?.toLowerCase().includes(q) || (p.fecha_ingreso && p.fecha_ingreso.includes(q));
           const matchS = this.projectStatusFilter === 'ALL' || norm === this.projectStatusFilter;
           const matchT = !tipo || p.tipologia?.toUpperCase().includes(tipo);
           const matchP = !piso || String(p.piso).includes(piso);
           return matchQ && matchS && matchT && matchP;
         });
+
+        // Aplicar ordenamiento dinámico
+        if (this.projectSortCol) {
+          const dir = this.projectSortDir === 'desc' ? -1 : 1;
+          const col = this.projectSortCol;
+
+          filtered.sort((a, b) => {
+            if (col === 'codigo') {
+              const valA = a.codigo || ('PROY-' + String(a.id).padStart(3, '0'));
+              const valB = b.codigo || ('PROY-' + String(b.id).padStart(3, '0'));
+              return valA.localeCompare(valB, undefined, { numeric: true, sensitivity: 'base' }) * dir;
+            }
+
+            if (col === 'fecha_ingreso') {
+              if (!a.fecha_ingreso && b.fecha_ingreso) return 1;
+              if (a.fecha_ingreso && !b.fecha_ingreso) return -1;
+              if (!a.fecha_ingreso && !b.fecha_ingreso) return 0;
+              const tA = new Date(a.fecha_ingreso).getTime();
+              const tB = new Date(b.fecha_ingreso).getTime();
+              if (tA !== tB) return (tA - tB) * dir;
+              return ((a.id || 0) - (b.id || 0)) * dir;
+            }
+
+            if (col === 'tipologia') {
+              const tA = (a.tipologia || 'PROYECTO').toUpperCase();
+              const tB = (b.tipologia || 'PROYECTO').toUpperCase();
+              return tA.localeCompare(tB, 'es') * dir;
+            }
+
+            if (col === 'requerimiento') {
+              const rA = (a.requerimiento || a.descripcion || '').toLowerCase().trim();
+              const rB = (b.requerimiento || b.descripcion || '').toLowerCase().trim();
+              return rA.localeCompare(rB, 'es') * dir;
+            }
+
+            if (col === 'unidad') {
+              const uA = (a.unidad || '').toLowerCase().trim();
+              const uB = (b.unidad || '').toLowerCase().trim();
+              if (!uA && uB) return 1;
+              if (uA && !uB) return -1;
+              return uA.localeCompare(uB, 'es') * dir;
+            }
+
+            if (col === 'piso') {
+              const numA = parseFloat(a.piso) || (String(a.piso || '').includes('-1') ? -1 : 999);
+              const numB = parseFloat(b.piso) || (String(b.piso || '').includes('-1') ? -1 : 999);
+              if (numA !== numB) return (numA - numB) * dir;
+              return (a.ubicacion || '').localeCompare(b.ubicacion || '', 'es') * dir;
+            }
+
+            if (col === 'pma') {
+              const pmaA = (a.pma || '').toLowerCase().trim();
+              const pmaB = (b.pma || '').toLowerCase().trim();
+              if (!pmaA && pmaB) return 1;
+              if (pmaA && !pmaB) return -1;
+              return pmaA.localeCompare(pmaB, 'es', { numeric: true }) * dir;
+            }
+
+            if (col === 'pendiente') {
+              const pendA = (a.pendiente || '').toLowerCase().trim();
+              const pendB = (b.pendiente || '').toLowerCase().trim();
+              if (!pendA && pendB) return 1;
+              if (pendA && !pendB) return -1;
+              return pendA.localeCompare(pendB, 'es') * dir;
+            }
+
+            if (col === 'estado') {
+              const sA = this.normalizeProjectStatus(a.estado);
+              const sB = this.normalizeProjectStatus(b.estado);
+              return sA.localeCompare(sB, 'es') * dir;
+            }
+
+            let vA = (a[col] || '').toString().toLowerCase().trim();
+            let vB = (b[col] || '').toString().toLowerCase().trim();
+            if (!vA && vB) return 1;
+            if (vA && !vB) return -1;
+            return vA.localeCompare(vB, 'es', { numeric: true }) * dir;
+          });
+        }
 
         if (this.projectsViewMode === 'kanban') {
           const cols = [
@@ -1735,7 +1836,7 @@
             `;
           }).join('') + '</div>';
         } else {
-          // Modo Matriz (Tabla) con Scroll Horizontal Suave, Columna Sticky y Hint Móvil
+          // Modo Matriz (Tabla) con Scroll Horizontal Suave, Columna Sticky, Columna Fecha y Ordenamiento en todas las cabeceras
           c.innerHTML = `
             <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
               <div class="md:hidden px-3 py-2 bg-slate-50 border-b border-slate-200 flex items-center justify-between text-xs text-slate-500 font-medium">
@@ -1743,17 +1844,63 @@
                 <span class="font-bold text-indigo-700 text-[11px]">${filtered.length} proyectos</span>
               </div>
               <div class="overflow-x-auto custom-scroll w-full">
-                <table class="w-full text-left text-xs min-w-[850px]">
+                <table class="w-full text-left text-xs min-w-[950px]">
                   <thead class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200 whitespace-nowrap">
                     <tr>
-                      <th class="p-3 sticky left-0 bg-slate-50 z-10 shadow-[1px_0_0_#e2e8f0]">Código</th>
-                      <th class="p-3">Tipología</th>
-                      <th class="p-3 min-w-[240px]">Requerimiento</th>
-                      <th class="p-3">Unidad Solicitante</th>
-                      <th class="p-3">Piso / Recinto</th>
-                      <th class="p-3">PMA</th>
-                      <th class="p-3 min-w-[180px]">Hito Pendiente</th>
-                      <th class="p-3 text-right">Fase</th>
+                      <th onclick="window.app.toggleProjectSort('codigo')" class="p-3 sticky left-0 bg-slate-50 z-10 shadow-[1px_0_0_#e2e8f0] cursor-pointer select-none hover:bg-slate-100 group transition" title="Ordenar por Código">
+                        <div class="flex items-center justify-between gap-1">
+                          <span>Código</span>
+                          ${this.getProjectSortIcon('codigo')}
+                        </div>
+                      </th>
+                      <th onclick="window.app.toggleProjectSort('fecha_ingreso')" class="p-3 cursor-pointer select-none hover:bg-slate-100 group transition whitespace-nowrap" title="Ordenar por Fecha de Ingreso">
+                        <div class="flex items-center gap-1">
+                          <span>Fecha</span>
+                          ${this.getProjectSortIcon('fecha_ingreso')}
+                        </div>
+                      </th>
+                      <th onclick="window.app.toggleProjectSort('tipologia')" class="p-3 cursor-pointer select-none hover:bg-slate-100 group transition whitespace-nowrap" title="Ordenar por Tipología">
+                        <div class="flex items-center gap-1">
+                          <span>Tipología</span>
+                          ${this.getProjectSortIcon('tipologia')}
+                        </div>
+                      </th>
+                      <th onclick="window.app.toggleProjectSort('requerimiento')" class="p-3 min-w-[240px] cursor-pointer select-none hover:bg-slate-100 group transition" title="Ordenar por Requerimiento">
+                        <div class="flex items-center gap-1">
+                          <span>Requerimiento</span>
+                          ${this.getProjectSortIcon('requerimiento')}
+                        </div>
+                      </th>
+                      <th onclick="window.app.toggleProjectSort('unidad')" class="p-3 cursor-pointer select-none hover:bg-slate-100 group transition whitespace-nowrap" title="Ordenar por Unidad Solicitante">
+                        <div class="flex items-center gap-1">
+                          <span>Unidad Solicitante</span>
+                          ${this.getProjectSortIcon('unidad')}
+                        </div>
+                      </th>
+                      <th onclick="window.app.toggleProjectSort('piso')" class="p-3 cursor-pointer select-none hover:bg-slate-100 group transition whitespace-nowrap" title="Ordenar por Piso / Recinto">
+                        <div class="flex items-center gap-1">
+                          <span>Piso / Recinto</span>
+                          ${this.getProjectSortIcon('piso')}
+                        </div>
+                      </th>
+                      <th onclick="window.app.toggleProjectSort('pma')" class="p-3 cursor-pointer select-none hover:bg-slate-100 group transition whitespace-nowrap" title="Ordenar por PMA">
+                        <div class="flex items-center gap-1">
+                          <span>PMA</span>
+                          ${this.getProjectSortIcon('pma')}
+                        </div>
+                      </th>
+                      <th onclick="window.app.toggleProjectSort('pendiente')" class="p-3 min-w-[180px] cursor-pointer select-none hover:bg-slate-100 group transition whitespace-nowrap" title="Ordenar por Hito Pendiente">
+                        <div class="flex items-center gap-1">
+                          <span>Hito Pendiente</span>
+                          ${this.getProjectSortIcon('pendiente')}
+                        </div>
+                      </th>
+                      <th onclick="window.app.toggleProjectSort('estado')" class="p-3 text-right cursor-pointer select-none hover:bg-slate-100 group transition whitespace-nowrap" title="Ordenar por Fase">
+                        <div class="flex items-center justify-end gap-1">
+                          <span>Fase</span>
+                          ${this.getProjectSortIcon('estado')}
+                        </div>
+                      </th>
                     </tr>
                   </thead>
                   <tbody class="divide-y divide-slate-100">
@@ -1761,6 +1908,9 @@
                       <tr class="hover:bg-slate-50 cursor-pointer transition" onclick="window.app.openEditProjectModal(${p.id})">
                         <td class="p-3 font-black text-indigo-700 whitespace-nowrap sticky left-0 bg-white shadow-[1px_0_0_#e2e8f0]">
                           ${escapeHtml(p.codigo || 'PROY-' + p.id)}
+                        </td>
+                        <td class="p-3 whitespace-nowrap font-mono text-[11px] text-slate-600">
+                          ${p.fecha_ingreso ? `<span class="bg-slate-100 px-2 py-0.5 rounded border border-slate-200 font-semibold">${escapeHtml(p.fecha_ingreso)}</span>` : '<span class="text-slate-400">-</span>'}
                         </td>
                         <td class="p-3 whitespace-nowrap">
                           <span class="px-2 py-0.5 rounded text-[10px] font-bold ${p.tipologia === 'REPARACION' ? 'badge-reparacion' : (p.tipologia === 'APOYO TECNICO' ? 'badge-apoyo' : 'badge-proyecto')}">
@@ -2002,9 +2152,10 @@
       }
 
       exportProjectsCSV() {
-        const headers = ["Código", "N° Ticket", "Tipología", "Unidad Solicitante", "Solicitante", "Piso", "Recinto", "PMA", "Requerimiento", "Estado", "Hito Pendiente", "Prioridad"];
+        const headers = ["Código", "Fecha Ingreso", "N° Ticket", "Tipología", "Unidad Solicitante", "Solicitante", "Piso", "Recinto", "PMA", "Requerimiento", "Estado", "Hito Pendiente", "Prioridad"];
         const rows = this.projects.map(p => [
           p.codigo,
+          p.fecha_ingreso || '',
           `"${(p.ticket || '').replace(/"/g, '""')}"`,
           p.tipologia || '',
           `"${(p.unidad || '').replace(/"/g, '""')}"`,
@@ -2803,7 +2954,7 @@
         }
 
         const headers = [
-          'Folio', 'Recinto', 'PMA', 'Especialidad', 'Prioridad', 'Solicitante', 
+          'Folio', 'Recinto', 'Servicio', 'PMA', 'Especialidad', 'Prioridad', 'Solicitante', 
           'Técnico Asignado', 'Estado', 'Fecha Creación', 'Fecha Término', 
           'Descripción del Trabajo', 'Instrucciones Jefatura', 'Diagnóstico y Solución'
         ];
@@ -2818,6 +2969,7 @@
           return [
             o.folio,
             o.recinto,
+            o.servicio || '',
             o.ticket || 'N/A',
             o.especialidad,
             o.prioridad,
@@ -2833,7 +2985,7 @@
         });
 
         const csvContent = headers.map(escapeCSV).join(';') + '\n' + rows.join('\n');
-        const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+        const blob = new Blob(['﻿' + csvContent], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         
@@ -2850,7 +3002,23 @@
         const o = this.orders.find(item => item.id === id);
         if (!o) return;
         const link = `${window.location.origin}${window.location.pathname}?ot=${encodeURIComponent(o.id)}`;
-        const msg = `*${this.hospitalName.toUpperCase()}*\n*OT: ${o.folio}*\n------------------\n📌 *Prioridad:* ${o.prioridad}\n📍 *Recinto:* ${o.recinto}\n🛠️ *Especialidad:* ${o.especialidad}\n🎫 *PMA:* ${o.ticket || 'N/A'}\n------------------\n📝 *Problema:*\n${o.descripcion}\n${o.instrucciones ? `\n📋 *Instrucción:*\n${o.instrucciones}` : ''}\n------------------\n🔗 *Enlace directo:*\n${link}`;
+        const msg = `*${this.hospitalName.toUpperCase()}*
+*OT: ${o.folio}*
+------------------
+📌 *Prioridad:* ${o.prioridad}
+📍 *Recinto:* ${o.recinto}${o.servicio ? `
+🏥 *Servicio:* ${o.servicio}` : ''}
+🛠️ *Especialidad:* ${o.especialidad}
+🎫 *PMA:* ${o.ticket || 'N/A'}
+------------------
+📝 *Problema:*
+${o.descripcion}
+${o.instrucciones ? `
+📋 *Instrucción:*
+${o.instrucciones}` : ''}
+------------------
+🔗 *Enlace directo:*
+${link}`;
         const a = document.createElement('a');
         a.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
         a.target = "_blank";
