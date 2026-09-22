@@ -703,15 +703,24 @@
               <textarea id="uovInstrucciones" rows="2" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium"></textarea>
             </div>
 
-            <!-- Estado y Tiempos consolidado -->
+            <!-- Estado y Tiempos consolidado (Con Fecha de Inicio y Fecha de Término editables por Supervisor) -->
             <div class="pt-4 border-t border-slate-100 mt-4">
-              <h4 class="text-xs font-bold text-slate-800 mb-3 uppercase tracking-wide">Estado y Tiempos</h4>
-              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                 <div class="uov-editable" id="uovFechaInicioContainer">
+              <div class="flex items-center justify-between mb-3">
+                <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wide">Estado y Tiempos</h4>
+                <span class="text-[10px] text-indigo-600 font-bold hidden sm:inline" id="uovSupervisorTimeHint">
+                  <i class="fa-solid fa-pen-to-square mr-1"></i>Supervisor: Fechas editables en cualquier momento (incluso cerrada)
+                </span>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                 <div id="uovFechaInicioContainer">
                     <label class="block text-xs font-bold text-slate-600 mb-1">Fecha de Inicio</label>
-                    <input type="datetime-local" id="uovFechaInicio" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium">
+                    <input type="datetime-local" id="uovFechaInicio" class="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-sm font-medium">
                  </div>
-                 <div class="uov-editable" id="uovEstadoContainer">
+                 <div id="uovFechaTerminoContainer">
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Fecha de Término</label>
+                    <input type="datetime-local" id="uovFechaTermino" class="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-sm font-medium" placeholder="dd/mm/aaaa --:--">
+                 </div>
+                 <div id="uovEstadoContainer">
                     <label class="block text-xs font-bold text-slate-600 mb-1">Estado Administrativo</label>
                     <select id="uovEstado" class="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-800">
                       <option value="Pendiente">Pendiente</option>
@@ -722,11 +731,11 @@
                 </div>
                 <div>
                    <label class="block text-xs font-bold text-slate-600 mb-1">Última Modificación</label>
-                   <div id="uovLastModText" class="w-full p-2.5 bg-slate-50 border border-slate-100 rounded-xl text-sm font-medium text-slate-700">-</div>
+                   <div id="uovLastModText" class="w-full p-2.5 bg-slate-50 border border-slate-100 rounded-xl text-sm font-medium text-slate-700 truncate">-</div>
                 </div>
                 <div>
-                   <label class="block text-xs font-bold text-slate-600 mb-1">Tiempo Transcurrido</label>
-                   <div id="uovElapsedText" class="w-full p-2.5 bg-slate-50 border border-slate-100 rounded-xl text-sm font-medium text-slate-700">-</div>
+                   <label class="block text-xs font-bold text-slate-600 mb-1">Tiempo de Ejecución</label>
+                   <div id="uovElapsedText" class="w-full p-2.5 bg-slate-50 border border-slate-100 rounded-xl text-sm font-medium text-slate-700 truncate">-</div>
                 </div>
               </div>
             </div>
@@ -779,7 +788,7 @@
         </form>
       </div>
       
-      <!-- Sticky Bottom Bar (Supervisor Save/Delete Actions) -->
+      <!-- Sticky Bottom Bar (Supervisor Save/Delete Actions - Visible ALWAYS for supervisor even when closed) -->
       <div id="uovBottomBar" class="uov-bottom-bar hidden">
           <div class="max-w-6xl mx-auto flex items-center justify-between px-4">
               <button type="button" onclick="window.app.deleteOrderFromModal()" class="uov-action-btn uov-btn-danger flex items-center gap-2">
@@ -2549,7 +2558,7 @@
         const timeInfo = this.calculateElapsedTimeInfo(o);
         const bg = o.estado === 'Terminada' ? 'bg-emerald-100 text-emerald-800' : (o.estado === 'Solicitud Cierre' ? 'bg-indigo-100 text-indigo-800' : (o.estado === 'En Ejecución' ? 'bg-blue-100 text-blue-800' : 'bg-amber-100 text-amber-800'));
         const unreadBadge = this.hasUnreadMessages(o) ? '<span class="bg-rose-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full ml-2 badge-pulse">🔔 NUEVO</span>' : '';
-        const btnText = (this.currentRole === 'supervisor' && o.estado !== 'Terminada') ? '⚙️ Gestionar' : '📋 Ver Ficha';
+        const btnText = (this.currentRole === 'supervisor') ? '⚙️ Gestionar' : '📋 Ver Ficha';
         const emojis = { Urgente: '🚨', Alta: '🟠', Media: '🟡', Baja: '🟢' };
         
         return `
@@ -2579,7 +2588,7 @@
         const timeInfo = this.calculateElapsedTimeInfo(o);
         const bg = o.estado === 'Terminada' ? 'bg-emerald-100 text-emerald-800' : (o.estado === 'Solicitud Cierre' ? 'bg-indigo-100 text-indigo-800' : (o.estado === 'En Ejecución' ? 'bg-blue-100 text-blue-800' : 'bg-amber-100 text-amber-800'));
         const unreadBadge = this.hasUnreadMessages(o) ? '<span class="bg-rose-500 text-white text-[9px] px-1 rounded-full ml-1 badge-pulse" title="Mensaje Nuevo">🔔</span>' : '';
-        const btnText = (this.currentRole === 'supervisor' && o.estado !== 'Terminada') ? '⚙️ Gestionar' : 'Ficha';
+        const btnText = (this.currentRole === 'supervisor') ? '⚙️ Gestionar' : 'Ficha';
         const emojis = { Urgente: '🚨', Alta: '🟠', Media: '🟡', Baja: '🟢' };
         
         return `
@@ -2706,7 +2715,6 @@
         const isSupervisor = this.currentRole === 'supervisor';
         const isReview = o.estado === 'Solicitud Cierre';
         const isClosed = o.estado === 'Terminada';
-        const isLocked = isReview || isClosed;
 
         document.getElementById('uovId').value = o.id;
         document.getElementById('uovFolio').textContent = o.folio;
@@ -2714,7 +2722,17 @@
         document.getElementById('uovStatusBadge').textContent = o.estado;
         document.getElementById('uovStatusBadgeMobile').textContent = o.estado;
         
-        document.getElementById('uovLockBanner').classList.toggle('hidden', !isClosed);
+        // Banner de estado cerrado con aviso de edición para supervisor
+        const lockBanner = document.getElementById('uovLockBanner');
+        if (isClosed) {
+          lockBanner.innerHTML = isSupervisor
+            ? '<span aria-hidden="true">🔒</span> <strong>OT Terminada (Cerrada).</strong> Como supervisor, puedes ajustar las fechas de inicio y término y hacer clic en <em>Guardar y Sincronizar</em>.'
+            : '<span aria-hidden="true">🔒</span> OT Terminada. Datos bloqueados. Solo lectura.';
+          lockBanner.classList.remove('hidden');
+        } else {
+          lockBanner.classList.add('hidden');
+        }
+
         document.getElementById('uovReviewSection').classList.toggle('hidden', !(isSupervisor && isReview));
         
         document.getElementById('uovEspecialidad').value = o.especialidad;
@@ -2727,14 +2745,21 @@
         document.getElementById('uovDescripcion').value = o.descripcion;
         document.getElementById('uovInstrucciones').value = o.instrucciones || '';
         
+        // Carga de fechas de inicio y término
         const dateToShow = o.fechaEjecucion || (o.estado === 'Pendiente' ? new Date().toISOString() : o.fechaCreacion);
         document.getElementById('uovFechaInicio').value = this.formatDateLocal(dateToShow);
-        
-        const disableSec1 = !isSupervisor || isClosed || isReview;
+        const inTermino = document.getElementById('uovFechaTermino');
+        if (inTermino) {
+          inTermino.value = o.fechaTermino ? this.formatDateLocal(o.fechaTermino) : '';
+        }
+
+        const disableSec1 = !isSupervisor || isReview || (isClosed && !isSupervisor);
         document.querySelectorAll('.uov-editable').forEach(el => {
           el.querySelectorAll('input, select, textarea').forEach(input => {
             if (input.id === 'uovEstado') {
               input.disabled = (!isSupervisor || isClosed);
+            } else if (input.id === 'uovFechaInicio' || input.id === 'uovFechaTermino') {
+              input.disabled = !isSupervisor;
             } else {
               input.disabled = disableSec1;
             }
@@ -2748,6 +2773,23 @@
             }
           });
         });
+
+        // Garantizar que supervisor siempre pueda editar fecha de inicio y término en cualquier estado
+        const inInicio = document.getElementById('uovFechaInicio');
+        if (inInicio) {
+          inInicio.disabled = !isSupervisor;
+          if (isSupervisor) {
+            inInicio.classList.add('bg-white', 'border-slate-200');
+            inInicio.classList.remove('bg-slate-50', 'border-transparent');
+          }
+        }
+        if (inTermino) {
+          inTermino.disabled = !isSupervisor;
+          if (isSupervisor) {
+            inTermino.classList.add('bg-white', 'border-slate-200');
+            inTermino.classList.remove('bg-slate-50', 'border-transparent');
+          }
+        }
         
         document.getElementById('uovWhatsappBtnTop').onclick = () => this.shareWhatsApp(o.id);
         document.getElementById('uovWhatsappBtnMobile').onclick = () => this.shareWhatsApp(o.id);
@@ -2759,7 +2801,7 @@
         document.getElementById('uovLastModText').textContent = new Date(dateRef).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' });
 
         this.renderOperativeHistory(o);
-        document.getElementById('uovRequestForm').style.display = (isLocked || isSupervisor) ? 'none' : 'block';
+        document.getElementById('uovRequestForm').style.display = (isClosed || isSupervisor) ? 'none' : 'block';
 
         document.getElementById('uovDiagnosticoSolucion').value = o.diagnostico || '';
         
@@ -2771,10 +2813,11 @@
           document.getElementById('uovDiagnosticoSolucion').classList.remove('bg-slate-50', 'border-transparent');
         }
         
-        document.getElementById('uovTechActions').style.display = (isLocked || isSupervisor) ? 'none' : 'flex';
+        document.getElementById('uovTechActions').style.display = (isClosed || isSupervisor) ? 'none' : 'flex';
         document.getElementById('uovEstadoContainer').style.display = isSupervisor ? 'block' : 'none';
 
-        document.getElementById('uovBottomBar').classList.toggle('hidden', !isSupervisor || isClosed);
+        // La barra de guardar debe ser visible para el supervisor SIEMPRE, incluso cuando la OT esté cerrada
+        document.getElementById('uovBottomBar').classList.toggle('hidden', !isSupervisor);
         
         window.scrollTo(0,0);
         document.querySelectorAll('.uov-nav-link').forEach(l => l.classList.remove('active'));
@@ -2864,10 +2907,11 @@
         if(event) event.preventDefault();
         
         const o = this.activeOperativeOt;
-        if (!o || o.estado === 'Terminada') return;
+        if (!o) return;
+        if (o.estado === 'Terminada' && this.currentRole !== 'supervisor') return;
 
         if (this.currentRole === 'supervisor') {
-          if(o.estado !== 'Solicitud Cierre') {
+          if(o.estado !== 'Solicitud Cierre' && o.estado !== 'Terminada') {
             o.especialidad = document.getElementById('uovEspecialidad').value;
             o.prioridad = document.getElementById('uovPrioridad').value;
             o.recinto = document.getElementById('uovRecinto').value.trim();
@@ -2883,39 +2927,47 @@
           
           const oldState = o.estado;
           const newState = document.getElementById('uovEstado').value;
-          const inputFecha = document.getElementById('uovFechaInicio').value;
+          const inputFecha = document.getElementById('uovFechaInicio')?.value;
+          const inputTermino = document.getElementById('uovFechaTermino')?.value;
+
+          // El supervisor puede editar fecha de inicio y término en cualquier momento, incluso si la OT está terminada
+          if (inputFecha) {
+            const startIso = new Date(inputFecha).toISOString();
+            if (o.fechaEjecucion !== startIso) {
+              o.fechaEjecucion = startIso;
+              this.logActivity(o, `Fecha de inicio modificada a: ${new Date(startIso).toLocaleString()}`);
+            }
+          }
+          if (inputTermino) {
+            const endIso = new Date(inputTermino).toISOString();
+            if (o.fechaTermino !== endIso) {
+              o.fechaTermino = endIso;
+              this.logActivity(o, `Fecha de término modificada a: ${new Date(endIso).toLocaleString()}`);
+            }
+          } else if (newState !== 'Terminada' && newState !== 'Solicitud Cierre') {
+            o.fechaTermino = null;
+          }
 
           // Regla de estados y tiempos:
-          // 1. Si está o vuelve a 'Pendiente': NO se contabiliza tiempo, se resetea a cero!
           if (newState === 'Pendiente') {
             if (oldState !== 'Pendiente') {
               this.logActivity(o, 'OT devuelta a estado Pendiente: tiempo de ejecución reiniciado a 0h');
             }
             o.fechaEjecucion = null;
             o.fechaTermino = null;
-          } 
-          // 2. Si pasa a 'En Ejecución': inicia el tiempo desde la fecha indicada!
-          else if (newState === 'En Ejecución') {
+          } else if (newState === 'En Ejecución') {
             if (oldState !== 'En Ejecución' || !o.fechaEjecucion) {
               const startIso = inputFecha ? new Date(inputFecha).toISOString() : new Date().toISOString();
               o.fechaEjecucion = startIso;
               o.fechaTermino = null;
               this.logActivity(o, `Inicio de ejecución registrado: ${new Date(startIso).toLocaleString()}`);
-            } else if (inputFecha) {
-              const editIso = new Date(inputFecha).toISOString();
-              if (o.fechaEjecucion !== editIso) {
-                o.fechaEjecucion = editIso;
-                this.logActivity(o, `Fecha de inicio de ejecución ajustada a: ${new Date(editIso).toLocaleString()}`);
-              }
             }
-          }
-          // 3. Solicitud de Cierre o Terminada
-          else if (newState === 'Solicitud Cierre' || newState === 'Terminada') {
+          } else if (newState === 'Solicitud Cierre' || newState === 'Terminada') {
             if (!o.fechaEjecucion) {
               o.fechaEjecucion = inputFecha ? new Date(inputFecha).toISOString() : (o.fechaCreacion || new Date().toISOString());
             }
             if (!o.fechaTermino) {
-              o.fechaTermino = new Date().toISOString();
+              o.fechaTermino = inputTermino ? new Date(inputTermino).toISOString() : new Date().toISOString();
             }
           }
 
@@ -2944,7 +2996,6 @@
           } else {
             if (o.estado === 'Pendiente') {
               o.estado = 'En Ejecución';
-              // Al iniciar ejecución el técnico, comienza el cronómetro desde este momento
               o.fechaEjecucion = new Date().toISOString();
               o.fechaUltimoEstado = new Date().toISOString();
               this.logActivity(o, 'El técnico inició la ejecución de trabajos (tiempo iniciado)');
@@ -3194,7 +3245,7 @@
 
         const headers = [
           'Folio', 'Recinto', 'Servicio', 'PMA', 'Especialidad', 'Prioridad', 'Solicitante', 
-          'Técnico Asignado', 'Estado', 'Fecha Creación', 'Fecha Término', 
+          'Técnico Asignado', 'Estado', 'Fecha Creación', 'Fecha Inicio Ejecución', 'Fecha Término', 
           'Descripción del Trabajo', 'Instrucciones Jefatura', 'Diagnóstico y Solución'
         ];
 
@@ -3216,6 +3267,7 @@
             o.encargado || 'No asignado',
             o.estado,
             o.fechaCreacion ? new Date(o.fechaCreacion).toLocaleString() : '',
+            o.fechaEjecucion ? new Date(o.fechaEjecucion).toLocaleString() : '',
             o.fechaTermino ? new Date(o.fechaTermino).toLocaleString() : '',
             o.descripcion,
             o.instrucciones,
@@ -3224,7 +3276,7 @@
         });
 
         const csvContent = headers.map(escapeCSV).join(';') + '\n' + rows.join('\n');
-        const blob = new Blob(['﻿' + csvContent], { type: 'text/csv;charset=utf-8;' });
+        const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         
@@ -3241,23 +3293,7 @@
         const o = this.orders.find(item => item.id === id);
         if (!o) return;
         const link = `${window.location.origin}${window.location.pathname}?ot=${encodeURIComponent(o.id)}`;
-        const msg = `*${this.hospitalName.toUpperCase()}*
-*OT: ${o.folio}*
-------------------
-📌 *Prioridad:* ${o.prioridad}
-📍 *Recinto:* ${o.recinto}${o.servicio ? `
-🏥 *Servicio:* ${o.servicio}` : ''}
-🛠️ *Especialidad:* ${o.especialidad}
-🎫 *PMA:* ${o.ticket || 'N/A'}
-------------------
-📝 *Problema:*
-${o.descripcion}
-${o.instrucciones ? `
-📋 *Instrucción:*
-${o.instrucciones}` : ''}
-------------------
-🔗 *Enlace directo:*
-${link}`;
+        const msg = `*${this.hospitalName.toUpperCase()}*\n*OT: ${o.folio}*\n------------------\n📌 *Prioridad:* ${o.prioridad}\n📍 *Recinto:* ${o.recinto}${o.servicio ? `\n🏥 *Servicio:* ${o.servicio}` : ''}\n🛠️ *Especialidad:* ${o.especialidad}\n🎫 *PMA:* ${o.ticket || 'N/A'}\n------------------\n📝 *Problema:*\n${o.descripcion}\n${o.instrucciones ? `\n📋 *Instrucción:*\n${o.instrucciones}` : ''}\n------------------\n🔗 *Enlace directo:*\n${link}`;
         const a = document.createElement('a');
         a.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
         a.target = "_blank";
@@ -3279,4 +3315,3 @@ ${link}`;
   </script>
 </body>
 </html>
-
