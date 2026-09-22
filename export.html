@@ -369,10 +369,14 @@
          SECCIÓN NUEVA: RESUMEN MENSUAL DE ÓRDENES DE TRABAJO
          (Fiel a la planilla de referencia con pie de firma)
          ========================================================== -->
+        <!-- ==========================================================
+         SECCIÓN NUEVA: RESUMEN MENSUAL DE ÓRDENES DE TRABAJO
+         (Fiel a la planilla de referencia con semanas Lunes a Viernes y doble pie de firma)
+         ========================================================== -->
     <section id="sectionMonthly" class="hidden space-y-4 animate-slide-up">
       <div class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
         
-        <!-- Controles de Configuración del Mes -->
+        <!-- Controles de Configuración del Mes y Técnico -->
         <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 border-b border-slate-100 pb-4">
           <div>
             <div class="flex items-center gap-2">
@@ -381,15 +385,15 @@
               </span>
               <div>
                 <h2 class="text-base font-black text-slate-900">Resumen Mensual de Órdenes de Trabajo</h2>
-                <p class="text-xs text-slate-500">Planilla formal de cierre mensual por semanas con pie de firma</p>
+                <p class="text-xs text-slate-500">Cierre mensual por semanas de Lunes a Viernes según calendario real y doble pie de firma</p>
               </div>
             </div>
           </div>
 
           <div class="flex items-center gap-2 flex-wrap w-full md:w-auto">
-            <div class="flex items-center gap-1.5 bg-slate-50 p-1.5 rounded-xl border border-slate-200 text-xs">
+            <div class="flex items-center gap-1.5 bg-slate-50 p-1.5 rounded-xl border border-slate-200 text-xs flex-wrap">
               <label for="monthlySelectMonth" class="font-bold text-slate-600 pl-1">Mes:</label>
-              <select id="monthlySelectMonth" onchange="window.exporter.renderMonthlySummary()" class="p-1.5 bg-white border border-slate-200 rounded-lg font-bold text-slate-800">
+              <select id="monthlySelectMonth" onchange="window.exporter.onMonthOrYearChange()" class="p-1.5 bg-white border border-slate-200 rounded-lg font-bold text-slate-800">
                 <option value="0">Enero</option>
                 <option value="1">Febrero</option>
                 <option value="2">Marzo</option>
@@ -405,10 +409,15 @@
               </select>
 
               <label for="monthlySelectYear" class="font-bold text-slate-600 pl-1">Año:</label>
-              <select id="monthlySelectYear" onchange="window.exporter.renderMonthlySummary()" class="p-1.5 bg-white border border-slate-200 rounded-lg font-bold text-slate-800">
+              <select id="monthlySelectYear" onchange="window.exporter.onMonthOrYearChange()" class="p-1.5 bg-white border border-slate-200 rounded-lg font-bold text-slate-800">
                 <option value="2025">2025</option>
                 <option value="2026" selected>2026</option>
                 <option value="2027">2027</option>
+              </select>
+
+              <label for="monthlySelectTechnician" class="font-bold text-slate-600 pl-1">Técnico:</label>
+              <select id="monthlySelectTechnician" onchange="window.exporter.onMonthlyTechnicianChange()" class="p-1.5 bg-white border border-slate-200 rounded-lg font-bold text-slate-800 max-w-[160px]">
+                <option value="ALL">Todos (General HBQP)</option>
               </select>
             </div>
 
@@ -421,7 +430,7 @@
         <!-- Botones de Acción de Exportación del Resumen Mensual -->
         <div class="flex items-center justify-between gap-2 flex-wrap bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs">
           <span class="text-slate-600 font-medium">
-            <i class="fa-solid fa-circle-info text-blue-600 mr-1"></i> Puedes editar manualmente cualquier casilla antes de exportar.
+            <i class="fa-solid fa-circle-info text-blue-600 mr-1"></i> Semanas según calendario hábil (Lunes a Viernes). Puedes editar cualquier casilla antes de exportar.
           </span>
           <div class="flex items-center gap-2">
             <button type="button" onclick="window.exporter.exportMonthlySummaryPDF()" class="px-4 py-2 bg-slate-900 hover:bg-black text-white font-black rounded-xl text-xs flex items-center gap-2 shadow-sm transition active:scale-95">
@@ -456,7 +465,7 @@
             Leyenda: celdas en <span class="font-bold text-blue-700">AZUL</span> = completar manualmente. Las demás se calculan solas.
           </div>
 
-          <!-- Tabla Semanal -->
+          <!-- Tabla Semanal Dinámica (Lunes a Viernes) -->
           <div class="overflow-x-auto custom-scroll w-full">
             <table class="w-full text-left text-xs min-w-[700px] border-collapse" id="monthlySummaryTable">
               <thead>
@@ -470,7 +479,7 @@
                 </tr>
               </thead>
               <tbody id="monthlySummaryTableBody" class="divide-y divide-slate-300">
-                <!-- Se llenan 5 semanas vía JS -->
+                <!-- Se llenan semanas hábiles vía JS -->
               </tbody>
               <tfoot>
                 <!-- Fila TOTAL DEL MES -->
@@ -495,18 +504,35 @@
             <p class="text-slate-600 leading-relaxed">- El TOTAL DEL MES se actualiza solo al llenar las semanas.</p>
           </div>
 
-          <!-- Pie de Firma Institucional (Requerido expresamente por el usuario) -->
-          <div class="p-6 bg-slate-50/60 border-t-2 border-slate-800 flex flex-col items-center justify-center text-center space-y-2">
-            <div class="w-72 sm:w-96 border-b-2 border-slate-800 pt-12 mb-2"></div>
-            <p class="font-black text-sm text-slate-900 uppercase tracking-wide" id="signerName">
-              ÁNGEL ALEJANDRO ASENCIO COLLAO
-            </p>
-            <p class="text-xs font-bold text-slate-700" id="signerRole">
-              Encargado de Planificación y Proyectos de Infraestructura
-            </p>
-            <p class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider" id="signerDepartment">
-              Subdirección de Operaciones — Hospital Biprovincial Quillota Petorca
-            </p>
+          <!-- Pie de Doble Firma Institucional: Técnico y Encargado de Infraestructura -->
+          <div class="p-6 bg-slate-50/60 border-t-2 border-slate-800 grid grid-cols-1 sm:grid-cols-2 gap-8 text-center">
+            
+            <!-- Firma Técnico Responsable -->
+            <div class="flex flex-col items-center justify-center space-y-1">
+              <div class="w-56 sm:w-72 border-b-2 border-slate-800 pt-10 mb-2"></div>
+              <input type="text" id="monthlyTechSignerName" value="FIRMA TÉCNICO RESPONSABLE" 
+                     class="font-black text-xs sm:text-sm text-slate-900 uppercase tracking-wide text-center bg-transparent border-0 focus:bg-white focus:ring-1 focus:ring-blue-500 rounded p-1 w-full max-w-xs font-sans">
+              <input type="text" id="monthlyTechSignerRole" value="Técnico de Mantenimiento HBQP" 
+                     class="text-xs font-bold text-slate-700 text-center bg-transparent border-0 focus:bg-white focus:ring-1 focus:ring-blue-500 rounded p-0.5 w-full max-w-xs font-sans">
+              <p class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+                Subdirección de Operaciones — Hospital Biprovincial Quillota Petorca
+              </p>
+            </div>
+
+            <!-- Firma Jefatura / Encargado de Planificación -->
+            <div class="flex flex-col items-center justify-center space-y-1">
+              <div class="w-56 sm:w-72 border-b-2 border-slate-800 pt-10 mb-2"></div>
+              <p class="font-black text-xs sm:text-sm text-slate-900 uppercase tracking-wide" id="signerName">
+                ÁNGEL ALEJANDRO ASENCIO COLLAO
+              </p>
+              <p class="text-xs font-bold text-slate-700" id="signerRole">
+                Encargado de Planificación y Proyectos de Infraestructura
+              </p>
+              <p class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider" id="signerDepartment">
+                Subdirección de Operaciones — Hospital Biprovincial Quillota Petorca
+              </p>
+            </div>
+
           </div>
         </div>
 
@@ -680,14 +706,8 @@
         this.advanceFilteredData = [];
         this.supabase = null;
 
-        // Estructura de las 5 semanas para el Resumen Mensual
-        this.monthlyWeeks = [
-          { weekName: "1ª Semana", dateRange: "1 al 7", total: 0, closed: 0, pending: 0, pendingDetails: "" },
-          { weekName: "2ª Semana", dateRange: "8 al 14", total: 0, closed: 0, pending: 0, pendingDetails: "" },
-          { weekName: "3ª Semana", dateRange: "15 al 21", total: 0, closed: 0, pending: 0, pendingDetails: "" },
-          { weekName: "4ª Semana", dateRange: "22 al 28", total: 0, closed: 0, pending: 0, pendingDetails: "" },
-          { weekName: "5ª Semana", dateRange: "29 al 30", total: 0, closed: 0, pending: 0, pendingDetails: "" }
-        ];
+        // Estructura dinámica de semanas para el Resumen Mensual (Lunes a Viernes según calendario real)
+        this.monthlyWeeks = [];
 
         // Metas configurables con persistencia
         this.kpiConfig = {
@@ -726,6 +746,7 @@
         this.updateFilterDropdowns();
         this.updateKpiSegmentDropdown();
         this.initMonthlySummaryDates();
+        this.populateMonthlyTechnicians();
         this.refreshCurrentView();
       }
 
@@ -779,6 +800,7 @@
         await this.fetchRemoteData();
         this.updateFilterDropdowns();
         this.updateKpiSegmentDropdown();
+        this.populateMonthlyTechnicians();
         this.refreshCurrentView();
         this.showToast('Datos actualizados en tiempo real', '✅');
       }
@@ -846,6 +868,7 @@
 
         this.updateFilterDropdowns();
         this.updateKpiSegmentDropdown();
+        this.populateMonthlyTechnicians();
         this.refreshCurrentView();
       }
 
@@ -1314,6 +1337,7 @@
 
       // ==========================================================
       // SECCIÓN NUEVA: RESUMEN MENSUAL DE ÓRDENES DE TRABAJO
+      // (Semanas reales de Lunes a Viernes y doble pie de firma)
       // ==========================================================
       initMonthlySummaryDates() {
         const now = new Date();
@@ -1332,28 +1356,111 @@
         return names[monthIndex] || "Mes";
       }
 
+      // Calcula las semanas hábiles reales (Lunes a Viernes) para el mes y año dados
+      getWorkingWeeksForMonth(year, month) {
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const weeks = [];
+        let currentDays = [];
+
+        for (let day = 1; day <= daysInMonth; day++) {
+          const d = new Date(year, month, day);
+          const dow = d.getDay(); // 0=Domingo, 1=Lunes, 2=Martes, 3=Miércoles, 4=Jueves, 5=Viernes, 6=Sábado
+
+          // Solo días de Lunes (1) a Viernes (5)
+          if (dow >= 1 && dow <= 5) {
+            currentDays.push(day);
+          }
+
+          // Si es Viernes (5) o es el último día del mes y hay días hábiles acumulados
+          if ((dow === 5 || day === daysInMonth) && currentDays.length > 0) {
+            const s = currentDays[0];
+            const e = currentDays[currentDays.length - 1];
+            const wIdx = weeks.length + 1;
+            weeks.push({
+              weekName: `${wIdx}ª Semana`,
+              dateRange: s === e ? `${s}` : `${s} al ${e}`,
+              startDay: s,
+              endDay: e,
+              days: [...currentDays],
+              total: 0,
+              closed: 0,
+              pending: 0,
+              pendingDetails: ""
+            });
+            currentDays = [];
+          }
+        }
+        return weeks;
+      }
+
+      populateMonthlyTechnicians() {
+        const sel = document.getElementById('monthlySelectTechnician');
+        if (!sel) return;
+
+        const baseTechs = [
+          { name: "Jorge Alarcón", spec: "Electricidad" },
+          { name: "Cristian Mena", spec: "Climatización" },
+          { name: "Rodrigo Bahamondes", spec: "Infraestructura" },
+          { name: "Manuel Tapia", spec: "Equipos Industriales" },
+          { name: "Víctor Silva", spec: "Infraestructura" }
+        ];
+
+        const dbTechs = Array.from(new Set(this.orders.map(o => o.encargado).filter(Boolean)));
+        const combined = new Map();
+        baseTechs.forEach(t => combined.set(t.name, t.spec));
+        dbTechs.forEach(name => {
+          if (!combined.has(name)) combined.set(name, "Mantenimiento General");
+        });
+
+        let opts = '<option value="ALL">Todos (General HBQP)</option>';
+        combined.forEach((spec, name) => {
+          opts += `<option value="${escapeHtml(name)}">${escapeHtml(name)} (${escapeHtml(spec)})</option>`;
+        });
+        sel.innerHTML = opts;
+      }
+
+      onMonthlyTechnicianChange() {
+        const sel = document.getElementById('monthlySelectTechnician');
+        const val = sel?.value || 'ALL';
+        const nameInput = document.getElementById('monthlyTechSignerName');
+        const roleInput = document.getElementById('monthlyTechSignerRole');
+
+        if (val === 'ALL') {
+          if (nameInput) nameInput.value = "FIRMA TÉCNICO RESPONSABLE";
+          if (roleInput) roleInput.value = "Técnico de Mantenimiento HBQP";
+        } else {
+          if (nameInput) nameInput.value = val.toUpperCase();
+          const found = this.orders.find(o => o.encargado === val);
+          const spec = found?.especialidad || "Mantenimiento";
+          if (roleInput) roleInput.value = `Técnico de ${spec} HBQP`;
+        }
+
+        this.autoCalculateMonthlyFromDatabase();
+      }
+
+      onMonthOrYearChange() {
+        this.renderMonthlySummary();
+      }
+
       autoCalculateMonthlyFromDatabase() {
         const selMonth = parseInt(document.getElementById('monthlySelectMonth')?.value || "8", 10);
         const selYear = parseInt(document.getElementById('monthlySelectYear')?.value || "2026", 10);
-        const maxDays = this.getDaysInMonth(selYear, selMonth);
+        const selTech = document.getElementById('monthlySelectTechnician')?.value || 'ALL';
 
-        // 5 rangos semanales estándar del mes
-        const ranges = [
-          { start: 1, end: 7, name: "1ª Semana" },
-          { start: 8, end: 14, name: "2ª Semana" },
-          { start: 15, end: 21, name: "3ª Semana" },
-          { start: 22, end: 28, name: "4ª Semana" },
-          { start: 29, end: maxDays, name: "5ª Semana" }
-        ];
+        // 1. Obtener las semanas reales de Lunes a Viernes del mes
+        const calWeeks = this.getWorkingWeeksForMonth(selYear, selMonth);
 
-        this.monthlyWeeks = ranges.map((r, idx) => {
-          const dStart = new Date(selYear, selMonth, r.start, 0, 0, 0);
-          const dEnd = new Date(selYear, selMonth, r.end, 23, 59, 59);
+        // 2. Mapear y calcular cada semana según calendario real
+        this.monthlyWeeks = calWeeks.map((r, idx) => {
+          const dStart = new Date(selYear, selMonth, r.startDay, 0, 0, 0);
+          const dEnd = new Date(selYear, selMonth, r.endDay, 23, 59, 59);
 
-          // Filtrar órdenes correspondientes a esta semana
+          // Filtrar órdenes que caen en este rango hábil (Lunes a Viernes)
           const weekOrders = this.orders.filter(o => {
             const dCreated = new Date(o.fechaCreacion || o.fechaEjecucion || Date.now());
-            return dCreated >= dStart && dCreated <= dEnd;
+            const inWeek = dCreated >= dStart && dCreated <= dEnd;
+            const matchTech = selTech === 'ALL' || o.encargado === selTech;
+            return inWeek && matchTech;
           });
 
           // Órdenes cerradas en esta semana
@@ -1362,7 +1469,6 @@
           // Órdenes que quedaron pendientes
           const pendingOrders = weekOrders.filter(o => o.estado !== 'Terminada');
           const pendingNums = pendingOrders.map(o => {
-            // Extraer solo el correlativo ej. N° 005 o mostrar el folio completo
             const parts = o.folio.split('-');
             return parts.length >= 3 ? `N° ${parts[parts.length - 2]}` : o.folio;
           }).join(', ');
@@ -1372,8 +1478,10 @@
           const pending = Math.max(0, total - closed);
 
           return {
-            weekName: r.name,
-            dateRange: `${r.start} al ${r.end}`,
+            weekName: r.weekName,
+            dateRange: r.dateRange,
+            startDay: r.startDay,
+            endDay: r.endDay,
             total: total,
             closed: closed,
             pending: pending,
@@ -1382,7 +1490,7 @@
         });
 
         this.renderMonthlySummaryTable();
-        this.showToast('Semanas calculadas desde la base de datos', '⚡');
+        this.showToast('Semanas calculadas de lunes a viernes según calendario real', '⚡');
       }
 
       renderMonthlySummary() {
@@ -1395,13 +1503,7 @@
           titleEl.textContent = `HBQP — Cierre Mes: [${monthName} / ${selYear}]`;
         }
 
-        // Si las semanas están en cero, auto-calcular
-        const isZero = this.monthlyWeeks.every(w => w.total === 0 && w.closed === 0);
-        if (isZero) {
-          this.autoCalculateMonthlyFromDatabase();
-        } else {
-          this.renderMonthlySummaryTable();
-        }
+        this.autoCalculateMonthlyFromDatabase();
       }
 
       renderMonthlySummaryTable() {
@@ -1473,7 +1575,7 @@
         this.renderMonthlySummaryTable();
       }
 
-      // EXPORTACIÓN DEL RESUMEN MENSUAL A PDF (Idéntico a la imagen de referencia con pie de firma)
+      // EXPORTACIÓN DEL RESUMEN MENSUAL A PDF (Con semanas reales y doble pie de firma)
       exportMonthlySummaryPDF() {
         if (!window.jspdf) {
           this.showToast('Librería jsPDF no disponible', '⚠️');
@@ -1509,7 +1611,7 @@
         doc.setTextColor(29, 78, 216);
         doc.text('Leyenda: celdas en AZUL = completar manualmente. Las demás se calculan solas.', 14, 34);
 
-        // 2. Armado de Filas
+        // 2. Armado de Filas Dinámicas
         let sumTotal = 0;
         let sumClosed = 0;
         let sumPending = 0;
@@ -1581,27 +1683,43 @@
         doc.text("- En 'N° Órdenes Pendientes' anotar los números de orden que quedaron abiertos (ej. N° 005, N° 020).", 14, finalY + 18);
         doc.text("- El TOTAL DEL MES se actualiza solo al llenar las semanas.", 14, finalY + 23);
 
-        // 5. Pie de Firma Oficial (Requerimiento explícito: "incluye el pie de firma")
-        const signY = finalY + 45;
+        // 5. Pie de Doble Firma Oficial (Técnico Responsable + Jefatura)
+        const signY = finalY + 42;
         doc.setDrawColor(15, 23, 42);
         doc.setLineWidth(0.5);
-        doc.line(100, signY, 196, signY); // Línea de firma centrada
 
+        // Obtenemos los valores ingresados o predeterminados
+        const techName = (document.getElementById('monthlyTechSignerName')?.value || 'FIRMA TÉCNICO RESPONSABLE').toUpperCase();
+        const techRole = document.getElementById('monthlyTechSignerRole')?.value || 'Técnico de Mantenimiento HBQP';
+
+        // Firma Izquierda: Técnico Responsable (Centro en X = 75)
+        doc.line(35, signY, 115, signY);
         doc.setFontSize(9);
         doc.setFont("helvetica", "bold");
         doc.setTextColor(15, 23, 42);
-        doc.text('ÁNGEL ALEJANDRO ASENCIO COLLAO', 148, signY + 5, { align: 'center' });
-
+        doc.text(techName, 75, signY + 5, { align: 'center' });
         doc.setFontSize(8);
         doc.setFont("helvetica", "normal");
         doc.setTextColor(71, 85, 105);
-        doc.text('Encargado de Planificación y Proyectos de Infraestructura', 148, signY + 9, { align: 'center' });
-        doc.text('Subdirección de Operaciones — Hospital Biprovincial Quillota Petorca', 148, signY + 13, { align: 'center' });
+        doc.text(techRole, 75, signY + 9, { align: 'center' });
+        doc.text('Subdirección de Operaciones — HBQP', 75, signY + 13, { align: 'center' });
+
+        // Firma Derecha: Jefatura / Encargado de Planificación (Centro en X = 220)
+        doc.line(180, signY, 260, signY);
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(15, 23, 42);
+        doc.text('ÁNGEL ALEJANDRO ASENCIO COLLAO', 220, signY + 5, { align: 'center' });
+        doc.setFontSize(8);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(71, 85, 105);
+        doc.text('Encargado de Planificación y Proyectos de Infraestructura', 220, signY + 9, { align: 'center' });
+        doc.text('Subdirección de Operaciones — Hospital Biprovincial Quillota Petorca', 220, signY + 13, { align: 'center' });
 
         // Guardar archivo PDF
         const filename = `HBQP_Cierre_Mes_${monthName}_${selYear}.pdf`;
         doc.save(filename);
-        this.showToast(`Informe ${filename} descargado con pie de firma`, '📄');
+        this.showToast(`Informe ${filename} descargado con doble pie de firma`, '📄');
       }
 
       // EXPORTACIÓN DEL RESUMEN MENSUAL A EXCEL (.xlsx)
@@ -1662,17 +1780,22 @@
         excelRows.push(["- El TOTAL DEL MES se actualiza solo al llenar las semanas."]);
         excelRows.push([]);
         excelRows.push([]);
-        excelRows.push(["__________________________________________"]);
-        excelRows.push(["ÁNGEL ALEJANDRO ASENCIO COLLAO"]);
-        excelRows.push(["Encargado de Planificación y Proyectos de Infraestructura"]);
-        excelRows.push(["Subdirección de Operaciones — Hospital Biprovincial Quillota Petorca"]);
+
+        // Doble pie de firma en Excel
+        const techName = (document.getElementById('monthlyTechSignerName')?.value || 'FIRMA TÉCNICO RESPONSABLE').toUpperCase();
+        const techRole = document.getElementById('monthlyTechSignerRole')?.value || 'Técnico de Mantenimiento HBQP';
+
+        excelRows.push(["__________________________________________", "", "", "", "__________________________________________"]);
+        excelRows.push([techName, "", "", "", "ÁNGEL ALEJANDRO ASENCIO COLLAO"]);
+        excelRows.push([techRole, "", "", "", "Encargado de Planificación y Proyectos de Infraestructura"]);
+        excelRows.push(["Subdirección de Operaciones — HBQP", "", "", "", "Subdirección de Operaciones — HBQP"]);
 
         const wb = XLSX.utils.book_new();
         const ws = XLSX.utils.aoa_to_sheet(excelRows);
 
         // Anchos de columnas
         ws['!cols'] = [
-          { wch: 16 },
+          { wch: 18 },
           { wch: 18 },
           { wch: 15 },
           { wch: 12 },
@@ -1684,7 +1807,7 @@
         const filename = `HBQP_Cierre_Mes_${monthName}_${selYear}.xlsx`;
         XLSX.writeFile(wb, filename);
 
-        this.showToast(`Archivo ${filename} descargado`, '📊');
+        this.showToast(`Archivo ${filename} descargado con doble firma`, '📊');
       }
 
       copyMonthlySummaryToClipboard() {
@@ -1708,7 +1831,13 @@
           tsv += `${w.weekName}\t${w.dateRange}\t${w.total}\t${w.closed}\t${p}\t${w.pendingDetails || ''}\n`;
         });
 
-        tsv += `TOTAL DEL MES\t\t${sumTotal}\t${sumClosed}\t${sumPending}\t\n`;
+        tsv += `TOTAL DEL MES\t\t${sumTotal}\t${sumClosed}\t${sumPending}\t\n\n`;
+
+        const techName = (document.getElementById('monthlyTechSignerName')?.value || 'FIRMA TÉCNICO RESPONSABLE').toUpperCase();
+        const techRole = document.getElementById('monthlyTechSignerRole')?.value || 'Técnico de Mantenimiento HBQP';
+
+        tsv += `Firma Técnico:\t${techName} (${techRole})\n`;
+        tsv += `Firma Jefatura:\tÁNGEL ALEJANDRO ASENCIO COLLAO (Encargado de Planificación y Proyectos de Infraestructura)\n`;
 
         navigator.clipboard.writeText(tsv).then(() => {
           this.showToast('Resumen mensual copiado al portapapeles', '📋');
@@ -1716,7 +1845,6 @@
           this.showToast('No se pudo copiar automáticamente', '⚠️');
         });
       }
-
       // ==========================================================
       // SECCIÓN 4: EXPORTACIÓN MULTI-FORMATO
       // ==========================================================
