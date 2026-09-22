@@ -57,7 +57,7 @@
       </div>
     </div>
 
-    <!-- Navegación por Secciones Principales -->
+    <!-- Navegación por Secciones Principales (Con pestaña para Resumen Mensual) -->
     <div class="bg-slate-950 px-3 sm:px-4 py-1.5 border-t border-slate-800/80">
       <div class="max-w-7xl mx-auto flex items-center justify-between gap-2 overflow-x-auto custom-scroll whitespace-nowrap">
         <div class="flex items-center space-x-1 sm:space-x-2 text-xs font-bold">
@@ -68,6 +68,10 @@
           <button id="tabBtnAdvance" onclick="window.exporter.switchSection('advance')" 
                   class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white flex items-center gap-1.5 transition">
             <i class="fa-solid fa-arrow-trend-up"></i> <span>Reporte de Avances (PDF)</span>
+          </button>
+          <button id="tabBtnMonthly" onclick="window.exporter.switchSection('monthly')" 
+                  class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white flex items-center gap-1.5 transition">
+            <i class="fa-solid fa-calendar-check"></i> <span>Resumen Mensual (Cierre de Mes)</span>
           </button>
           <button id="tabBtnExport" onclick="window.exporter.switchSection('export')" 
                   class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white flex items-center gap-1.5 transition">
@@ -86,7 +90,7 @@
   <main class="max-w-7xl w-full mx-auto px-3 sm:px-4 py-4 flex-1 space-y-4">
 
     <!-- Selector de Fuente de Datos (OTs vs Proyectos) -->
-    <section class="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm">
+    <section class="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm" id="moduleSourceSelectorContainer">
       <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
         <span class="text-xs font-black uppercase text-slate-500 tracking-wider flex items-center gap-1.5">
           <i class="fa-solid fa-layer-group text-indigo-600"></i> Fuente de Información:
@@ -362,6 +366,154 @@
     </section>
 
     <!-- ==========================================================
+         SECCIÓN NUEVA: RESUMEN MENSUAL DE ÓRDENES DE TRABAJO
+         (Fiel a la planilla de referencia con pie de firma)
+         ========================================================== -->
+    <section id="sectionMonthly" class="hidden space-y-4 animate-slide-up">
+      <div class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        
+        <!-- Controles de Configuración del Mes -->
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="w-8 h-8 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-sm">
+                <i class="fa-solid fa-calendar-days"></i>
+              </span>
+              <div>
+                <h2 class="text-base font-black text-slate-900">Resumen Mensual de Órdenes de Trabajo</h2>
+                <p class="text-xs text-slate-500">Planilla formal de cierre mensual por semanas con pie de firma</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2 flex-wrap w-full md:w-auto">
+            <div class="flex items-center gap-1.5 bg-slate-50 p-1.5 rounded-xl border border-slate-200 text-xs">
+              <label for="monthlySelectMonth" class="font-bold text-slate-600 pl-1">Mes:</label>
+              <select id="monthlySelectMonth" onchange="window.exporter.renderMonthlySummary()" class="p-1.5 bg-white border border-slate-200 rounded-lg font-bold text-slate-800">
+                <option value="0">Enero</option>
+                <option value="1">Febrero</option>
+                <option value="2">Marzo</option>
+                <option value="3">Abril</option>
+                <option value="4">Mayo</option>
+                <option value="5">Junio</option>
+                <option value="6">Julio</option>
+                <option value="7">Agosto</option>
+                <option value="8" selected>Septiembre</option>
+                <option value="9">Octubre</option>
+                <option value="10">Noviembre</option>
+                <option value="11">Diciembre</option>
+              </select>
+
+              <label for="monthlySelectYear" class="font-bold text-slate-600 pl-1">Año:</label>
+              <select id="monthlySelectYear" onchange="window.exporter.renderMonthlySummary()" class="p-1.5 bg-white border border-slate-200 rounded-lg font-bold text-slate-800">
+                <option value="2025">2025</option>
+                <option value="2026" selected>2026</option>
+                <option value="2027">2027</option>
+              </select>
+            </div>
+
+            <button type="button" onclick="window.exporter.autoCalculateMonthlyFromDatabase()" class="px-3 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-bold text-xs rounded-xl flex items-center gap-1.5 transition" title="Sincronizar semanas con las OTs registradas">
+              <i class="fa-solid fa-arrows-rotate text-xs"></i> <span>Auto-calcular</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Botones de Acción de Exportación del Resumen Mensual -->
+        <div class="flex items-center justify-between gap-2 flex-wrap bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs">
+          <span class="text-slate-600 font-medium">
+            <i class="fa-solid fa-circle-info text-blue-600 mr-1"></i> Puedes editar manualmente cualquier casilla antes de exportar.
+          </span>
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="window.exporter.exportMonthlySummaryPDF()" class="px-4 py-2 bg-slate-900 hover:bg-black text-white font-black rounded-xl text-xs flex items-center gap-2 shadow-sm transition active:scale-95">
+              <i class="fa-solid fa-file-pdf text-rose-400 text-sm"></i> <span>Descargar PDF Oficial</span>
+            </button>
+            <button type="button" onclick="window.exporter.exportMonthlySummaryExcel()" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-600 text-white font-black rounded-xl text-xs flex items-center gap-2 shadow-sm transition active:scale-95">
+              <i class="fa-solid fa-file-excel text-sm"></i> <span>Descargar Excel (.xlsx)</span>
+            </button>
+            <button type="button" onclick="window.exporter.copyMonthlySummaryToClipboard()" class="px-3 py-2 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 font-bold rounded-xl text-xs flex items-center gap-1.5 transition">
+              <i class="fa-solid fa-copy text-indigo-600"></i> <span>Copiar</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Vista Previa Idéntica a la Imagen de Referencia -->
+        <div class="border-2 border-slate-800 rounded-xl overflow-hidden shadow-lg bg-white" id="monthlySummarySheetContainer">
+          
+          <!-- Encabezado de la Planilla -->
+          <div class="border-b-2 border-slate-800 p-3 text-center bg-white">
+            <h3 id="sheetHeaderTitle" class="text-base sm:text-lg font-black tracking-tight text-slate-900">
+              HBQP — Cierre Mes: [SEPTIEMBRE / 2026]
+            </h3>
+          </div>
+          
+          <div class="border-b border-slate-400 p-2 text-center bg-slate-50/50">
+            <h4 class="text-sm font-bold italic text-slate-800 tracking-wide">
+              Resumen de Órdenes de Trabajo
+            </h4>
+          </div>
+
+          <div class="px-4 py-1.5 text-xs text-blue-700 italic border-b border-slate-300 bg-white">
+            Leyenda: celdas en <span class="font-bold text-blue-700">AZUL</span> = completar manualmente. Las demás se calculan solas.
+          </div>
+
+          <!-- Tabla Semanal -->
+          <div class="overflow-x-auto custom-scroll w-full">
+            <table class="w-full text-left text-xs min-w-[700px] border-collapse" id="monthlySummaryTable">
+              <thead>
+                <tr class="bg-[#1e3a5f] text-white text-center font-bold text-xs border-b-2 border-slate-800">
+                  <th class="p-2.5 border-r border-slate-700 w-28">Semana</th>
+                  <th class="p-2.5 border-r border-slate-700 w-36">Rango de fechas</th>
+                  <th class="p-2.5 border-r border-slate-700 w-32">Total Órdenes</th>
+                  <th class="p-2.5 border-r border-slate-700 w-28">Cerradas</th>
+                  <th class="p-2.5 border-r border-slate-700 w-28">Pendientes</th>
+                  <th class="p-2.5 text-left pl-3">N° Órdenes Pendientes</th>
+                </tr>
+              </thead>
+              <tbody id="monthlySummaryTableBody" class="divide-y divide-slate-300">
+                <!-- Se llenan 5 semanas vía JS -->
+              </tbody>
+              <tfoot>
+                <!-- Fila TOTAL DEL MES -->
+                <tr class="bg-[#dbeafe] text-slate-900 font-black text-xs border-t-2 border-slate-800">
+                  <td colspan="2" class="p-3 text-center uppercase tracking-wide border-r border-slate-300">
+                    TOTAL DEL MES
+                  </td>
+                  <td id="monthlyTotalOrders" class="p-3 text-center border-r border-slate-300 text-sm font-black">0</td>
+                  <td id="monthlyTotalClosed" class="p-3 text-center border-r border-slate-300 text-sm font-black">0</td>
+                  <td id="monthlyTotalPending" class="p-3 text-center border-r border-slate-300 text-sm font-black text-amber-900">0</td>
+                  <td id="monthlyTotalPendingDetails" class="p-3 text-xs font-semibold text-slate-600 pl-3 italic">-</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <!-- Notas Oficiales -->
+          <div class="p-4 bg-white border-t border-slate-300 text-xs text-slate-800 space-y-1">
+            <p class="font-bold text-slate-900">Notas:</p>
+            <p class="text-slate-600 leading-relaxed">- Completar 'Total Órdenes' y 'Cerradas' cada semana; 'Pendientes' se calcula automáticamente.</p>
+            <p class="text-slate-600 leading-relaxed">- En 'N° Órdenes Pendientes' anotar los números de orden que quedaron abiertos (ej. N° 005, N° 020).</p>
+            <p class="text-slate-600 leading-relaxed">- El TOTAL DEL MES se actualiza solo al llenar las semanas.</p>
+          </div>
+
+          <!-- Pie de Firma Institucional (Requerido expresamente por el usuario) -->
+          <div class="p-6 bg-slate-50/60 border-t-2 border-slate-800 flex flex-col items-center justify-center text-center space-y-2">
+            <div class="w-72 sm:w-96 border-b-2 border-slate-800 pt-12 mb-2"></div>
+            <p class="font-black text-sm text-slate-900 uppercase tracking-wide" id="signerName">
+              ÁNGEL ALEJANDRO ASENCIO COLLAO
+            </p>
+            <p class="text-xs font-bold text-slate-700" id="signerRole">
+              Encargado de Planificación y Proyectos de Infraestructura
+            </p>
+            <p class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider" id="signerDepartment">
+              Subdirección de Operaciones — Hospital Biprovincial Quillota Petorca
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==========================================================
          SECCIÓN 3: DESCARGA & EXPORTACIÓN MULTI-FORMATO
          ========================================================== -->
     <section id="sectionExport" class="hidden space-y-4 animate-slide-up">
@@ -528,6 +680,15 @@
         this.advanceFilteredData = [];
         this.supabase = null;
 
+        // Estructura de las 5 semanas para el Resumen Mensual
+        this.monthlyWeeks = [
+          { weekName: "1ª Semana", dateRange: "1 al 7", total: 0, closed: 0, pending: 0, pendingDetails: "" },
+          { weekName: "2ª Semana", dateRange: "8 al 14", total: 0, closed: 0, pending: 0, pendingDetails: "" },
+          { weekName: "3ª Semana", dateRange: "15 al 21", total: 0, closed: 0, pending: 0, pendingDetails: "" },
+          { weekName: "4ª Semana", dateRange: "22 al 28", total: 0, closed: 0, pending: 0, pendingDetails: "" },
+          { weekName: "5ª Semana", dateRange: "29 al 30", total: 0, closed: 0, pending: 0, pendingDetails: "" }
+        ];
+
         // Metas configurables con persistencia
         this.kpiConfig = {
           targetCloseRate: 80,
@@ -564,6 +725,7 @@
         this.setAdvanceDatePreset(30);
         this.updateFilterDropdowns();
         this.updateKpiSegmentDropdown();
+        this.initMonthlySummaryDates();
         this.refreshCurrentView();
       }
 
@@ -626,31 +788,45 @@
         
         const btnStats = document.getElementById('tabBtnStats');
         const btnAdv = document.getElementById('tabBtnAdvance');
+        const btnMon = document.getElementById('tabBtnMonthly');
         const btnExp = document.getElementById('tabBtnExport');
 
         const secStats = document.getElementById('sectionStats');
         const secAdv = document.getElementById('sectionAdvance');
+        const secMon = document.getElementById('sectionMonthly');
         const secExp = document.getElementById('sectionExport');
 
-        [btnStats, btnAdv, btnExp].forEach(b => {
-          b.className = "px-3 py-1.5 rounded-lg text-slate-400 hover:text-white flex items-center gap-1.5 transition";
+        const sourceSelector = document.getElementById('moduleSourceSelectorContainer');
+
+        [btnStats, btnAdv, btnMon, btnExp].forEach(b => {
+          if (b) b.className = "px-3 py-1.5 rounded-lg text-slate-400 hover:text-white flex items-center gap-1.5 transition";
         });
 
-        secStats.classList.add('hidden');
-        secAdv.classList.add('hidden');
-        secExp.classList.add('hidden');
+        secStats?.classList.add('hidden');
+        secAdv?.classList.add('hidden');
+        secMon?.classList.add('hidden');
+        secExp?.classList.add('hidden');
 
         if (sec === 'stats') {
-          btnStats.className = "px-3 py-1.5 rounded-lg bg-indigo-600 text-white shadow-sm flex items-center gap-1.5 transition";
-          secStats.classList.remove('hidden');
+          if (btnStats) btnStats.className = "px-3 py-1.5 rounded-lg bg-indigo-600 text-white shadow-sm flex items-center gap-1.5 transition";
+          secStats?.classList.remove('hidden');
+          sourceSelector?.classList.remove('hidden');
           this.renderStatsView();
         } else if (sec === 'advance') {
-          btnAdv.className = "px-3 py-1.5 rounded-lg bg-indigo-600 text-white shadow-sm flex items-center gap-1.5 transition";
-          secAdv.classList.remove('hidden');
+          if (btnAdv) btnAdv.className = "px-3 py-1.5 rounded-lg bg-indigo-600 text-white shadow-sm flex items-center gap-1.5 transition";
+          secAdv?.classList.remove('hidden');
+          sourceSelector?.classList.remove('hidden');
           this.generateAdvanceStats();
+        } else if (sec === 'monthly') {
+          if (btnMon) btnMon.className = "px-3 py-1.5 rounded-lg bg-indigo-600 text-white shadow-sm flex items-center gap-1.5 transition";
+          secMon?.classList.remove('hidden');
+          // El resumen mensual aplica específicamente para Órdenes de Trabajo (OTs)
+          sourceSelector?.classList.add('hidden');
+          this.renderMonthlySummary();
         } else {
-          btnExp.className = "px-3 py-1.5 rounded-lg bg-indigo-600 text-white shadow-sm flex items-center gap-1.5 transition";
-          secExp.classList.remove('hidden');
+          if (btnExp) btnExp.className = "px-3 py-1.5 rounded-lg bg-indigo-600 text-white shadow-sm flex items-center gap-1.5 transition";
+          secExp?.classList.remove('hidden');
+          sourceSelector?.classList.remove('hidden');
           this.applyExportFilters();
         }
       }
@@ -676,6 +852,7 @@
       refreshCurrentView() {
         if (this.currentSection === 'stats') this.renderStatsView();
         else if (this.currentSection === 'advance') this.generateAdvanceStats();
+        else if (this.currentSection === 'monthly') this.renderMonthlySummary();
         else this.applyExportFilters();
       }
 
@@ -797,9 +974,11 @@
           critical = filtered.filter(o => o.prioridad === 'Urgente' && o.estado !== 'Terminada').length;
 
           filtered.forEach(o => {
-            const start = new Date(o.fechaCreacion || Date.now());
-            const end = o.fechaTermino ? new Date(o.fechaTermino) : new Date();
-            totalHours += Math.max(0, (end - start) / 3600000);
+            if (o.estado !== 'Pendiente' && o.fechaEjecucion) {
+              const start = new Date(o.fechaEjecucion);
+              const end = o.fechaTermino ? new Date(o.fechaTermino) : new Date();
+              totalHours += Math.max(0, (end - start) / 3600000);
+            }
           });
         } else {
           completed = filtered.filter(p => (p.estado || '').toUpperCase().includes('TERMINADO')).length;
@@ -889,7 +1068,6 @@
           groups[key] = (groups[key] || 0) + 1;
         });
 
-        // Colores para las barras
         const colorPalette = [
           'bg-indigo-600', 'bg-blue-600', 'bg-amber-500', 'bg-emerald-600', 
           'bg-purple-600', 'bg-rose-600', 'bg-cyan-600', 'bg-teal-600'
@@ -971,7 +1149,6 @@
         doc.setTextColor(100, 116, 139);
         doc.text(`Periodo: ${this.kpiConfig.dateFrom || 'Inicio'} al ${this.kpiConfig.dateTo || 'Hoy'} | Meta Cierre: ${this.kpiConfig.targetCloseRate}%`, 14, 26);
 
-        // Tabla con datos de la matriz
         const rows = Array.from(document.querySelectorAll('#dynamicMatrixBody tr')).map(tr => {
           return Array.from(tr.querySelectorAll('td')).map(td => td.textContent.trim());
         });
@@ -1091,7 +1268,6 @@
         const fromVal = document.getElementById('advDateFrom').value;
         const toVal = document.getElementById('advDateTo').value;
 
-        // Membrete Oficial
         doc.setFontSize(14);
         doc.setTextColor(15, 23, 42);
         doc.text('HOSPITAL BIPROVINCIAL QUILLOTA PETORCA (HBQP)', 14, 15);
@@ -1137,7 +1313,412 @@
       }
 
       // ==========================================================
-      // SECCIÓN 3: EXPORTACIÓN MULTI-FORMATO
+      // SECCIÓN NUEVA: RESUMEN MENSUAL DE ÓRDENES DE TRABAJO
+      // ==========================================================
+      initMonthlySummaryDates() {
+        const now = new Date();
+        const selMonth = document.getElementById('monthlySelectMonth');
+        const selYear = document.getElementById('monthlySelectYear');
+        if (selMonth) selMonth.value = String(now.getMonth());
+        if (selYear) selYear.value = String(now.getFullYear());
+      }
+
+      getDaysInMonth(year, month) {
+        return new Date(year, month + 1, 0).getDate();
+      }
+
+      getMonthName(monthIndex) {
+        const names = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+        return names[monthIndex] || "Mes";
+      }
+
+      autoCalculateMonthlyFromDatabase() {
+        const selMonth = parseInt(document.getElementById('monthlySelectMonth')?.value || "8", 10);
+        const selYear = parseInt(document.getElementById('monthlySelectYear')?.value || "2026", 10);
+        const maxDays = this.getDaysInMonth(selYear, selMonth);
+
+        // 5 rangos semanales estándar del mes
+        const ranges = [
+          { start: 1, end: 7, name: "1ª Semana" },
+          { start: 8, end: 14, name: "2ª Semana" },
+          { start: 15, end: 21, name: "3ª Semana" },
+          { start: 22, end: 28, name: "4ª Semana" },
+          { start: 29, end: maxDays, name: "5ª Semana" }
+        ];
+
+        this.monthlyWeeks = ranges.map((r, idx) => {
+          const dStart = new Date(selYear, selMonth, r.start, 0, 0, 0);
+          const dEnd = new Date(selYear, selMonth, r.end, 23, 59, 59);
+
+          // Filtrar órdenes correspondientes a esta semana
+          const weekOrders = this.orders.filter(o => {
+            const dCreated = new Date(o.fechaCreacion || o.fechaEjecucion || Date.now());
+            return dCreated >= dStart && dCreated <= dEnd;
+          });
+
+          // Órdenes cerradas en esta semana
+          const closedOrders = weekOrders.filter(o => o.estado === 'Terminada');
+          
+          // Órdenes que quedaron pendientes
+          const pendingOrders = weekOrders.filter(o => o.estado !== 'Terminada');
+          const pendingNums = pendingOrders.map(o => {
+            // Extraer solo el correlativo ej. N° 005 o mostrar el folio completo
+            const parts = o.folio.split('-');
+            return parts.length >= 3 ? `N° ${parts[parts.length - 2]}` : o.folio;
+          }).join(', ');
+
+          const total = weekOrders.length;
+          const closed = closedOrders.length;
+          const pending = Math.max(0, total - closed);
+
+          return {
+            weekName: r.name,
+            dateRange: `${r.start} al ${r.end}`,
+            total: total,
+            closed: closed,
+            pending: pending,
+            pendingDetails: pendingNums || (pending > 0 ? "Sin especificar" : "")
+          };
+        });
+
+        this.renderMonthlySummaryTable();
+        this.showToast('Semanas calculadas desde la base de datos', '⚡');
+      }
+
+      renderMonthlySummary() {
+        const selMonth = parseInt(document.getElementById('monthlySelectMonth')?.value || "8", 10);
+        const selYear = parseInt(document.getElementById('monthlySelectYear')?.value || "2026", 10);
+        const monthName = this.getMonthName(selMonth).toUpperCase();
+
+        const titleEl = document.getElementById('sheetHeaderTitle');
+        if (titleEl) {
+          titleEl.textContent = `HBQP — Cierre Mes: [${monthName} / ${selYear}]`;
+        }
+
+        // Si las semanas están en cero, auto-calcular
+        const isZero = this.monthlyWeeks.every(w => w.total === 0 && w.closed === 0);
+        if (isZero) {
+          this.autoCalculateMonthlyFromDatabase();
+        } else {
+          this.renderMonthlySummaryTable();
+        }
+      }
+
+      renderMonthlySummaryTable() {
+        const tbody = document.getElementById('monthlySummaryTableBody');
+        if (!tbody) return;
+
+        let sumTotal = 0;
+        let sumClosed = 0;
+        let sumPending = 0;
+        const allPendingNums = [];
+
+        tbody.innerHTML = this.monthlyWeeks.map((w, i) => {
+          sumTotal += Number(w.total) || 0;
+          sumClosed += Number(w.closed) || 0;
+          const pendingCalc = Math.max(0, (Number(w.total) || 0) - (Number(w.closed) || 0));
+          sumPending += pendingCalc;
+          if (w.pendingDetails && w.pendingDetails.trim()) {
+            allPendingNums.push(`Sem ${i+1}: ${w.pendingDetails}`);
+          }
+
+          return `
+            <tr class="hover:bg-slate-50 transition border-b border-slate-300">
+              <td class="p-2.5 font-bold text-slate-800 text-center border-r border-slate-300 bg-slate-50/70">
+                ${escapeHtml(w.weekName)}
+              </td>
+              <td class="p-2.5 text-center font-bold text-blue-700 border-r border-slate-300 whitespace-nowrap">
+                <input type="text" value="${escapeHtml(w.dateRange)}" 
+                       onchange="window.exporter.updateMonthlyWeek(${i}, 'dateRange', this.value)"
+                       class="w-full text-center bg-transparent border-0 font-bold text-blue-700 focus:bg-blue-50 focus:ring-1 focus:ring-blue-500 rounded p-0.5">
+              </td>
+              <td class="p-2.5 text-center border-r border-slate-300 font-bold">
+                <input type="number" min="0" value="${w.total}" 
+                       oninput="window.exporter.updateMonthlyWeek(${i}, 'total', this.value)"
+                       class="w-20 text-center bg-transparent border border-blue-200 focus:border-blue-500 rounded p-1 font-bold text-slate-900 focus:bg-blue-50">
+              </td>
+              <td class="p-2.5 text-center border-r border-slate-300 font-bold">
+                <input type="number" min="0" value="${w.closed}" 
+                       oninput="window.exporter.updateMonthlyWeek(${i}, 'closed', this.value)"
+                       class="w-20 text-center bg-transparent border border-blue-200 focus:border-blue-500 rounded p-1 font-bold text-slate-900 focus:bg-blue-50">
+              </td>
+              <td class="p-2.5 text-center font-black border-r border-slate-300 bg-slate-50/40 text-amber-900">
+                ${pendingCalc}
+              </td>
+              <td class="p-2.5 bg-[#fff9db] border-slate-300">
+                <input type="text" value="${escapeHtml(w.pendingDetails || '')}" 
+                       placeholder="ej. N° 005, N° 020..." 
+                       oninput="window.exporter.updateMonthlyWeek(${i}, 'pendingDetails', this.value)"
+                       class="w-full bg-transparent border-0 text-amber-950 font-medium text-xs focus:bg-white focus:ring-1 focus:ring-amber-500 rounded p-1">
+              </td>
+            </tr>
+          `;
+        }).join('');
+
+        // Actualizar fila TOTAL DEL MES
+        document.getElementById('monthlyTotalOrders').textContent = sumTotal;
+        document.getElementById('monthlyTotalClosed').textContent = sumClosed;
+        document.getElementById('monthlyTotalPending').textContent = sumPending;
+        document.getElementById('monthlyTotalPendingDetails').textContent = allPendingNums.length > 0 ? allPendingNums.join(' | ') : (sumPending === 0 ? "Sin pendientes" : "");
+      }
+
+      updateMonthlyWeek(index, field, value) {
+        if (!this.monthlyWeeks[index]) return;
+        if (field === 'total' || field === 'closed') {
+          this.monthlyWeeks[index][field] = parseInt(value, 10) || 0;
+          this.monthlyWeeks[index].pending = Math.max(0, this.monthlyWeeks[index].total - this.monthlyWeeks[index].closed);
+        } else {
+          this.monthlyWeeks[index][field] = value;
+        }
+        this.renderMonthlySummaryTable();
+      }
+
+      // EXPORTACIÓN DEL RESUMEN MENSUAL A PDF (Idéntico a la imagen de referencia con pie de firma)
+      exportMonthlySummaryPDF() {
+        if (!window.jspdf) {
+          this.showToast('Librería jsPDF no disponible', '⚠️');
+          return;
+        }
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('landscape');
+
+        const selMonth = parseInt(document.getElementById('monthlySelectMonth')?.value || "8", 10);
+        const selYear = parseInt(document.getElementById('monthlySelectYear')?.value || "2026", 10);
+        const monthName = this.getMonthName(selMonth).toUpperCase();
+
+        const titleText = `HBQP — Cierre Mes: [${monthName} / ${selYear}]`;
+
+        // 1. Membrete e Institución
+        doc.setFontSize(12);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(15, 23, 42);
+        doc.text('HOSPITAL BIPROVINCIAL QUILLOTA PETORCA (HBQP)', 148, 14, { align: 'center' });
+
+        doc.setFontSize(14);
+        doc.setTextColor(15, 41, 66);
+        doc.text(titleText, 148, 22, { align: 'center' });
+
+        doc.setFontSize(11);
+        doc.setFont("helvetica", "bolditalic");
+        doc.setTextColor(71, 85, 105);
+        doc.text('Resumen de Órdenes de Trabajo', 148, 28, { align: 'center' });
+
+        doc.setFontSize(8);
+        doc.setFont("helvetica", "italic");
+        doc.setTextColor(29, 78, 216);
+        doc.text('Leyenda: celdas en AZUL = completar manualmente. Las demás se calculan solas.', 14, 34);
+
+        // 2. Armado de Filas
+        let sumTotal = 0;
+        let sumClosed = 0;
+        let sumPending = 0;
+
+        const bodyData = this.monthlyWeeks.map(w => {
+          sumTotal += Number(w.total) || 0;
+          sumClosed += Number(w.closed) || 0;
+          const p = Math.max(0, (Number(w.total) || 0) - (Number(w.closed) || 0));
+          sumPending += p;
+
+          return [
+            w.weekName,
+            w.dateRange,
+            String(w.total),
+            String(w.closed),
+            String(p),
+            w.pendingDetails || ''
+          ];
+        });
+
+        // Fila Total del Mes
+        bodyData.push([
+          { content: 'TOTAL DEL MES', colSpan: 2, styles: { halign: 'center', fontStyle: 'bold', fillColor: [219, 234, 254], textColor: [15, 23, 42] } },
+          { content: String(sumTotal), styles: { halign: 'center', fontStyle: 'bold', fillColor: [219, 234, 254], textColor: [15, 23, 42] } },
+          { content: String(sumClosed), styles: { halign: 'center', fontStyle: 'bold', fillColor: [219, 234, 254], textColor: [15, 23, 42] } },
+          { content: String(sumPending), styles: { halign: 'center', fontStyle: 'bold', fillColor: [219, 234, 254], textColor: [120, 53, 15] } },
+          { content: sumPending > 0 ? `${sumPending} órdenes abiertas` : 'Sin pendientes', styles: { fillColor: [219, 234, 254], fontStyle: 'italic', textColor: [71, 85, 105] } }
+        ]);
+
+        // 3. Tabla con autoTable
+        doc.autoTable({
+          head: [["Semana", "Rango de fechas", "Total Órdenes", "Cerradas", "Pendientes", "N° Órdenes Pendientes"]],
+          body: bodyData,
+          startY: 37,
+          theme: 'grid',
+          styles: {
+            fontSize: 9,
+            cellPadding: 3.5,
+            lineColor: [100, 116, 139],
+            lineWidth: 0.2
+          },
+          headStyles: {
+            fillColor: [30, 58, 95], // Dark Navy Blue matching image
+            textColor: [255, 255, 255],
+            fontStyle: 'bold',
+            halign: 'center'
+          },
+          columnStyles: {
+            0: { halign: 'center', fontStyle: 'bold', cellWidth: 32 },
+            1: { halign: 'center', textColor: [29, 78, 216], fontStyle: 'bold', cellWidth: 38 }, // Blue text
+            2: { halign: 'center', fontStyle: 'bold', cellWidth: 32 },
+            3: { halign: 'center', fontStyle: 'bold', cellWidth: 28 },
+            4: { halign: 'center', fontStyle: 'bold', cellWidth: 28 },
+            5: { fillColor: [255, 249, 219], textColor: [120, 53, 15] } // Soft yellow background
+          }
+        });
+
+        const finalY = doc.lastAutoTable.finalY || 110;
+
+        // 4. Notas oficiales
+        doc.setFontSize(8);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(15, 23, 42);
+        doc.text('Notas:', 14, finalY + 8);
+        
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(71, 85, 105);
+        doc.text("- Completar 'Total Órdenes' y 'Cerradas' cada semana; 'Pendientes' se calcula automáticamente.", 14, finalY + 13);
+        doc.text("- En 'N° Órdenes Pendientes' anotar los números de orden que quedaron abiertos (ej. N° 005, N° 020).", 14, finalY + 18);
+        doc.text("- El TOTAL DEL MES se actualiza solo al llenar las semanas.", 14, finalY + 23);
+
+        // 5. Pie de Firma Oficial (Requerimiento explícito: "incluye el pie de firma")
+        const signY = finalY + 45;
+        doc.setDrawColor(15, 23, 42);
+        doc.setLineWidth(0.5);
+        doc.line(100, signY, 196, signY); // Línea de firma centrada
+
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(15, 23, 42);
+        doc.text('ÁNGEL ALEJANDRO ASENCIO COLLAO', 148, signY + 5, { align: 'center' });
+
+        doc.setFontSize(8);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(71, 85, 105);
+        doc.text('Encargado de Planificación y Proyectos de Infraestructura', 148, signY + 9, { align: 'center' });
+        doc.text('Subdirección de Operaciones — Hospital Biprovincial Quillota Petorca', 148, signY + 13, { align: 'center' });
+
+        // Guardar archivo PDF
+        const filename = `HBQP_Cierre_Mes_${monthName}_${selYear}.pdf`;
+        doc.save(filename);
+        this.showToast(`Informe ${filename} descargado con pie de firma`, '📄');
+      }
+
+      // EXPORTACIÓN DEL RESUMEN MENSUAL A EXCEL (.xlsx)
+      exportMonthlySummaryExcel() {
+        if (!window.XLSX) {
+          this.showToast('Librería XLSX no disponible', '⚠️');
+          return;
+        }
+
+        const selMonth = parseInt(document.getElementById('monthlySelectMonth')?.value || "8", 10);
+        const selYear = parseInt(document.getElementById('monthlySelectYear')?.value || "2026", 10);
+        const monthName = this.getMonthName(selMonth).toUpperCase();
+
+        const title = `HBQP — Cierre Mes: [${monthName} / ${selYear}]`;
+
+        let sumTotal = 0;
+        let sumClosed = 0;
+        let sumPending = 0;
+
+        const excelRows = [
+          [title],
+          ["Resumen de Órdenes de Trabajo"],
+          ["Leyenda: celdas en AZUL = completar manualmente. Las demás se calculan solas."],
+          [],
+          ["Semana", "Rango de fechas", "Total Órdenes", "Cerradas", "Pendientes", "N° Órdenes Pendientes"]
+        ];
+
+        this.monthlyWeeks.forEach(w => {
+          sumTotal += Number(w.total) || 0;
+          sumClosed += Number(w.closed) || 0;
+          const p = Math.max(0, (Number(w.total) || 0) - (Number(w.closed) || 0));
+          sumPending += p;
+
+          excelRows.push([
+            w.weekName,
+            w.dateRange,
+            Number(w.total) || 0,
+            Number(w.closed) || 0,
+            p,
+            w.pendingDetails || ''
+          ]);
+        });
+
+        // Fila Total
+        excelRows.push([
+          "TOTAL DEL MES",
+          "",
+          sumTotal,
+          sumClosed,
+          sumPending,
+          ""
+        ]);
+
+        excelRows.push([]);
+        excelRows.push(["Notas:"]);
+        excelRows.push(["- Completar 'Total Órdenes' y 'Cerradas' cada semana; 'Pendientes' se calcula automáticamente."]);
+        excelRows.push(["- En 'N° Órdenes Pendientes' anotar los números de orden que quedaron abiertos (ej. N° 005, N° 020)."]);
+        excelRows.push(["- El TOTAL DEL MES se actualiza solo al llenar las semanas."]);
+        excelRows.push([]);
+        excelRows.push([]);
+        excelRows.push(["__________________________________________"]);
+        excelRows.push(["ÁNGEL ALEJANDRO ASENCIO COLLAO"]);
+        excelRows.push(["Encargado de Planificación y Proyectos de Infraestructura"]);
+        excelRows.push(["Subdirección de Operaciones — Hospital Biprovincial Quillota Petorca"]);
+
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.aoa_to_sheet(excelRows);
+
+        // Anchos de columnas
+        ws['!cols'] = [
+          { wch: 16 },
+          { wch: 18 },
+          { wch: 15 },
+          { wch: 12 },
+          { wch: 12 },
+          { wch: 45 }
+        ];
+
+        XLSX.utils.book_append_sheet(wb, ws, "Cierre_Mes_HBQP");
+        const filename = `HBQP_Cierre_Mes_${monthName}_${selYear}.xlsx`;
+        XLSX.writeFile(wb, filename);
+
+        this.showToast(`Archivo ${filename} descargado`, '📊');
+      }
+
+      copyMonthlySummaryToClipboard() {
+        const selMonth = parseInt(document.getElementById('monthlySelectMonth')?.value || "8", 10);
+        const selYear = parseInt(document.getElementById('monthlySelectYear')?.value || "2026", 10);
+        const monthName = this.getMonthName(selMonth).toUpperCase();
+
+        let tsv = `HBQP — Cierre Mes: [${monthName} / ${selYear}]\n`;
+        tsv += `Resumen de Órdenes de Trabajo\n\n`;
+        tsv += `Semana\tRango de fechas\tTotal Órdenes\tCerradas\tPendientes\tN° Órdenes Pendientes\n`;
+
+        let sumTotal = 0;
+        let sumClosed = 0;
+        let sumPending = 0;
+
+        this.monthlyWeeks.forEach(w => {
+          sumTotal += Number(w.total) || 0;
+          sumClosed += Number(w.closed) || 0;
+          const p = Math.max(0, (Number(w.total) || 0) - (Number(w.closed) || 0));
+          sumPending += p;
+          tsv += `${w.weekName}\t${w.dateRange}\t${w.total}\t${w.closed}\t${p}\t${w.pendingDetails || ''}\n`;
+        });
+
+        tsv += `TOTAL DEL MES\t\t${sumTotal}\t${sumClosed}\t${sumPending}\t\n`;
+
+        navigator.clipboard.writeText(tsv).then(() => {
+          this.showToast('Resumen mensual copiado al portapapeles', '📋');
+        }).catch(() => {
+          this.showToast('No se pudo copiar automáticamente', '⚠️');
+        });
+      }
+
+      // ==========================================================
+      // SECCIÓN 4: EXPORTACIÓN MULTI-FORMATO
       // ==========================================================
       updateFilterDropdowns() {
         const isOrders = this.targetModule === 'orders';
@@ -1333,6 +1914,7 @@
             "Técnico Asignado": o.encargado || 'No asignado',
             "Estado": o.estado,
             "Fecha Creación": o.fechaCreacion ? new Date(o.fechaCreacion).toLocaleString() : '',
+            "Fecha Inicio Ejecución": o.fechaEjecucion ? new Date(o.fechaEjecucion).toLocaleString() : '',
             "Fecha Término": o.fechaTermino ? new Date(o.fechaTermino).toLocaleString() : '',
             "Descripción": o.descripcion,
             "Instrucciones Jefatura": o.instrucciones || '',
@@ -1385,7 +1967,6 @@
           rows = this.filteredExportData.map(o => [
             o.folio, o.recinto, o.servicio || '', o.ticket || 'N/A', o.especialidad, o.prioridad, o.solicitante, o.encargado || 'No asignado',
             o.estado, o.fechaCreacion ? new Date(o.fechaCreacion).toLocaleString() : '', o.fechaEjecucion ? new Date(o.fechaEjecucion).toLocaleString() : '', o.fechaTermino ? new Date(o.fechaTermino).toLocaleString() : '',
-            o.estado, o.fechaCreacion ? new Date(o.fechaCreacion).toLocaleString() : '', o.fechaTermino ? new Date(o.fechaTermino).toLocaleString() : '',
             o.descripcion, o.instrucciones, o.diagnostico
           ].map(escapeCSV).join(';'));
         } else {
@@ -1433,9 +2014,9 @@
         let body = [];
 
         if (isOrders) {
-          head = [["Folio", "Recinto", "Especialidad", "Prioridad", "Técnico", "Estado", "Fecha Creación"]];
+          head = [["Folio", "Recinto", "Servicio", "Especialidad", "Prioridad", "Técnico", "Estado", "Fecha Creación"]];
           body = this.filteredExportData.map(o => [
-            o.folio, o.recinto, o.especialidad, o.prioridad, o.encargado || 'No asignado', o.estado,
+            o.folio, o.recinto, o.servicio || '', o.especialidad, o.prioridad, o.encargado || 'No asignado', o.estado,
             o.fechaCreacion ? new Date(o.fechaCreacion).toLocaleDateString() : ''
           ]);
         } else {
@@ -1470,8 +2051,8 @@
         let rows = [];
 
         if (isOrders) {
-          headers = ['Folio', 'Recinto', 'Especialidad', 'Prioridad', 'Técnico', 'Estado', 'Descripción'];
-          rows = this.filteredExportData.map(o => [o.folio, o.recinto, o.especialidad, o.prioridad, o.encargado || '', o.estado, o.descripcion].join('\t'));
+          headers = ['Folio', 'Recinto', 'Servicio', 'Especialidad', 'Prioridad', 'Técnico', 'Estado', 'Descripción'];
+          rows = this.filteredExportData.map(o => [o.folio, o.recinto, o.servicio || '', o.especialidad, o.prioridad, o.encargado || '', o.estado, o.descripcion].join('\t'));
         } else {
           headers = ['Código', 'Tipología', 'Requerimiento', 'Unidad', 'Piso', 'PMA', 'Estado', 'Hito Pendiente'];
           rows = this.filteredExportData.map(p => [p.codigo, p.tipologia, p.requerimiento, p.unidad, p.piso, p.pma, p.estado, p.pendiente].join('\t'));
@@ -1502,4 +2083,3 @@
   </script>
 </body>
 </html>
-
