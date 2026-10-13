@@ -1,0 +1,27 @@
+# Consulta Supabase cada 3 días para que el plan gratuito no pause el proyecto
+# por inactividad (se pausa tras 7 días sin uso).
+name: Mantener Supabase activo
+
+on:
+  schedule:
+    - cron: "0 12 */3 * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Consultar la base de datos
+        env:
+          # Misma URL y clave pública que usa index.html
+          SUPABASE_URL: https://izyxyycwhszkmosyszzx.supabase.co
+          SUPABASE_KEY: sb_publishable_nK2G8pWWkR7A59B_xGQJ9A_NFNPy0--
+        run: |
+          status=$(curl -sS -o /dev/null -w "%{http_code}" \
+            "$SUPABASE_URL/rest/v1/system_settings?select=id&limit=1" \
+            -H "apikey: $SUPABASE_KEY" -H "Authorization: Bearer $SUPABASE_KEY")
+          echo "Respuesta de Supabase: $status"
+          if [ "$status" != "200" ]; then
+            echo "::error::Supabase no respondió (código $status). Revisa si el proyecto está en pausa."
+            exit 1
+          fi

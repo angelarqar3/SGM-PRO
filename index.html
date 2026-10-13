@@ -193,6 +193,13 @@
 
 
 
+  <!-- Aviso cuando la nube (Supabase) no responde, p. ej. proyecto en pausa -->
+  <div id="cloudOfflineBanner" class="hidden bg-red-600 text-white text-xs sm:text-sm font-semibold px-3 py-2 text-center" role="alert">
+    ⚠️ Sin conexión con la nube: se muestran solo los datos guardados en este equipo y los cambios nuevos no se comparten.
+    Revisa que el proyecto de Supabase no esté en pausa.
+    <button onclick="location.reload()" class="ml-2 underline font-bold">Reintentar</button>
+  </div>
+
   <!-- ==========================================================
        VISTA 1: MÓDULO DE PROYECTOS (SUPERVISOR)
        ========================================================== -->
@@ -1220,8 +1227,10 @@
             this.fetchConfigFromSupabase();
             this.fetchOrdersFromSupabase();
             this.fetchProjectsFromSupabase();
+          } else {
+            this.setCloudStatus(false);
           }
-        } catch (e) { console.warn("Supabase local mode:", e); }
+        } catch (e) { console.warn("Supabase local mode:", e); this.setCloudStatus(false); }
       }
 
       subscribeRealtime() {
@@ -1274,6 +1283,7 @@
         if (!this.supabase) return;
         try {
           const { data, error } = await this.supabase.from('orders').select('*').order('created_at', { ascending: false });
+          this.setCloudStatus(!error && !!data);
           if (!error && data) {
             if (data.length > 0) {
               this.orders = data.map(row => row.data);
@@ -1290,7 +1300,12 @@
               }
             }
           }
-        } catch (e) { console.warn("Error fetching orders:", e); }
+        } catch (e) { console.warn("Error fetching orders:", e); this.setCloudStatus(false); }
+      }
+
+      setCloudStatus(ok) {
+        const banner = document.getElementById('cloudOfflineBanner');
+        if (banner) banner.classList.toggle('hidden', ok);
       }
 
       async fetchProjectsFromSupabase() {
